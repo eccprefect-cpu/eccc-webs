@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Prefects' Guild</title>
+    <link rel="icon" href="meroon Transparent logo prefect.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <style>
+        /* Styles for Absent Reason Form */
+        #absent-reason-container .dashboard-card {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+        }
+
+        #absence-reason-form select,
+        #absence-reason-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+
+        #absence-reason-form button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        #absence-reason-form button:hover {
+            background-color: #70160F;
+        }
+
+        @media (max-width: 768px) {
+            #absent-reason-container {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --primary-color: #8C1C13;
+            --secondary-color: #C6A98F;
+            --accent-color: #FFA500;
+            --text-color: #3b3b3b;
+            --text-light: #5f5f5f;
+            --bg-color: #FFFBEB;
+            --card-bg-color: #FFFFFF;
+            --border-color: #EAEAEA;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* --- Header Styles --- */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2.5rem;
+            background-color: var(--card-bg-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-left img { height: 50px; }
+        .header-left .school-name { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .main-nav ul { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 2rem; }
+        .main-nav a { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: color 0.3s, border-color 0.3s; }
+        .main-nav a:hover, .main-nav a.active { color: var(--primary-color); border-color: var(--primary-color); }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+
+        /* Notification styles */
+        .notification-container { position: relative; }
+        .notification-bell { font-size: 1.5rem; color: var(--text-light); cursor: pointer; position: relative; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--card-bg-color); }
+        .notification-panel { position: absolute; top: 65px; right: 2.5rem; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--border-color); z-index: 1001; }
+        .notification-header { padding: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        .notification-header h4 { margin: 0; }
+        #notification-list .notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        #notification-list .notification-item:last-child { border-bottom: none; }
+        #notification-list .notification-item h5 { margin: 0 0 0.25rem 0; font-size: 1rem; }
+        #notification-list .notification-item p { margin: 0; font-size: 0.9rem; color: var(--text-light); }
+
+        /* Button and Toggle styles */
+        #logout-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s; }
+        #logout-btn:hover { background-color: #70160F; }
+        #menu-toggle { display: none; }
+
+        /* Footer */
+        .portfolio-footer { padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color); color: var(--text-light); border-top: 1px solid #eee; }
+        .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .social-icons a { color: var(--primary-color); background-color: rgba(140, 28, 19, 0.1); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 50%; font-size: 1rem; transition: all 0.3s ease; }
+        .social-icons a:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-5px); }
+        .copyright-main { margin: 0.5rem 0; font-weight: 600; color: var(--text-color); }
+        .copyright-credits { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+
+        /* --- Dashboard Layout --- */
+        .dashboard-container { padding: 2rem 2.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; }
+        .dashboard-card { background-color: var(--card-bg-color); padding: 1.5rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); }
+        .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 3px solid var(--accent-color); }
+
+        /* Profile Card Specific Styles */
+        .profile-card { grid-row: span 2; text-align: center; }
+        #profile-picture { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--secondary-color); margin-bottom: 1rem; }
+        #welcome-name { font-size: 1.3rem; font-weight: 600; color: var(--text-color); margin: 0.5rem 0; }
+        .profile-details p { margin: 0.5rem 0; font-size: 1rem; color: var(--text-light); }
+        .profile-details p strong { color: var(--text-color); }
+        .profile-divider { height: 2px; background-color: var(--accent-color); border: none; margin: 1rem 0; }
+        
+        /* Stats List Styles */
+        .stats-list { list-style: none; padding: 0; margin: 0; }
+        .stats-list li { display: flex; justify-content: space-between; font-size: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .stats-list li:last-child { border-bottom: none; }
+        .stats-list li span { font-weight: 600; color: var(--primary-color); }
+        .card-span-2 { grid-column: span 2; }
+        #loading-state { text-align: center; padding-top: 150px; font-family: 'Poppins', sans-serif; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .dashboard-container { grid-template-columns: 1fr 1fr; }
+            .profile-card { grid-row: auto; grid-column: span 2; }
+            .card-span-2 { grid-column: span 2; }
+        }
+        
+        @media (max-width: 992px) {
+            .main-header { padding: 1rem; }
+            .main-nav { display: none; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--card-bg-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 999; }
+            .main-nav.mobile-nav-active { display: block; }
+            .main-nav ul { flex-direction: column; padding: 1rem 0; gap: 0; }
+            .main-nav a { display: block; padding: 1rem; border: none; text-align: center; }
+            .header-right { gap: 0.5rem; }
+            #menu-toggle { display: block; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary-color); z-index: 1000; }
+            .notification-panel { right: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            .school-name { display: none; }
+            .dashboard-container { grid-template-columns: 1fr; padding: 2rem 1rem; }
+            .profile-card, .card-span-2 { grid-column: auto; }
+            #logout-btn span { display: none; }
+            #logout-btn { padding: 0.7rem; }
+            .notification-bell { font-size: 1.3rem; }
+            /* --- Updated Notification Panel for Mobile --- */
+            .notification-panel { 
+                position: fixed;
+                top: 100px; /* Adjust as needed */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90vw;
+                max-width: 400px; /* Optional: to constrain max width */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="meroon Transparent logo prefect.png" alt="School Logo">
+                <span class="school-name">R/Eheliyagoda Central College</span>
+            </a>
+        </div>
+        <nav class="main-nav" id="main-nav">
+            <ul>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="ideas.html">Ideas & Proposals</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <div class="notification-container">
+                <i class="fas fa-bell notification-bell">
+                    <span class="notification-badge" style="display: none;"></span>
+                </i>
+                <div class="notification-panel" style="display: none;">
+                    <div class="notification-header">
+                        <h4>Announcements</h4>
+                    </div>
+                    <div id="notification-list"></div>
+                </div>
+            </div>
+            <button id="menu-toggle">☰</button>
+            <button id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="dashboard-content" style="display: none;">
+        <div class="dashboard-container">
+            <div class="dashboard-card profile-card">
+                <img id="profile-picture" src="https://via.placeholder.com/120" alt="Profile Picture">
+                <p>Welcome,</p>
+                <h2 id="welcome-name">Prefect Name</h2>
+                <hr class="profile-divider">
+                <div class="profile-details">
+                    <p><strong>Role:</strong> <span id="profile-role">Prefect</span></p>
+                    <p><strong>Class:</strong> <span id="profile-class">13-B</span></p>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <h3 class="card-title">Key Stats</h3>
+                <ul class="stats-list">
+                    <li>Total Points: <span id="total-points">0</span></li>
+                    <li>Absences: <span id="total-absences">0</span></li>
+                    <li>Late Arrivals: <span id="total-late">0</span></li>
+                </ul>
+            </div>
+
+            <div class="dashboard-card">
+                <h3 class="card-title">Recent Attendance</h3>
+                <div id="recent-attendance-list">
+                    <p>No recent attendance records found.</p>
+                </div>
+            </div>
+
+            <div class="dashboard-card card-span-2">
+                <h3 class="card-title">Recent Points</h3>
+                <div id="recent-points-list">
+                    <p>No recent points awarded.</p>
+                </div>
+            </div>
+
+            <div class="dashboard-card card-span-2">
+                <h3 class="card-title">Performance Issues</h3>
+                <div id="bad-work-list">
+                    <p>No performance issues recorded.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="absent-reason-container" style="display: none; padding: 2rem 2.5rem;">
+        <div class="dashboard-card">
+            <h3 class="card-title">Reason for Absence</h3>
+            <p>You were marked absent on <span id="absence-date"></span>. Please provide a reason for your absence.</p>
+            <form id="absence-reason-form">
+                <select id="absence-reason-select" style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <option value="">Select a reason...</option>
+                    <option value="Sick">Sick</option>
+                    <option value="Family Emergency">Family Emergency</option>
+                    <option value="Appointment">Appointment</option>
+                    <option value="Other">Other</option>
+                </select>
+                <textarea id="absence-reason-other" rows="4" style="width: 100%; margin-bottom: 1rem; display: none;" placeholder="Please specify the reason..."></textarea>
+                <button type="submit">Submit Reason</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="loading-state">
+        <h2>Loading Dashboard...</h2>
+        <p>Please wait while we fetch your details.</p>
+    </div>
+    <footer class="portfolio-footer">
+            <div class="social-icons">
+                <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank" aria-label="Instagram"><i class="fa-solid fa-phone"></i></a>
+                <a href="#" target="_blank" aria-label="WhatsApp"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+            <p class="copyright-main">P.M.S © 2025 Hansaka P. Fernando</p>
+            <p class="copyright-credits">Adeesha Ravimal Kannangara | Thevindu Thisev Rajapaksha | Hansaka Fernando</p>
+        </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, limit, orderBy, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+            authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+            projectId: "prefect-management-syste-e1575",
+            storageBucket: "prefect-management-syste-e1575.appspot.com",
+            messagingSenderId: "973932803095",
+            appId: "1:973932803095:web:a7f2db386cafb53330d852",
+            measurementId: "G-FLF7R3B8J3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const dashboardContent = document.getElementById('dashboard-content');
+        const loadingState = document.getElementById('loading-state');
+
+        // --- MOBILE MENU LOGIC ---
+        const menuToggle = document.getElementById('menu-toggle');
+        const mainNav = document.getElementById('main-nav');
+        if(menuToggle && mainNav) {
+            menuToggle.addEventListener('click', () => {
+                const isActive = mainNav.classList.toggle('mobile-nav-active');
+                menuToggle.innerHTML = isActive ? '&times;' : '☰';
+            });
+        }
+        
+        // --- ANNOUNCEMENT LOGIC ---
+        const notificationBell = document.querySelector('.notification-bell');
+        const notificationPanel = document.querySelector('.notification-panel');
+        const notificationBadge = document.querySelector('.notification-badge');
+        const notificationList = document.getElementById('notification-list');
+
+        notificationBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = notificationPanel.style.display === 'block';
+            notificationPanel.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                notificationBadge.style.display = 'none';
+                const latestTimestamp = notificationList.firstChild?.dataset.timestamp;
+                if (latestTimestamp) {
+                    localStorage.setItem('lastSeenAnnouncement', latestTimestamp);
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!notificationPanel.contains(e.target) && !notificationBell.contains(e.target)) {
+                notificationPanel.style.display = 'none';
+            }
+        });
+
+        function loadAnnouncements() {
+            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    notificationList.innerHTML = '<div class="notification-item"><p>No announcements right now.</p></div>';
+                    return;
+                }
+                notificationList.innerHTML = '';
+                let latestTimestamp = snapshot.docs[0].data().timestamp?.toMillis();
+                snapshot.forEach(doc => {
+                    notificationList.appendChild(renderAnnouncement(doc.data()));
+                });
+                const lastSeenTimestamp = localStorage.getItem('lastSeenAnnouncement');
+                if (latestTimestamp && (!lastSeenTimestamp || latestTimestamp > lastSeenTimestamp)) {
+                    notificationBadge.style.display = 'block';
+                }
+            });
+        }
+
+        function renderAnnouncement(announcement) {
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.dataset.timestamp = announcement.timestamp?.toMillis();
+            item.innerHTML = `
+                <h5>${announcement.title}</h5>
+                <p>${announcement.content}</p>
+                <small style="color: var(--accent-color)">${announcement.timestamp ? announcement.timestamp.toDate().toLocaleString() : ''}</small>
+            `;
+            return item;
+        }
+
+        function formatDate(date) {
+            if (!date) {
+                return 'N/A';
+            }
+            if (date.seconds) {
+                // It's a Firestore timestamp
+                return new Date(date.seconds * 1000).toLocaleDateString();
+            }
+            // It's probably a string in 'YYYY-MM-DD' format
+            const parts = date.split('-');
+            if (parts.length === 3) {
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                const day = parseInt(parts[2], 10);
+                const d = new Date(year, month, day);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleDateString();
+                }
+            }
+            
+            // Fallback for other string formats or invalid dates
+            const d = new Date(date);
+            if (isNaN(d.getTime())) {
+                return 'Invalid Date';
+            }
+            return d.toLocaleDateString();
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loadAnnouncements();
+                const prefectsRef = collection(db, "prefects");
+                const q = query(prefectsRef, where("uid", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const prefectDoc = querySnapshot.docs[0];
+                    const prefectData = prefectDoc.data();
+                    const prefectId = prefectDoc.id;
+                    document.getElementById('profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
+                    document.getElementById('welcome-name').textContent = prefectData.name || 'Prefect Name';
+                    document.getElementById('profile-role').textContent = prefectData.destiny || 'N/A';
+                    document.getElementById('profile-class').textContent = prefectData.class || 'N/A';
+                    await fetchKeyStats(prefectId);
+                    await fetchRecentPoints(prefectId);
+                    await fetchRecentAttendance(prefectId);
+                    await checkForAbsenceReason(prefectId);
+                    await fetchBadWork(prefectId);
+                } else {
+                    console.error("Could not find a prefect profile linked to this user.");
+                    document.getElementById('welcome-name').textContent = user.email;
+                }
+                loadingState.style.display = 'none';
+                dashboardContent.style.display = 'block';
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function fetchKeyStats(prefectId) {
+            const pointsQuery = query(collection(db, "points"), where("prefect_id", "==", prefectId));
+            const pointsSnapshot = await getDocs(pointsQuery);
+            let totalPoints = 0;
+            pointsSnapshot.forEach(doc => { totalPoints += doc.data().points || 0; });
+            document.getElementById('total-points').textContent = totalPoints;
+
+            const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
+            const attendanceSnapshot = await getDocs(attendanceQuery);
+            let totalAbsences = 0;
+            let totalLate = 0;
+            attendanceSnapshot.forEach(doc => {
+                const record = doc.data();
+                if (record.status === 'absent') totalAbsences++;
+                else if (record.status === 'late') totalLate++;
+            });
+            document.getElementById('total-absences').textContent = totalAbsences;
+            document.getElementById('total-late').textContent = totalLate;
+        }
+
+        async function fetchRecentPoints(prefectId) {
+            const pointsList = document.getElementById('recent-points-list');
+            const q = query(collection(db, "points"), where("prefect_id", "==", prefectId), orderBy("date", "desc"), limit(5));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                pointsList.innerHTML = '<p>No recent points awarded.</p>';
+                return;
+            }
+            let html = '<ul class="stats-list">';
+            querySnapshot.forEach(doc => {
+                const point = doc.data();
+                html += `<li>${point.reason || 'No reason'} <span>+${point.points || 0}</span></li>`;
+            });
+            html += '</ul>';
+            pointsList.innerHTML = html;
+        }
+
+        async function fetchRecentAttendance(prefectId) {
+            const attendanceList = document.getElementById('recent-attendance-list');
+            const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), orderBy("date", "desc"), limit(5));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                attendanceList.innerHTML = '<p>No recent attendance records found.</p>';
+                return;
+            }
+            let html = '<ul class="stats-list">';
+            querySnapshot.forEach(doc => {
+                const record = doc.data();
+                html += `<li>${formatDate(record.date)} <span>${record.status || 'N/A'}</span></li>`;
+            });
+            html += '</ul>';
+            attendanceList.innerHTML = html;
+        }
+
+        async function checkForAbsenceReason(prefectId) {
+            const attendanceRef = collection(db, "attendance");
+            const q = query(attendanceRef, where("prefect_id", "==", prefectId), orderBy("date", "desc"), limit(1));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const latestAttendance = querySnapshot.docs[0];
+                const data = latestAttendance.data();
+
+                if (data.status === 'Absent' && !data.reason) {
+                    const absentReasonContainer = document.getElementById('absent-reason-container');
+                    const absenceDate = document.getElementById('absence-date');
+                    absenceDate.textContent = formatDate(data.date);
+                    absentReasonContainer.style.display = 'block';
+
+                    const absenceReasonForm = document.getElementById('absence-reason-form');
+                    const absenceReasonSelect = document.getElementById('absence-reason-select');
+                    const absenceReasonOther = document.getElementById('absence-reason-other');
+
+                    absenceReasonSelect.addEventListener('change', () => {
+                        if (absenceReasonSelect.value === 'Other') {
+                            absenceReasonOther.style.display = 'block';
+                        } else {
+                            absenceReasonOther.style.display = 'none';
+                        }
+                    });
+
+                    absenceReasonForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        let reason = absenceReasonSelect.value;
+                        if (reason === 'Other') {
+                            reason = absenceReasonOther.value;
+                        }
+
+                        if (reason) {
+                            const attendanceDocRef = doc(db, "attendance", latestAttendance.id);
+                            await updateDoc(attendanceDocRef, { reason: reason });
+                            absentReasonContainer.innerHTML = '<p>Thank you for submitting your reason.</p>';
+                        }
+                    });
+                }
+            }
+        }
+
+        async function fetchBadWork(prefectId) {
+            const badWorkList = document.getElementById('bad-work-list');
+            const q = query(collection(db, "bad_work"), where("prefect_id", "==", prefectId), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                badWorkList.innerHTML = '<p>No performance issues recorded.</p>';
+                return;
+            }
+            let html = '<ul class="stats-list">';
+            querySnapshot.forEach(doc => {
+                const record = doc.data();
+                html += `<li>${formatDate(record.date)}: ${record.description}</li>`;
+            });
+            html += '</ul>';
+            badWorkList.innerHTML = html;
+        }
+        
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => { window.location.href = 'index.html'; });
+        });
+    </script>
+</body>
+</html>

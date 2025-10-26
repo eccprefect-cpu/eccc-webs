@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - Prefects' Guild</title>
+    <link rel="icon" href="meroon Transparent logo prefect.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --primary-color: #8C1C13;
+            --secondary-color: #C6A98F;
+            --accent-color: #FFA500;
+            --text-color: #3b3b3b;
+            --text-light: #5f5f5f;
+            --bg-color: #FFFBEB;
+            --card-bg-color: #FFFFFF;
+            --border-color: #EAEAEA;
+            --success-color: #28a745;
+            --taken-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+
+        
+        /* Footer */
+        .portfolio-footer { padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color); color: var(--text-light); border-top: 1px solid #eee; }
+        .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .social-icons a { color: var(--primary-color); background-color: rgba(140, 28, 19, 0.1); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 50%; font-size: 1rem; transition: all 0.3s ease; }
+        .social-icons a:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-5px); }
+        .copyright-main { margin: 0.5rem 0; font-weight: 600; color: var(--text-color); }
+        .copyright-credits { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+
+
+        /* --- Header Styles --- */
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; background-color: var(--card-bg-color); box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-left img { height: 50px; }
+        .header-left .school-name { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .main-nav ul { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 2rem; }
+        .main-nav a { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: color 0.3s, border-color 0.3s; }
+        .main-nav a:hover, .main-nav a.active { color: var(--primary-color); border-color: var(--primary-color); }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+
+        /* Notification styles */
+        .notification-container { position: relative; }
+        .notification-bell { font-size: 1.5rem; color: var(--text-light); cursor: pointer; position: relative; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--card-bg-color); }
+        .notification-panel { position: absolute; top: 65px; right: 2.5rem; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--border-color); z-index: 1001; }
+        .notification-header { padding: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        #notification-list .notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        #notification-list .notification-item h5 { margin: 0 0 0.25rem 0; font-size: 1rem; }
+        #notification-list .notification-item p { margin: 0; font-size: 0.9rem; color: var(--text-light); }
+
+        /* Button and Toggle styles */
+        #logout-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s; }
+        #logout-btn:hover { background-color: #70160F; }
+        #menu-toggle { display: none; }
+
+        /* --- Main Content --- */
+        .events-container { padding: 2rem 2.5rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; border-bottom: 4px solid var(--accent-color); padding-bottom: 0.5rem; }
+        .event-card { background-color: var(--card-bg-color); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .event-header h3 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+        .event-header p { font-size: 1rem; color: var(--text-light); margin: 0.25rem 0 1rem 0; }
+        .event-description { margin-bottom: 1.5rem; }
+        
+        /* Duties List Styles */
+        .duties-list { list-style: none; padding: 0; margin: 0; }
+        .duty-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem; }
+        .duty-title { font-weight: 600; }
+        .duty-status { display: flex; align-items: center; gap: 1rem; }
+        .duty-assignee { font-weight: 600; color: var(--taken-color); }
+        .take-duty-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        .take-duty-btn:hover { background-color: #218838; }
+        .take-duty-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+        #loading-state { text-align: center; padding-top: 150px; font-family: 'Poppins', sans-serif; }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            .main-header { padding: 1rem; }
+            .main-nav { display: none; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--card-bg-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 999; }
+            .main-nav.mobile-nav-active { display: block; }
+            .main-nav ul { flex-direction: column; padding: 1rem 0; gap: 0; }
+            .main-nav a { display: block; padding: 1rem; border: none; text-align: center; }
+            .header-right { gap: 0.5rem; }
+            #menu-toggle { display: block; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary-color); z-index: 1000; }
+            .notification-panel { right: 1rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .school-name { display: none; }
+            .events-container { padding: 2rem 1rem; }
+            .page-title { font-size: 1.5rem; }
+            .event-card { padding: 1rem 1.5rem; }
+            #logout-btn span { display: none; }
+            #logout-btn { padding: 0.7rem; }
+            .notification-bell { font-size: 1.3rem; }
+            /* --- Updated Notification Panel for Mobile --- */
+            .notification-panel { 
+                position: fixed;
+                top: 70px; /* Adjust as needed */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90vw;
+                max-width: 400px; /* Optional: to constrain max width */
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <header class="main-header">
+        <div class="header-left">
+            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="meroon Transparent logo prefect.png" alt="School Logo">
+                <span class="school-name">R/Eheliyagoda Central College</span>
+            </a>
+        </div>
+        <nav class="main-nav" id="main-nav">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="events.html" class="active">Events</a></li>
+                <li><a href="ideas.html">Ideas & Proposals</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <div class="notification-container">
+                <i class="fas fa-bell notification-bell">
+                    <span class="notification-badge" style="display: none;"></span>
+                </i>
+                <div class="notification-panel" style="display: none;">
+                    <div class="notification-header">
+                        <h4>Announcements</h4>
+                    </div>
+                    <div id="notification-list"></div>
+                </div>
+            </div>
+            <button id="menu-toggle">☰</button>
+            <button id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="events-content" style="display: none;">
+        <div class="events-container">
+            <h1 class="page-title">Upcoming Events</h1>
+            <div id="events-list"></div>
+        </div>
+    </main>
+
+    <div id="loading-state">
+        <h2>Loading Events...</h2>
+        <p>Please wait while we fetch the event schedule.</p>
+    </div>
+
+    <footer class="portfolio-footer">
+            <div class="social-icons">
+                <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank" aria-label="Instagram"><i class="fa-solid fa-phone"></i></a>
+                <a href="#" target="_blank" aria-label="WhatsApp"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+            <p class="copyright-main">P.M.S © 2025 Hansaka P. Fernando</p>
+            <p class="copyright-credits">Adeesha Ravimal Kannangara | Thevindu Thisev Rajapaksha | Hansaka Fernando</p>
+        </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+             apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+            authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+            projectId: "prefect-management-syste-e1575",
+            storageBucket: "prefect-management-syste-e1575.appspot.com",
+            messagingSenderId: "973932803095",
+            appId: "1:973932803095:web:a7f2db386cafb53330d852",
+            measurementId: "G-FLF7R3B8J3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- MOBILE MENU LOGIC ---
+        const menuToggle = document.getElementById('menu-toggle');
+        const mainNav = document.getElementById('main-nav');
+        if(menuToggle && mainNav) {
+            menuToggle.addEventListener('click', () => {
+                const isActive = mainNav.classList.toggle('mobile-nav-active');
+                menuToggle.innerHTML = isActive ? '&times;' : '☰';
+            });
+        }
+        
+        const eventsContent = document.getElementById('events-content');
+        const loadingState = document.getElementById('loading-state');
+        const eventsListDiv = document.getElementById('events-list');
+        let currentPrefect = null;
+
+        const notificationBell = document.querySelector('.notification-bell');
+        const notificationPanel = document.querySelector('.notification-panel');
+        const notificationBadge = document.querySelector('.notification-badge');
+        const notificationList = document.getElementById('notification-list');
+
+        notificationBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = notificationPanel.style.display === 'block';
+            notificationPanel.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                notificationBadge.style.display = 'none';
+                const latestTimestamp = notificationList.firstChild?.dataset.timestamp;
+                if (latestTimestamp) localStorage.setItem('lastSeenAnnouncement', latestTimestamp);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!notificationPanel.contains(e.target) && !notificationBell.contains(e.target)) {
+                notificationPanel.style.display = 'none';
+            }
+        });
+
+        function loadAnnouncements() {
+            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    notificationList.innerHTML = '<div class="notification-item"><p>No announcements right now.</p></div>';
+                    return;
+                }
+                notificationList.innerHTML = '';
+                let latestTimestamp = snapshot.docs[0].data().timestamp?.toMillis();
+                snapshot.forEach(doc => {
+                    notificationList.appendChild(renderAnnouncement(doc.data()));
+                });
+                const lastSeenTimestamp = localStorage.getItem('lastSeenAnnouncement');
+                if (latestTimestamp && (!lastSeenTimestamp || latestTimestamp > lastSeenTimestamp)) {
+                    notificationBadge.style.display = 'block';
+                }
+            });
+        }
+
+        function renderAnnouncement(announcement) {
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.dataset.timestamp = announcement.timestamp?.toMillis();
+            item.innerHTML = `
+                <h5>${announcement.title}</h5>
+                <p>${announcement.content}</p>
+                <small style="color: var(--accent-color)">${announcement.timestamp ? announcement.timestamp.toDate().toLocaleString() : ''}</small>
+            `;
+            return item;
+        }
+
+        function formatDate(date) {
+            if (!date) {
+                return 'N/A';
+            }
+            if (date.seconds) {
+                // It's a Firestore timestamp
+                return new Date(date.seconds * 1000).toLocaleDateString();
+            }
+            // It's probably a string in 'YYYY-MM-DD' format
+            const parts = date.split('-');
+            if (parts.length === 3) {
+                const year = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                const day = parseInt(parts[2], 10);
+                const d = new Date(year, month, day);
+                if (!isNaN(d.getTime())) {
+                    return d.toLocaleDateString();
+                }
+            }
+            
+            // Fallback for other string formats or invalid dates
+            const d = new Date(date);
+            if (isNaN(d.getTime())) {
+                return 'Invalid Date';
+            }
+            return d.toLocaleDateString();
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loadAnnouncements();
+                const q = query(collection(db, "prefects"), where("uid", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    currentPrefect = querySnapshot.docs[0].data();
+                    currentPrefect.id = querySnapshot.docs[0].id;
+                } else {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                loadEvents();
+                loadingState.style.display = 'none';
+                eventsContent.style.display = 'block';
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function loadEvents() {
+            const eventsQuery = query(collection(db, 'events'), orderBy("date", "desc"));
+            onSnapshot(eventsQuery, (snapshot) => {
+                eventsListDiv.innerHTML = snapshot.empty ? "<p>No events scheduled.</p>" : '';
+                snapshot.forEach(eventDoc => {
+                    const event = { id: eventDoc.id, ...eventDoc.data() };
+                    const eventCard = createEventCard(event);
+                    eventsListDiv.appendChild(eventCard);
+                    loadDutiesForEvent(event.id);
+                });
+            });
+        }
+
+        function loadDutiesForEvent(eventId) {
+            const dutiesList = document.getElementById(`duties-for-${eventId}`);
+            const dutiesQuery = query(collection(db, 'event_duties'), where('eventId', '==', eventId));
+            onSnapshot(dutiesQuery, (snapshot) => {
+                dutiesList.innerHTML = snapshot.empty ? "<li>No duties listed.</li>" : '';
+                snapshot.forEach(dutyDoc => {
+                    const duty = { id: dutyDoc.id, ...dutyDoc.data() };
+                    dutiesList.appendChild(createDutyItem(duty));
+                });
+            });
+        }
+
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="event-header">
+                    <h3>${event.title}</h3>
+                    <p>Date: ${formatDate(event.date)}</p>
+                </div>
+                <p class="event-description">${event.description || 'No description.'}</p>
+                <h4>Duties:</h4>
+                <ul class="duties-list" id="duties-for-${event.id}"></ul>`;
+            return card;
+        }
+
+        function createDutyItem(duty) {
+            const item = document.createElement('li');
+            item.className = 'duty-item';
+            const isTaken = !!duty.assignedPrefectName;
+            item.innerHTML = `
+                <span class="duty-title">${duty.title}</span>
+                <div class="duty-status">
+                    ${isTaken ? `<span class="duty-assignee">Taken by: ${duty.assignedPrefectName}</span>` : '<button class="take-duty-btn">Take Duty</button>'}
+                </div>`;
+            if (!isTaken) {
+                item.querySelector('.take-duty-btn').addEventListener('click', () => takeDuty(duty.id));
+            }
+            return item;
+        }
+
+        async function takeDuty(dutyId) {
+            if (!currentPrefect) return alert("Could not verify your identity.");
+            const dutyRef = doc(db, 'event_duties', dutyId);
+            try {
+                const dutySnap = await getDoc(dutyRef);
+                if (dutySnap.exists() && dutySnap.data().assignedPrefectId) {
+                    return alert("Sorry, this duty was just taken!");
+                }
+                await updateDoc(dutyRef, {
+                    assignedPrefectId: currentPrefect.id,
+                    assignedPrefectName: currentPrefect.name
+                });
+                alert("Duty assigned to you successfully!");
+            } catch (error) {
+                console.error("Error taking duty: ", error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+        
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => { window.location.href = 'login.html'; });
+        });
+    </script>
+</body>
+</html>

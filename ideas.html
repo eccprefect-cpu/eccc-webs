@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideas & Proposals - Prefects' Guild</title>
+    <link rel="icon" href="meroon Transparent logo prefect.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+
+        :root {
+            --primary-color: #8C1C13;
+            --secondary-color: #C6A98F;
+            --accent-color: #FFA500;
+            --text-color: #3b3b3b;
+            --text-light: #5f5f5f;
+            --bg-color: #FFFBEB;
+            --card-bg-color: #FFFFFF;
+            --border-color: #EAEAEA;
+            --status-pending: #ffc107;
+            --status-approved: #28a745;
+            --status-rejected: #dc3545;
+            --status-completed: #17a2b8;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        
+
+        
+        /* Footer */
+        .portfolio-footer { padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color); color: var(--text-light); border-top: 1px solid #eee; }
+        .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .social-icons a { color: var(--primary-color); background-color: rgba(140, 28, 19, 0.1); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 50%; font-size: 1rem; transition: all 0.3s ease; }
+        .social-icons a:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-5px); }
+        .copyright-main { margin: 0.5rem 0; font-weight: 600; color: var(--text-color); }
+        .copyright-credits { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+
+        /* --- Header Styles --- */
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2.5rem; background-color: var(--card-bg-color); box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .header-left { display: flex; align-items: center; gap: 1rem; }
+        .header-left img { height: 50px; }
+        .header-left .school-name { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+        .main-nav ul { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 2rem; }
+        .main-nav a { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: color 0.3s, border-color 0.3s; }
+        .main-nav a:hover, .main-nav a.active { color: var(--primary-color); border-color: var(--primary-color); }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+
+        /* Notification styles */
+        .notification-container { position: relative; }
+        .notification-bell { font-size: 1.5rem; color: var(--text-light); cursor: pointer; position: relative; }
+        .notification-badge { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--card-bg-color); }
+        .notification-panel { position: absolute; top: 65px; right: 2.5rem; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--border-color); z-index: 1001; }
+        .notification-header { padding: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+        #notification-list .notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        #notification-list .notification-item h5 { margin: 0 0 0.25rem 0; font-size: 1rem; }
+        #notification-list .notification-item p { margin: 0; font-size: 0.9rem; color: var(--text-light); }
+        
+        /* Button and Toggle styles */
+        #logout-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s; }
+        #logout-btn:hover { background-color: #70160F; }
+        #menu-toggle { display: none; }
+
+        /* --- Main Content --- */
+        .ideas-container { padding: 2rem 2.5rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; border-bottom: 4px solid var(--accent-color); padding-bottom: 0.5rem; }
+        .card { background-color: var(--card-bg-color); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Poppins', sans-serif; font-size: 1rem; box-sizing: border-box; }
+        .submit-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        .submit-btn:disabled { background-color: #ccc; }
+
+        /* Idea Item Styles */
+        .idea-item { border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        .idea-header h3 { font-size: 1.2rem; margin: 0 0 0.5rem 0; }
+        .idea-meta { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem; }
+        .idea-status { display: inline-block; padding: 0.3rem 0.7rem; border-radius: 15px; font-weight: 700; font-size: 0.8rem; color: white; }
+        .status-pending_approval { background-color: var(--text-light); }
+        .status-pending { background-color: var(--status-pending); }
+        .status-approved { background-color: var(--status-approved); }
+        .status-rejected { background-color: var(--status-rejected); }
+        .status-completed { background-color: var(--status-completed); }
+        .idea-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+        .upvote-btn { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+        .upvote-btn.upvoted, .upvote-btn:disabled { background-color: var(--primary-color); color: white; cursor: not-allowed; }
+
+        #loading-state { text-align: center; padding-top: 150px; }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            .main-header { padding: 1rem; }
+            .main-nav { display: none; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--card-bg-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 999; }
+            .main-nav.mobile-nav-active { display: block; }
+            .main-nav ul { flex-direction: column; padding: 1rem 0; gap: 0; }
+            .main-nav a { display: block; padding: 1rem; border: none; text-align: center; }
+            .header-right { gap: 0.5rem; }
+            #menu-toggle { display: block; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary-color); z-index: 1000; }
+            .notification-panel { right: 1rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .school-name { display: none; }
+            .ideas-container { padding: 2rem 1rem; }
+            .page-title { font-size: 1.5rem; }
+            .card { padding: 1rem 1.5rem; }
+            #logout-btn span { display: none; }
+            #logout-btn { padding: 0.7rem; }
+            .notification-bell { font-size: 1.3rem; }
+
+            .notification-panel {
+                position: fixed;
+                top: 70px; /* Adjust as needed */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90vw;
+                max-width: 400px; /* Optional: to constrain max width */
+            }        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="meroon Transparent logo prefect.png" alt="School Logo">
+                <span class="school-name">R/Eheliyagoda Central College</span>
+            </a>
+        </div>
+        <nav class="main-nav" id="main-nav">
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="events.html">Events</a></li>
+                <li><a href="ideas.html" class="active">Ideas & Proposals</a></li>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <div class="notification-container">
+                <i class="fas fa-bell notification-bell">
+                    <span class="notification-badge" style="display: none;"></span>
+                </i>
+                <div class="notification-panel" style="display: none;">
+                    <div class="notification-header">
+                        <h4>Announcements</h4>
+                    </div>
+                    <div id="notification-list"></div>
+                </div>
+            </div>
+            <button id="menu-toggle">☰</button>
+            <button id="logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+        </div>
+    </header>
+
+    <main id="ideas-content" style="display: none;">
+        <div class="ideas-container">
+            <div class="card">
+                <h2 class="page-title">Submit an Idea</h2>
+                <form id="idea-form">
+                    <div class="form-group">
+                        <input type="text" id="idea-title" placeholder="Title of your idea" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="idea-description" rows="4" placeholder="Describe your idea in detail..." required></textarea>
+                    </div>
+                    <button type="submit" id="idea-submit-btn" class="submit-btn">Submit for Approval</button>
+                    <p id="submit-message" style="margin-top: 1rem;"></p>
+                </form>
+            </div>
+            <div class="card">
+                <h2 class="page-title">My Submissions</h2>
+                <div id="my-ideas-list"></div>
+            </div>
+            <div class="card">
+                <h2 class="page-title">Public Proposals</h2>
+                <div id="public-ideas-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="loading-state">
+        <h2>Loading...</h2>
+    </div>
+
+    <footer class="portfolio-footer">
+            <div class="social-icons">
+                <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" target="_blank" aria-label="Instagram"><i class="fa-solid fa-phone"></i></a>
+                <a href="#" target="_blank" aria-label="WhatsApp"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+            <p class="copyright-main">P.M.S © 2025 Hansaka P. Fernando</p>
+            <p class="copyright-credits">Adeesha Ravimal Kannangara | Thevindu Thisev Rajapaksha | Hansaka Fernando</p>
+        </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, runTransaction, arrayUnion, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+            authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+            projectId: "prefect-management-syste-e1575",
+            storageBucket: "prefect-management-syste-e1575.appspot.com",
+            messagingSenderId: "973932803095",
+            appId: "1:973932803095:web:a7f2db386cafb53330d852",
+            measurementId: "G-FLF7R3B8J3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- MOBILE MENU LOGIC ---
+        const menuToggle = document.getElementById('menu-toggle');
+        const mainNav = document.getElementById('main-nav');
+        if(menuToggle && mainNav) {
+            menuToggle.addEventListener('click', () => {
+                const isActive = mainNav.classList.toggle('mobile-nav-active');
+                menuToggle.innerHTML = isActive ? '&times;' : '☰';
+            });
+        }
+        
+        const ideasContent = document.getElementById('ideas-content');
+        const loadingState = document.getElementById('loading-state');
+        let currentPrefect = null;
+        
+        const notificationBell = document.querySelector('.notification-bell');
+        const notificationPanel = document.querySelector('.notification-panel');
+        const notificationBadge = document.querySelector('.notification-badge');
+        const notificationList = document.getElementById('notification-list');
+
+        notificationBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = notificationPanel.style.display === 'block';
+            notificationPanel.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                notificationBadge.style.display = 'none';
+                const latestTimestamp = notificationList.firstChild?.dataset.timestamp;
+                if (latestTimestamp) localStorage.setItem('lastSeenAnnouncement', latestTimestamp);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!notificationPanel.contains(e.target) && !notificationBell.contains(e.target)) {
+                notificationPanel.style.display = 'none';
+            }
+        });
+
+        function loadAnnouncements() {
+            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    notificationList.innerHTML = '<div class="notification-item"><p>No announcements right now.</p></div>';
+                    return;
+                }
+                notificationList.innerHTML = '';
+                let latestTimestamp = snapshot.docs[0].data().timestamp?.toMillis();
+                snapshot.forEach(doc => {
+                    notificationList.appendChild(renderAnnouncement(doc.data()));
+                });
+                const lastSeenTimestamp = localStorage.getItem('lastSeenAnnouncement');
+                if (latestTimestamp && (!lastSeenTimestamp || latestTimestamp > lastSeenTimestamp)) {
+                    notificationBadge.style.display = 'block';
+                }
+            });
+        }
+
+        function renderAnnouncement(announcement) {
+            const item = document.createElement('div');
+            item.className = 'notification-item';
+            item.dataset.timestamp = announcement.timestamp?.toMillis();
+            item.innerHTML = `
+                <h5>${announcement.title}</h5>
+                <p>${announcement.content}</p>
+                <small style="color: var(--accent-color)">${announcement.timestamp ? announcement.timestamp.toDate().toLocaleString() : ''}</small>
+            `;
+            return item;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loadAnnouncements();
+                const q = query(collection(db, "prefects"), where("uid", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    currentPrefect = querySnapshot.docs[0].data();
+                    currentPrefect.id = querySnapshot.docs[0].id;
+                    initializePage();
+                } else {
+                    window.location.href = 'login.html';
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function initializePage() {
+            setupForm();
+            loadMyIdeas();
+            loadPublicIdeas();
+            loadingState.style.display = 'none';
+            ideasContent.style.display = 'block';
+        }
+
+        function setupForm() {
+            const form = document.getElementById('idea-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('idea-submit-btn');
+                const messageEl = document.getElementById('submit-message');
+                submitBtn.disabled = true;
+                messageEl.textContent = 'Submitting...';
+                try {
+                    await addDoc(collection(db, 'ideas_proposals'), {
+                        prefectId: currentPrefect.id,
+                        prefectName: currentPrefect.name,
+                        title: document.getElementById('idea-title').value,
+                        description: document.getElementById('idea-description').value,
+                        status: 'Pending_Approval',
+                        timestamp: serverTimestamp(),
+                        upvotes: 0,
+                        upvotedBy: []
+                    });
+                    form.reset();
+                    messageEl.textContent = 'Submitted successfully!';
+                    messageEl.style.color = 'green';
+                } catch (error) {
+                    messageEl.textContent = `Error: ${error.message}`;
+                    messageEl.style.color = 'red';
+                }
+                submitBtn.disabled = false;
+                setTimeout(() => messageEl.textContent = '', 4000);
+            });
+        }
+
+        function loadMyIdeas() {
+            const myList = document.getElementById('my-ideas-list');
+            const q = query(collection(db, 'ideas_proposals'), where('prefectId', '==', currentPrefect.id), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                myList.innerHTML = snapshot.empty ? "<p>You haven't submitted any ideas yet.</p>" : '';
+                snapshot.forEach(doc => myList.appendChild(renderIdea(doc.data(), false, doc.id)));
+            });
+        }
+
+        function loadPublicIdeas() {
+            const publicList = document.getElementById('public-ideas-list');
+            const q = query(collection(db, 'ideas_proposals'), where('status', 'in', ['Pending', 'Approved', 'Completed']), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                publicList.innerHTML = snapshot.empty ? "<p>No public proposals at the moment.</p>" : '';
+                snapshot.forEach(doc => publicList.appendChild(renderIdea(doc.data(), true, doc.id)));
+            });
+        }
+
+        function renderIdea(idea, isPublic, docId) {
+            const item = document.createElement('div');
+            item.className = 'idea-item';
+            const statusClass = `status-${idea.status.toLowerCase()}`;
+            const dateString = idea.timestamp ? idea.timestamp.toDate().toLocaleDateString() : 'N/A';
+            item.innerHTML = `
+                <div class="idea-header">
+                    <h3>${idea.title}</h3>
+                    <span class="idea-status ${statusClass}">${idea.status.replace('_', ' ')}</span>
+                </div>
+                <p class="idea-meta">By ${idea.prefectName} on ${dateString}</p>
+                <p>${idea.description}</p>
+                ${isPublic ? `
+                <div class="idea-footer">
+                    <button class="upvote-btn" data-id="${docId}"><i class="fas fa-thumbs-up"></i> Upvote</button>
+                    <span>${idea.upvotes} Upvotes</span>
+                </div>` : ''}`;
+            if (isPublic) {
+                const upvoteBtn = item.querySelector('.upvote-btn');
+                if (idea.upvotedBy.includes(currentPrefect.id)) {
+                    upvoteBtn.classList.add('upvoted');
+                    upvoteBtn.disabled = true;
+                }
+                upvoteBtn.addEventListener('click', () => handleUpvote(docId));
+            }
+            return item;
+        }
+
+        async function handleUpvote(docId) {
+            const ideaRef = doc(db, "ideas_proposals", docId);
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const ideaDoc = await transaction.get(ideaRef);
+                    if (!ideaDoc.exists()) throw "Document does not exist!";
+                    const data = ideaDoc.data();
+                    if (data.upvotedBy.includes(currentPrefect.id)) return;
+                    transaction.update(ideaRef, {
+                        upvotes: data.upvotes + 1,
+                        upvotedBy: arrayUnion(currentPrefect.id)
+                    });
+                });
+            } catch (e) {
+                console.error("Upvote transaction failed: ", e);
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => { window.location.href = 'login.html'; });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon - ECC Prefects' Guild</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fdfaf6; 
+            margin: 0;
+            text-align: center;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            width: 90%;
+            padding: 40px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-container { perspective: 1000px; margin-bottom: 20px; }
+        .logo { width: 120px; height: 120px; background-image: url('meroon Transparent logo prefect.png'); background-size: contain; background-position: center; background-repeat: no-repeat; margin: 0 auto; animation: rotateLogo 15s infinite linear; transform-style: preserve-3d; }
+        @keyframes rotateLogo { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+        h1 { font-size: 2.5em; color: #810000; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 2px; }
+        p { font-size: 1.05em; line-height: 1.7; margin: 0 0 30px 0; max-width: 500px; color: #333; }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .action-button.primary {
+            background-color: #810000;
+            color: white;
+            border: 2px solid #810000;
+        }
+        .action-button.primary:hover {
+            background-color: #600000;
+            border-color: #600000;
+            transform: translateY(-2px);
+        }
+
+        .action-button.secondary {
+            background-color: transparent;
+            color: #810000;
+            border: 2px solid #810000;
+        }
+        .action-button.secondary:hover {
+            background-color: #810000;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            flex-shrink: 0;
+            width: auto;
+            margin: 0 20px 20px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .footer-social { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+        .footer-social a { color: #333; margin: 0 15px; font-size: 1.6em; text-decoration: none; transition: color 0.3s; }
+        .footer-social a:hover { color: #810000; }
+        .footer-copyright { color: #333; font-size: 0.85em; line-height: 1.5; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 { color: #333; margin-bottom: 20px; }
+        .modal-content input[type="text"], .modal-content input[type="password"] { width: 100%; padding: 12px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        .modal-button { background-color: #810000; color: white; padding: 14px 20px; margin-top: 15px; border: none; cursor: pointer; width: 100%; border-radius: 8px; font-size: 1em; font-family: 'Poppins', sans-serif; transition: background-color 0.3s; }
+        .modal-button:hover { background-color: #600000; }
+        .error-text { color: #D8000C; font-size: 0.9em; min-height: 1.2em; }
+
+        @media (max-width: 600px) {
+            .container { padding: 25px; width: 90%; }
+            .logo { width: 100px; height: 100px; }
+            h1 { font-size: 1.8em; letter-spacing: 1px; }
+            p { font-size: 0.95em; }
+            .button-container { flex-direction: column; gap: 15px; }
+            footer { margin: 0 10px 10px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <main>
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo"></div>
+            </div>
+            <h1>We Are Launching Soon</h1>
+            <p><b>Our new digital platform is under construction.</b></p>
+            <div class="button-container">
+                <a href="https://www.shorturl.at/Equ5J" class="action-button primary">View Prefects</a>
+                <a href="#" id="admin-login-btn" class="action-button secondary">Login as Admin</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-social">
+            <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-google"></i></a>
+        </div>
+        <div class="footer-copyright">
+            © 2025 Prefect Information System.<br>
+            All rights reserved.<br>
+            Designed by ECC Prefects' Guild.<br>
+            Version 1.0.0
+        </div>
+    </footer>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Admin Login</h2>
+            <p id="error-message" class="error-text"></p>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button id="login-submit-btn" class="modal-button">Login</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    
+    <script>
+        // tsParticles Configuration
+        tsParticles.load("particles-js", {
+            background: { color: { value: "#fdfaf6" } },
+            fpsLimit: 60,
+            interactivity: {
+                events: { onHover: { enable: true, mode: "repulse" }, resize: true },
+                modes: { repulse: { distance: 100, duration: 0.4 } }
+            },
+            particles: {
+                color: { value: "#810000" },
+                links: { color: "#810000", distance: 150, enable: true, opacity: 0.5, width: 1 },
+                collisions: { enable: true },
+                move: { direction: "none", enable: true, outModes: { default: "bounce" }, random: false, speed: 2, straight: false },
+                number: { density: { enable: true, area: 800 }, value: 80 },
+                opacity: { value: 0.5 },
+                shape: { type: "circle" },
+                size: { value: { min: 1, max: 5 } }
+            },
+            detectRetina: true
+        });
+
+        // --- Login Modal Logic ---
+        const CORRECT_USERNAME = "admin";
+        const CORRECT_PASSWORD = "password123";
+
+        const loginModal = document.getElementById('login-modal');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const closeBtn = document.querySelector('.close-button');
+        const loginSubmitBtn = document.getElementById('login-submit-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+
+        adminLoginBtn.onclick = function(event) {
+            event.preventDefault();
+            errorMessage.textContent = '';
+            usernameInput.value = '';
+            passwordInput.value = '';
+            loginModal.style.display = "flex";
+        }
+
+        closeBtn.onclick = function() {
+            loginModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                loginModal.style.display = "none";
+            }
+        }
+
+        loginSubmitBtn.onclick = function() {
+            const enteredUser = usernameInput.value;
+            const enteredPass = passwordInput.value;
+
+            if (enteredUser === CORRECT_USERNAME && enteredPass === CORRECT_PASSWORD) {
+                loginModal.style.display = "none";
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Successful!',
+                    text: 'Welcome, Admin. Redirecting...',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    allowOutsideClick: false
+                });
+
+                setTimeout(function() {
+                    window.location.href = "main.html";
+                }, 2000);
+
+            } else {
+                errorMessage.textContent = "Invalid username or password. Please try again.";
+                passwordInput.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
