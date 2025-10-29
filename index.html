@@ -8,18 +8,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* All CSS styles from your previous file are included here... */
         :root {
-            --primary-color: #8C1C13;
-            --secondary-color: #C6A98F;
+            --primary-color: #7A150F;
+            --secondary-color: #D4AF37;
             --text-color: #3b3b3b;
             --text-light: #5f5f5f;
-            --card-bg-color: #FFFAF0;
+            --card-bg-color: #FDFDFD;
             --light-text-color: #ffffff;
-            --glass-bg: rgba(255, 250, 240, 0.75);
+            --glass-bg: rgba(253, 253, 253, 0.75);
             --success-color: #28a745;
         }
 
@@ -32,8 +31,6 @@
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             background-attachment: fixed;
         }
-
-        /* Specific overrides for dark mode */
         body.dark-mode .portfolio-header.header-scrolled { background-color: rgba(26, 26, 26, 0.85); border-color: rgba(255,255,255,0.1); }
         body.dark-mode .portfolio-header.header-scrolled h1,
         body.dark-mode .portfolio-header.header-scrolled .desktop-nav-links a { color: var(--text-color); }
@@ -85,19 +82,21 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             color: var(--text-color);
-            background: linear-gradient(135deg, #FFFBF5 0%, #FFF5E1 100%);
+            background: linear-gradient(135deg, #F8F8F8 0%, #F0F0F0 100%); /* Slightly darker background */
             background-attachment: fixed;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
         }
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--card-bg-color); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; text-align: center; }
         #loader img { width: 100px; height: 100px; animation: pulsate 1.5s ease-in-out infinite; margin-bottom: 1rem; }
-        #loader-text { color: var(--primary-color); font-weight: 600; font-size: 1.2rem; margin: 0; }
-        @keyframes pulsate { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        #loader-text { color: var(--primary-color); font-weight: 600; font-size: 1.2rem; margin: 0; animation: fade-text 2s infinite alternate; }
+        @keyframes fade-text { 0% { opacity: 0.5; } 100% { opacity: 1; } }
         #loader.hidden { opacity: 0; visibility: hidden; }
-        .portfolio-header { display: flex; justify-content: space-between; align-items: center; padding: 2.5rem 2rem; position: sticky; top: 0; z-index: 998; transition: all 0.5s ease-in-out; height: 50px; box-sizing: border-box; width: 95%; max-width: 1200px; margin: 0 auto; border-radius: 12px; background-color: transparent; }
+        .portfolio-header { display: flex; justify-content: space-between; align-items: center; padding: 2.5rem 2rem; position: sticky; top: 0; z-index: 998; transition: all 0.5s ease-in-out; box-sizing: border-box; width: 95%; max-width: 1200px; margin: 0 auto; border-radius: 12px; background-color: transparent; }
         .portfolio-header img { transition: filter 0.4s ease; filter: brightness(0) invert(1); }
         .portfolio-header h1 { margin: 0; font-size: 1.5rem; color: var(--light-text-color); transition: color 0.4s ease, font-size 0.3s ease; }
         
-        /* === DELETED old .main-nav styles === */
         
         #menu-toggle { color: var(--light-text-color); transition: color 0.4s ease; }
         .portfolio-header.header-scrolled { top: 1rem; background-color: rgba(255, 250, 240, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); border: 1px solid rgba(0,0,0,0.08); }
@@ -105,7 +104,6 @@
         .portfolio-header.header-scrolled h1 { color: var(--primary-color); }
         .portfolio-header.header-scrolled .main-nav a, .portfolio-header.header-scrolled #user-status { color: var(--text-color); }
         
-        /* === DELETED old .main-nav:hover styles === */
         
         .portfolio-header.header-scrolled #menu-toggle { color: var(--primary-color); }
         .portfolio-header.header-scrolled #login-nav-btn a, .portfolio-header.header-scrolled #logout-nav-btn a,
@@ -116,20 +114,46 @@
         
         .portfolio-header-left { display: flex; align-items: center; }
         
-        /* === DELETED old .main-nav ul/li styles === */
-
-        .header-right { display: flex; align-items: center; }
+        
+        .header-right { display: flex; align-items: center; gap: 1rem; }
         .login-btn { font-weight: 700; cursor: pointer; transition: all 0.2s ease-in-out; text-transform: uppercase; border-radius: 8px; text-decoration: none; color: var(--light-text-color); }
-        .login-btn:hover { transform: translateY(-2px); }
-        .hero-login-btn { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); color: var(--light-text-color); padding: 0.8rem 2.5rem; margin-top: 2.5rem; display: inline-block; }
-        .hero-login-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .login-btn-mobile {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .login-btn-mobile:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+                        .login-btn:hover {
+                            transform: translateY(-3px);
+                            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+                        }.hero-login-btn {
+    background: transparent;
+    border: 2px solid var(--light-text-color);
+    color: var(--light-text-color);
+    padding: 0.8rem 2.5rem;
+    margin-top: 2.5rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+.hero-login-btn:hover {
+    background: var(--light-text-color);
+    color: var(--primary-color);
+}
         .scroll-more-indicator { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: var(--light-text-color); font-size: 2.5rem; text-decoration: none; z-index: 10; transition: color 0.3s ease; }
         .scroll-more-indicator:hover { color: var(--secondary-color); }
         .scroll-more-indicator i { animation: bounceArrow 1.5s infinite; }
         @keyframes bounceArrow { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
         #menu-toggle { display: none; }
 
-        /* === START: NEW STYLES FOR HEADER LAYOUT === */
         .desktop-nav-links {
             display: block; /* Show by default */
         }
@@ -141,7 +165,7 @@
             align-items: center;
         }
         .desktop-nav-links li {
-            margin-left: 2rem;
+            margin-left: 1.5rem;
         }
         .desktop-nav-links a {
             color: var(--light-text-color); 
@@ -153,6 +177,7 @@
         }
         .desktop-nav-links a:hover {
             border-color: var(--light-text-color);
+            transform: translateY(-2px);
         }
         .portfolio-header.header-scrolled .desktop-nav-links a {
             color: var(--text-color);
@@ -169,20 +194,30 @@
             display: flex; 
             align-items: center; 
             gap: 1.5rem; /* Spacing for login/logout */
-            margin-left: 1rem; /* Space between menu and login */
         }
         
         /* Original main-nav is now mobile-only by default */
         .main-nav {
             display: none; /* Hide original nav on desktop */
         }
-        /* === END: NEW STYLES FOR HEADER LAYOUT === */
-
+        
 
         .hero-section { display: flex; justify-content: center; align-items: center; text-align: center; min-height: 100vh; padding: 2rem; position: relative; color: var(--light-text-color); background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('edit 2.jpg'); background-size: cover; background-position: center; margin-top: -130px; }
         .hero-content { z-index: 2; max-width: 800px; }
         .hero-greeting { font-size: 1.2rem; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin: 0; }
         .hero-title { font-size: 4rem; font-weight: 600; color: var(--light-text-color); margin: 0.5rem 0; line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .hero-title-gradient {
+            background: linear-gradient(90deg, var(--secondary-color), #fff, var(--secondary-color));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 5s linear infinite;
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 200% center; }
+            100% { background-position: 0% center; }
+        }
         .hero-divider { width: 80px; height: 4px; background-color: var(--light-text-color); margin: 1.5rem auto; }
         .hero-divider-t { width: 80px; height: 4px; background-color: #70160F; margin: 1.5rem auto; }
         .hero-description { font-size: 1.1rem; line-height: 1.7; color: rgba(255, 255, 255, 0.9); }
@@ -194,7 +229,6 @@
         .principal-card-style h4, .teacher-card-style h4 { margin-top: 0.8rem; }
         .principal-card-style p, .teacher-card-style p { margin-top: 0.2rem; }
 
-        /* New minimalist design for Administrator cards */
         #teachers-in-charge .prefect-card {
             background-color: #fdfdfd;
         }
@@ -212,7 +246,6 @@
         .vision-mission-card h4 { color: var(--primary-color); margin-top: 0; margin-bottom: 0.75rem; font-size: 1.1rem; border-bottom: 2px solid var(--secondary-color); padding-bottom: 0.5rem; }
         .vision-mission-card p { margin: 0; color: var(--text-light); font-size: 0.9rem; line-height: 1.6; }
 
-        /* Stats Counter Section */
         .stats-container {
             display: flex;
             justify-content: space-around;
@@ -253,7 +286,6 @@
             margin: 0.5rem 0 0 0;
         }
 
-        /* Announcements Section */
         .announcements-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -330,11 +362,8 @@
         .gallery-item { background: #fff; border-radius: 12px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); overflow: hidden; position: relative; transition: transform 0.3s ease, box-shadow 0.4s ease; }
         .gallery-item:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: block; transition: transform 0.4s ease; }
-        .gallery-item:hover img { transform: scale(1.1); }
-        .gallery-item::after { content: '\f00e'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(140, 28, 19, 0.7); color: white; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; opacity: 0; transition: opacity 0.4s ease; }
-        .gallery-item:hover::after { opacity: 1; }
 
-        /* --- Skeleton Loader --- */
+
         .skeleton {
             background: #e0e0e0;
             position: relative;
@@ -373,6 +402,37 @@
         #show-more-teachers-btn:hover, #show-less-teachers-btn:hover { background-color: #70160F; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
         #show-less-teachers-btn { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none; }
         #show-less-teachers-btn:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        #show-more-gallery-btn, #show-less-gallery-btn {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        #show-more-gallery-btn:hover, #show-less-gallery-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        #show-less-gallery-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            box-shadow: none;
+        }
+        #show-less-gallery-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
         .portfolio-footer { padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color); color: var(--text-light); border-top: 1px solid #eee; border-top-left-radius: 25px; border-top-right-radius: 25px; }
         .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
         .social-icons a { color: var(--primary-color); background-color: rgba(140, 28, 19, 0.1); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 50%; font-size: 1rem; transition: all 0.3s ease; }
@@ -380,7 +440,6 @@
         .copyright-main { margin: 0.5rem 0; font-weight: 600; color: var(--text-color); }
         .copyright-credits { margin: 0; font-size: 0.8rem; color: var(--text-light); }
 
-        /* Performance optimization: Hint to the browser about upcoming animations */
         .vision-mission-card,
         .prefect-card,
         .gallery-item,
@@ -389,6 +448,11 @@
         .stat-item,
         .theme-toggle-btn {
             will-change: transform, box-shadow;
+        }
+
+        .prefect-card, .gallery-item, .testimonial-card, .developer-card-new, .vision-mission-card, .stat-item {
+            transition: transform 0.2s ease-out;
+            transform-style: preserve-3d;
         }
 
         .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
@@ -455,7 +519,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
+            overflow: hidden;
             background-color: rgba(0,0,0,0.6);
             opacity: 0; /* Start hidden */
             transition: opacity 0.3s ease-in-out; /* Fade transition */
@@ -493,25 +557,27 @@
         /* The login modal still uses this */
         #auth-modal .modal-content-wrapper > .auth-card { animation: fadeInScaleUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
 
-        /* --- NEW CREATORS DRAWER STYLES --- */
         .creators-card {
             position: fixed;
             top: 0;
             right: -100%; /* Start off-screen */
             width: 100%;
-            max-width: 380px;
+            max-width: 100%;
             height: 100vh;
             margin: 0;
             border-radius: 0;
             background: rgba(255, 250, 240, 0.85);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+            border-left: none;
+            box-shadow: none;
             text-align: center;
             overflow-y: auto;
+            overflow-x: hidden;
             transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             padding: 2.5rem 1.5rem;
+            z-index: 1001;
+            box-sizing: border-box;
         }
 
         #creators-modal.show .creators-card {
@@ -526,7 +592,6 @@
             gap: 1.5rem; 
         }
 
-        /* --- NEW: Animated Atomic Background for Drawer --- */
         .creators-card::before {
             content: '';
             position: absolute;
@@ -552,7 +617,6 @@
             100% { transform: translateY(0) translateX(0); }
         }
 
-        /* --- NEW: Custom Scrollbar for Drawer --- */
         .creators-card::-webkit-scrollbar {
             width: 8px;
         }
@@ -560,13 +624,12 @@
             background: transparent;
         }
         .creators-card::-webkit-scrollbar-thumb {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             border-radius: 4px;
         }
         .creators-card::-webkit-scrollbar-thumb:hover {
-            background-color: var(--primary-color);
+            background-color: #6A120C; /* Darker primary color on hover */
         }
-        /* --- NEW: Accordion Styles for Developer List --- */
         .developer-accordion-item {
             background: rgba(255, 255, 255, 0.5);
             border-radius: 10px;
@@ -624,7 +687,7 @@
             padding: 0 1rem;
         }
         .developer-accordion-item.active .developer-accordion-content {
-            max-height: 200px; /* Adjust as needed */
+            max-height: 500px; /* Adjust as needed */
             padding-bottom: 1rem;
             padding-left: 1rem;
             padding-right: 1rem;
@@ -643,6 +706,51 @@
             justify-content: center;
             gap: 1rem;
             padding-top: 0.5rem;
+        }
+        .section-accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: background-color 0.3s;
+            overflow: hidden;
+        }
+        .section-accordion-item:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .section-accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            cursor: pointer;
+            background-color: rgba(140, 28, 19, 0.1);
+            border-bottom: 1px solid rgba(140, 28, 19, 0.2);
+        }
+        .section-accordion-header .section-title {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        .section-accordion-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+        .section-accordion-item.active .section-accordion-icon {
+            transform: rotate(180deg);
+        }
+        .section-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            padding: 0 1rem;
+        }
+        .section-accordion-item.active .section-accordion-content {
+            max-height: 1000px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
         .modal.visible .developer-card {
             opacity: 1;
@@ -694,7 +802,6 @@
         .toast-notification.show { visibility: visible; animation: toast-in-out 3s ease-in-out forwards; }
         @keyframes toast-in-out { 0% { opacity: 0; transform: translate(-50%, -40px); } 15%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -40px); } }
 
-        /* --- START: Redesigned Auth Modal Styles --- */
         #auth-modal .auth-card {
             padding: 2rem;
         }
@@ -739,9 +846,7 @@
         #auth-modal #auth-submit-btn:active {
             transform: scale(0.95);
         }
-        /* --- END: Redesigned Auth Modal Styles --- */
-
-        /* --- Style for the new Auth Modal Close Icon --- */
+        
         #auth-modal .close-button {
             position: absolute;
             top: 15px;
@@ -754,8 +859,8 @@
             background-color: #f0f0f0;
             border-radius: 50%;
             color: #888;
-            font-size: 1rem; /* Adjust icon size */
-            font-weight: normal; /* Reset bold from generic style */
+            font-size: 1rem;
+            font-weight: normal;
             transition: all 0.3s ease;
             z-index: 10;
         }
@@ -765,7 +870,6 @@
             transform: rotate(90deg);
         }
 
-        /* --- Theme Toggle Button --- */
         .theme-toggle-btn {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -832,7 +936,6 @@
         }
 
         @media (max-width: 992px) {
-            /* === START: NEW MOBILE HEADER STYLES === */
             .desktop-nav-links,
             .header-controls-desktop {
                 display: none; /* Hide desktop menu and controls on mobile */
@@ -855,10 +958,8 @@
                 overflow: hidden; 
                 transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
             }
-            /* === END: NEW MOBILE HEADER STYLES === */
-
+            
             .contact-layout { grid-template-columns: 1fr; }
-            /* .main-nav { ... MOVED UP ... } */
             .main-nav.mobile-nav-active { max-height: 30rem; opacity: 1; }
             .main-nav ul { flex-direction: column; padding: 1rem 0; align-items: center; margin: 0; list-style: none; }
             .main-nav li { margin: 0; text-align: center; }
@@ -928,6 +1029,9 @@
             .social-icons a { width: 35px; height: 35px; font-size: 0.9rem; }
             .copyright-main { font-size: 0.9rem; }
             .copyright-credits { font-size: 0.7rem; }
+            .creators-card {
+                padding: 1.5rem 0.5rem;
+            }
         }
         .chat-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 995; transition: all 0.3s ease; animation: pulse-chat-fab 2s infinite ease-in-out; border: none; }
         .chat-fab:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); }
@@ -955,52 +1059,41 @@
             .message-content { max-width: 85%; }
         }
 
-        @media (max-width: 768px) {
+@media (max-width: 768px) {
+    #developer-detail-modal .developer-detail-card {
+        width: 95%;
+        max-width: 400px; /* Limit width on medium screens */
+        padding: 1.5rem;
+    }
+    #developer-detail-modal #developer-detail-img {
+        width: 100px;
+        height: 100px;
+        border-width: 4px;
+    }
+    #developer-detail-modal #developer-detail-name {
+        font-size: 1.6rem;
+    }
+    #developer-detail-modal #developer-detail-role,
+    #developer-detail-modal #developer-detail-desc,
+    #developer-detail-modal .dev-comment {
+        font-size: 0.9rem;
+    }
+    #developer-detail-modal .dev-skills {
+        font-size: 1.3rem;
+        gap: 0.8rem;
+    }
+}
+
+        @media (max-width: 480px) {
             .creators-card {
-                max-width: 95%;
-                margin: 1rem auto;
-                padding: 1.5rem;
+                padding: 1.5rem 0.5rem;
             }
-            .developer-cards-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 1.5rem;
-            }
-            .developer-card {
-                min-width: unset;
-                max-width: 300px;
-                width: 90%;
+            .developer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
         }
 
-        @media (max-width: 480px) {
-            .modal-content-wrapper {
-                align-items: flex-start; /* Align to top on very small screens */
-                padding-top: 1rem;
-            }
-            .creators-card {
-                max-width: 95%;
-                width: 95%; /* Ensure it takes up width */
-                margin: 0.5rem auto; /* Smaller margin */
-                padding: 1rem;
-            }
-            .developer-card {
-                width: 100%;
-                max-width: 280px; /* Slightly smaller max-width for cards */
-            }
-            .dev-skills {
-                font-size: 1.2rem; /* Further reduced font size */
-                gap: 0.6rem;
-            }
-            .dev-social-icons a {
-                width: 28px;
-                height: 28px;
-                font-size: 0.8rem;
-            }
-            .creators-card h3 {
-                font-size: 1.5rem; /* Smaller heading */
-            }
-        }
+
 
         .background-particles {
             position: fixed;
@@ -1022,7 +1115,7 @@
             height: 20px;
             background: rgba(140, 28, 19, 0.15);
             border-radius: 50%;
-            animation: particle-animation 25s linear infinite;
+            animation: particle-animation 45s linear infinite;
             bottom: -150px;
         }
 
@@ -1039,104 +1132,628 @@
 
         @keyframes particle-animation {
             0% {
-                transform: translateY(0) translateX(0) rotate(0deg);
-                opacity: 0.8;
-                border-radius: 50%;
-            }
-            20% {
-                transform: translateY(-20vh) translateX(5vw) rotate(144deg);
-            }
-            40% {
-                transform: translateY(-40vh) translateX(-5vw) rotate(288deg);
-            }
-            60% {
-                transform: translateY(-60vh) translateX(8vw) rotate(432deg);
-            }
-            80% {
-                transform: translateY(-80vh) translateX(-3vw) rotate(576deg);
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.5;
             }
             100% {
-                transform: translateY(-105vh) translateX(0) rotate(720deg);
+                transform: translateY(-100vh) rotate(720deg);
                 opacity: 0;
-                border-radius: 25%;
             }
         }
 
-        /* --- Gallery Lightbox --- */
-        .lightbox {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 60px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.9);
-            transition: opacity 0.4s ease;
-        }
-        .lightbox-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            animation-name: zoom;
-            animation-duration: 0.6s;
-        }
-        @keyframes zoom {
-            from {transform:scale(0)}
-            to {transform:scale(1)}
-        }
-        .lightbox-close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-        .lightbox-close:hover,
-        .lightbox-close:focus {
-            color: #bbb;
-            text-decoration: none;
-        }
-        .lightbox-prev, .lightbox-next {
-          cursor: pointer;
-          position: absolute;
-          top: 50%;
-          width: auto;
-          padding: 16px;
-          margin-top: -50px;
-          color: white;
-          font-weight: bold;
-          font-size: 20px;
-          transition: 0.6s ease;
-          border-radius: 0 3px 3px 0;
-          user-select: none;
-          -webkit-user-select: none;
-        }
-        .lightbox-next {
-          right: 0;
-          border-radius: 3px 0 0 3px;
-        }
-        .lightbox-prev:hover, .lightbox-next:hover {
-          background-color: rgba(255,255,255,0.2);
-        }
-        #lightbox-caption {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            text-align: center;
-            color: #ccc;
-            padding: 10px 0;
-            height: 150px;
-        }
-    </style>
-</head>
+
+.developer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    justify-items: center;
+}
+.guidance-section .prefects-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+.guidance-section .prefects-grid .prefect-card {
+    width: 80%;
+}
+.developer-card-new {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: 80%;
+}
+.developer-card-new:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    background: rgba(255, 255, 255, 0.8);
+}
+.developer-card-new img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--secondary-color);
+    margin-bottom: 1rem;
+}
+.developer-card-new h4 {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+.developer-card-new .role {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.developer-card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 1.5rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin-top: 1rem;
+}
+
+.developer-card-new.expanded .developer-card-details {
+    max-height: 500px; /* Adjust as needed */
+    padding: 1.5rem;
+}
+
+.developer-card-new.expanded .view-details-btn {
+    background-color: #70160F; /* Darker color when expanded */
+}
+
+/* Launch Banner */
+.launch-banner {
+    background-color: var(--secondary-color); /* Gold background */
+    color: var(--primary-color); /* Maroon text */
+    text-align: center;
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 997; /* Below header, above other content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.launch-banner strong {
+    color: var(--primary-color);
+}
+.launch-banner .close-banner-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    transition: transform 0.3s ease;
+}
+.launch-banner .close-banner-btn:hover {
+    transform: rotate(90deg);
+    color: #5f0f0f; /* Darker maroon */
+}
+
+/* Responsive adjustments for banner */
+@media (max-width: 768px) {
+    .launch-banner {
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+    }
+    .launch-banner .close-banner-btn {
+        font-size: 1.2rem;
+        right: 0.5rem;
+    }
+}
+@media (max-width: 480px) {
+    .launch-banner {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.5rem;
+    }
+    .launch-banner .close-banner-btn {
+        font-size: 1rem;
+        right: 0.3rem;
+    }
+}
+
+.creators-card .guidance-section h4 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+}
+.creators-card .guidance-section ul {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    padding-left: 0;
+    text-align: left;
+    color: var(--text-color);
+}
+.creators-card .guidance-section ul li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+/* School Heritage Section */
+#school-heritage h3 {
+    margin-bottom: 1rem;
+}
+#school-heritage .hero-divider-t {
+    margin-bottom: 2.5rem;
+}
+.heritage-content {
+    display: grid;
+    grid-template-columns: 1fr; /* Stack by default */
+    gap: 3rem;
+}
+.school-anthem-block, .prefects-history-block {
+    background: var(--card-bg-color);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.school-anthem-block:hover, .prefects-history-block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+.school-anthem-block h4, .prefects-history-block h4 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+}
+.school-anthem-block p, .prefects-history-block p {
+    color: var(--text-color);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+.prefects-history-block ul {
+    list-style-type: disc; /* Ensure standard bullets */
+    margin-left: 1.5rem;
+    padding-left: 0;
+    color: var(--text-color);
+}
+.prefects-history-block ul li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+.prefects-history-block ul li strong {
+    color: var(--primary-color);
+}
+.maroon-bold {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Responsive for School Heritage */
+@media (min-width: 769px) {
+    .heritage-content {
+        grid-template-columns: 1fr 2fr; /* Anthem on left, History on right */
+        align-items: start;
+    }
+    .school-anthem-block {
+        text-align: center;
+    }
+}
+@media (max-width: 768px) {
+    .school-anthem-block, .prefects-history-block {
+        padding: 1.5rem;
+    }
+    .school-anthem-block h4, .prefects-history-block h4 {
+        font-size: 1.3rem;
+    }
+    .school-anthem-block p, .prefects-history-block p {
+        font-size: 0.95rem;
+    }
+}
+@media (max-width: 480px) {
+    .school-anthem-block, .prefects-history-block {
+        padding: 1rem;
+    }
+    .school-anthem-block h4, .prefects-history-block h4 {
+        font-size: 1.2rem;
+    }
+    .school-anthem-block p, .prefects-history-block p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Prefect Detail Modal (Enhanced) */
+#prefect-detail-modal .modal-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Add some padding around the modal content */
+}
+#prefect-detail-modal .prefect-detail-card {
+    text-align: center;
+    max-width: 500px; /* Slightly wider */
+    width: 100%; /* Ensure it takes full width on small screens */
+    background: var(--glass-bg); /* Use glassmorphism background */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+    padding: 2.5rem; /* More padding */
+    border-radius: 20px; /* Rounded corners */
+    position: relative; /* For absolute positioning of close button if needed */
+}
+#prefect-detail-modal #prefect-detail-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+#prefect-detail-modal #prefect-detail-close-btn:hover {
+    color: var(--primary-color);
+    transform: rotate(90deg);
+}
+#prefect-detail-modal #prefect-detail-img {
+    width: 150px; /* Larger image */
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--secondary-color); /* Thicker border */
+    margin-bottom: 1.5rem; /* More space */
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.3); /* Outer glow */
+}
+#prefect-detail-modal #prefect-detail-name {
+    font-size: 2rem; /* Larger name */
+    color: var(--primary-color);
+    margin: 0.5rem 0 0.2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+#prefect-detail-modal #prefect-detail-destiny {
+    font-size: 1.2rem; /* Larger destiny text */
+    color: var(--text-color); /* Use text-color for better contrast */
+    margin-bottom: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+#prefect-detail-modal .prefect-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 2 columns on larger screens */
+    gap: 1.5rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    padding: 0 1rem;
+}
+#prefect-detail-modal .prefect-details-grid > div {
+    background-color: rgba(140, 28, 19, 0.08); /* Light background for each item */
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+#prefect-detail-modal .prefect-details-grid > div:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+#prefect-detail-modal .prefect-details-grid strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.4rem; /* More space */
+    font-size: 1.2rem; /* Larger heading */
+}
+#prefect-detail-modal .prefect-details-grid span {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+#prefect-detail-modal #prefect-modal-close-btn-bottom {
+    /* Reusing existing btn-danger styles, but can override if needed */
+    margin-top: 1.5rem; /* Adjust margin */
+}
+
+/* Responsive adjustments for prefect modal */
+@media (max-width: 768px) {
+    #prefect-detail-modal .prefect-detail-card {
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+    #prefect-detail-modal #prefect-detail-img {
+        width: 120px;
+        height: 120px;
+        border-width: 4px;
+    }
+    #prefect-detail-modal #prefect-detail-name {
+        font-size: 1.8rem;
+    }
+    #prefect-detail-modal #prefect-detail-destiny {
+        font-size: 1rem;
+    }
+    #prefect-detail-modal .prefect-details-grid {
+        font-size: 0.95rem;
+        gap: 0.6rem;
+    }
+    #prefect-detail-modal #prefect-detail-close-btn {
+        font-size: 1.8rem;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    #prefect-detail-modal .prefect-detail-card {
+        max-width: 95%;
+        margin: 1rem;
+        padding: 1rem;
+    }
+    #prefect-detail-modal #prefect-detail-img {
+        width: 100px;
+        height: 100px;
+        border-width: 3px;
+    }
+    #prefect-detail-modal #prefect-detail-name {
+        font-size: 1.5rem;
+    }
+    #prefect-detail-modal #prefect-detail-destiny {
+        font-size: 0.9rem;
+    }
+    #prefect-detail-modal .prefect-details-grid {
+        grid-template-columns: 1fr; /* Stack on very small screens */
+        gap: 0.8rem;
+        padding: 0;
+    }
+    #prefect-detail-modal .prefect-details-grid strong {
+        font-size: 1.1rem;
+    }
+    #prefect-detail-modal .prefect-details-grid span {
+        font-size: 0.9rem;
+    }
+    #prefect-detail-modal #prefect-modal-close-btn-bottom {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+#developer-detail-modal {
+    z-index: 1001;
+}
+.view-details-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.view-details-btn:hover {
+    background-color: #70160F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.terms-btn {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+.terms-btn:hover {
+    background-color: #c49a24; /* Darker gold */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+#developer-detail-modal .btn-danger {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+    #developer-detail-modal .btn-danger:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(140, 28, 19, 0.3);
+    }
+
+    /* Lightbox styles */
+    #gallery-lightbox {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1002; /* Sit on top */
+        padding-top: 60px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+    }
+
+    .lightbox-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        max-height: 80%;
+        object-fit: contain;
+    }
+
+    .lightbox-close, .lightbox-prev, .lightbox-next {
+        position: absolute;
+        top: 15px;
+        color: #f1f1f1;
+        font-size: 40px;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .lightbox-close {
+        right: 35px;
+    }
+
+    .lightbox-prev {
+        left: 35px;
+    }
+
+    .lightbox-next {
+        right: 35px;
+    }
+
+    .lightbox-close:hover,
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+        color: #bbb;
+    }
+
+    .modal-logo-item {
+        border-radius: 8px; /* Slightly rounded corners */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .modal-logo-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+        .scroll-to-top-btn:hover {
+        background-color: #70160F; /* Darker primary color on hover */
+        transform: translateY(-3px);
+    }
+
+    .error-message {
+        color: var(--primary-color);
+        text-align: center;
+        margin-top: 1rem;
+        font-weight: 600;
+    }
+
+    #developer-detail-modal {
+        z-index: 1001; /* Ensure it appears on top of other modals */
+    }
+
+    .audio-player-wrapper {
+        margin-top: 1rem;
+        background: rgba(0,0,0,0.05);
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    body.dark-mode .audio-player-wrapper {
+        background: rgba(255,255,255,0.05);
+    }
+    .custom-audio-player {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+    }
+    .play-pause-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .play-pause-btn:hover {
+        background-color: #70160F;
+    }
+    .seek-bar-container {
+        flex-grow: 1;
+    }
+    .seek-bar, .volume-bar {
+        width: 100%;
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+    }
+    .seek-bar::-webkit-slider-runnable-track, .volume-bar::-webkit-slider-runnable-track {
+        background: rgba(0,0,0,0.1);
+        height: 6px;
+        border-radius: 3px;
+    }
+    body.dark-mode .seek-bar::-webkit-slider-runnable-track, body.dark-mode .volume-bar::-webkit-slider-runnable-track {
+        background: rgba(255,255,255,0.1);
+    }
+    .seek-bar::-webkit-slider-thumb, .volume-bar::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        margin-top: -5px;
+    }
+    .seek-bar:focus, .volume-bar:focus {
+        outline: none;
+    }
+    .time-display {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-color);
+        min-width: 70px;
+        text-align: center;
+    }
+    .volume-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .volume-container i {
+        color: var(--primary-color);
+        cursor: pointer;
+    }
+    .volume-bar {
+        width: 70px;
+    }
+    </style></head>
 <body>
 <ul class="background-particles">
     <li></li>
@@ -1164,72 +1781,51 @@
         
         <header class="portfolio-header" id="portfolio-header">
             <div class="portfolio-header-left">
-                <img src="meroon Transparent logo prefect.png" alt="School Logo" style="height: 50px; margin-right: 15px;">
+                <img src="meroon Transparent logo prefect.png" alt="Prefect Guild Logo" style="height: 50px; margin-right: 15px;">
+                <h1>PREFECTS' GUILD</h1>
             </div>
-            
             <nav class="desktop-nav-links">
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#about-us">About Us</a></li>
-                    <li><a href="#teachers-in-charge">Teachers</a></li>
-                    <li><a href="#testimonials">Comments</a></li>
+                    <li><a href="#about-us">About</a></li>
                     <li><a href="#prefects-list">Prefects</a></li>
                     <li><a href="#gallery">Gallery</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
-            
             <div class="header-right">
                 <ul class="header-controls-desktop">
-                    <li>
-                        <button id="theme-toggle-btn-desktop" class="theme-toggle-btn" title="Toggle theme">
-                            <i class="fas fa-moon"></i>
-                            <i class="fas fa-sun"></i>
-                        </button>
-                    </li>
-                    <li id="user-status-desktop" style="display: none; align-items: center; color: white;">
-                        <span id="user-email-desktop" style="font-weight: 500; font-size: 0.9rem;"></span>
-                    </li>
-                    <li id="login-nav-btn-desktop">
-                        <a href="#" class="login-btn" style="border: 1px solid white; padding: 8px 15px; border-radius: 5px;">Login</a>
-                    </li>
-                    <li id="logout-nav-btn-desktop" style="display: none;">
-                        <a href="#" class="login-btn" style="border: 1px solid white; padding: 8px 15px; border-radius: 5px;">Logout</a>
-                    </li>
+                    <li id="login-nav-btn-desktop" style="display: block;"><a href="#" class="login-btn">Login</a></li>
+                    <li id="logout-nav-btn-desktop" style="display: none;"><a href="#" class="login-btn">Logout</a></li>
+                    <li id="user-status-desktop" style="display: none;">Welcome, <span id="user-email-desktop"></span></li>
                 </ul>
-                
-                <nav class="main-nav" id="main-nav">
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#about-us">About Us</a></li>
-                        <li><a href="#teachers-in-charge">Teachers</a></li>
-                        <li><a href="#testimonials">Comments</a></li>
-                        <li><a href="#prefects-list">Prefects</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#contact">Contact Us</a></li>
-                        <li>
-                            <button id="theme-toggle-btn-mobile" class="theme-toggle-btn-mobile" title="Toggle theme">
-                                Toggle Theme
-                            </button>
-                        </li>
-                        <li id="user-status" style="display: none; align-items: center; color: white;">
-                            <span id="user-email" style="font-weight: 500; font-size: 0.9rem;"></span>
-                        </li>
-                        <li id="login-nav-btn">
-                            <a href="#" class="login-btn" style="border: 1px solid white; padding: 8px 15px; border-radius: 5px;">Login</a>
-                        </li>
-                        <li id="logout-nav-btn" style="display: none;">
-                            <a href="#" class="login-btn" style="border: 1px solid white; padding: 8px 15px; border-radius: 5px;">Logout</a>
-                        </li>
-                    </ul>
-                </nav>
-                <button id="menu-toggle" aria-label="Toggle Menu"><span></span><span></span><span></span></button>
+                <div class="theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </div>
+                <button id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
+            <nav class="main-nav" id="main-nav">
+                <ul>
+                    <li><a href="#about-us">About</a></li>
+                    <li><a href="#prefects-list">Prefects</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li id="login-nav-btn" style="display: block;"><a href="#" class="login-btn-mobile">Login</a></li>
+                    <li id="logout-nav-btn" style="display: none;"><a href="#">Logout</a></li>
+                    <li id="user-status" style="display: none;">Welcome, <span id="user-email"></span></li>
+                </ul>
+            </nav>
         </header>
+
+
         <section class="hero-section animate-on-scroll" id="hero">
              <div class="hero-content">
                 <p class="hero-greeting">Welcome to the</p>
-                <h2 class="hero-title">ECC PREFECTS' GUILD</h2>
+                <h2 class="hero-title hero-title-gradient">ECC PREFECTS' GUILD</h2>
                 <div class="hero-divider"></div>
                 <p class="hero-description">Leading with integrity and dedication. We are committed to upholding the values of our college and serving the student community.</p>
                 <a href="login.html" class="login-btn hero-login-btn">Login As Prefect</a>
@@ -1259,17 +1855,60 @@
                 </ul>
             </section>
 
+            <section id="school-heritage" class="portfolio-section animate-on-scroll">
+                <h3>School Heritage</h3>
+                <div class="hero-divider-t"></div>
+
+                <div class="heritage-content">
+                    <div class="school-anthem-block">
+                        <h4>Prefect Anthem</h4>
+                        <div class="audio-player-wrapper">
+                            <audio id="prefect-anthem-audio" src="Anthem/PMS.mp3"></audio>
+                            <div class="custom-audio-player">
+                                <button class="play-pause-btn" id="play-pause-btn"><i class="fas fa-play"></i></button>
+                                <div class="time-display" id="time-display">0:00 / 0:00</div>
+                                <div class="seek-bar-container">
+                                    <input type="range" id="seek-bar" class="seek-bar" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prefects-history-block" style="margin-top: 3rem;">
+                        <h4>History of Prefects' Guild</h4>
+                        <p>Here you can add the detailed history of the Prefects' Guild of Eheliyagoda Central College as bullet points:</p>
+                        <ul>
+                            <li><strong class="maroon-bold">Establishment:</strong> Founded in <strong class="maroon-bold">1988</strong> with the aim of <strong class="maroon-bold">maintaining school discipline</strong>.</li>
+                            <li><strong class="maroon-bold">First Head Prefect:</strong> <strong class="maroon-bold">Hansaka Fernando</strong> (1988).</li>
+                            <li><strong class="maroon-bold">Key Milestones:</strong>
+                                <ul>
+                                    <li><strong class="maroon-bold">1995:</strong> Introduced new student leadership programs.</li>
+                                    <li><strong class="maroon-bold">2002:</strong> Organized the first inter-house prefects' competition.</li>
+                                    <li><strong class="maroon-bold">2010:</strong> Launched a community service initiative.</li>
+                                    <li><strong class="maroon-bold">2018:</strong> Celebrated 30 years of service with a grand event.</li>
+                                    <li><strong class="maroon-bold">2023:</strong> Implemented a digital prefect management system.</li>
+                                </ul>
+                            </li>
+                            <li><strong class="maroon-bold">Evolution of Role:</strong> Over the years, the role of prefects has evolved to include fostering student welfare and promoting academic excellence.</li>
+                            <li><strong class="maroon-bold">Notable Achievements:</strong> Successfully managed numerous school events and contributed to a positive school environment.</li>
+                            <li><strong class="maroon-bold">Leadership & Values:</strong> Emphasize the core values of integrity, responsibility, and dedication upheld by the Prefects' Guild.</li>
+                        </ul>
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">(Please replace this placeholder text with the actual history of the Prefects' Guild)</p>
+                    </div>
+                </div>
+            </section>
+
             <section id="stats-counter" class="portfolio-section animate-on-scroll">
                 <h3>Our Community In Numbers</h3>
                 <div class="stats-container">
                     <div class="stat-item animate-child">
                         <i class="fas fa-user-shield"></i>
-                        <h2 class="counter" data-target="56">0</h2>
+                        <h2 class="counter" data-target="54">0</h2>
                         <p>Senior Prefects</p>
                     </div>
                     <div class="stat-item animate-child">
                         <i class="fas fa-user-graduate"></i>
-                        <h2 class="counter" data-target="76">0</h2>
+                        <h2 class="counter" data-target="82">0</h2>
                         <p>Junior Prefects</p>
                     </div>
                     <div class="stat-item animate-child">
@@ -1280,40 +1919,7 @@
                 </div>
             </section>
 
-            <section id="announcements" class="portfolio-section animate-on-scroll">
-                <h3>Announcements & Events</h3>
-                <div class="announcements-container">
-                    <div class="announcement-card animate-child">
-                        <div class="announcement-date">
-                            <span class="day">28</span>
-                            <span class="month">OCT</span>
-                        </div>
-                        <div class="announcement-content">
-                            <h4>Annual General Meeting</h4>
-                            <p>The Annual General Meeting of the Prefects' Guild will be held at the main auditorium. All prefects are requested to attend.</p>
-                        </div>
-                    </div>
-                    <div class="announcement-card animate-child">
-                        <div class="announcement-date">
-                            <span class="day">15</span>
-                            <span class="month">NOV</span>
-                        </div>
-                        <div class="announcement-content">
-                            <h4>Leadership Workshop</h4>
-                            <p>A leadership workshop for all senior and junior prefects will be conducted. Venue: School Library.</p>
-                        </div>
-                    </div>
-                    <div class="announcement-card animate-child">
-                         <div class="announcement-icon">
-                            <i class="fas fa-bullhorn"></i>
-                        </div>
-                        <div class="announcement-content">
-                            <h4>Special Notice</h4>
-                            <p>Please note that there will be no morning assembly next Monday due to scheduled maintenance work.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+
             
             <section id="teachers-in-charge" class="portfolio-section animate-on-scroll">
                 <h3>Administrators</h3>
@@ -1445,6 +2051,10 @@
                     <div class="skeleton"></div>
                     <div class="skeleton"></div>
                 </div>
+                <div class="show-more-container">
+                    <button id="show-more-gallery-btn">Show More</button>
+                    <button id="show-less-gallery-btn" style="display: none;">Show Less</button>
+                </div>
             </section>
 
             <section id="contact" class="portfolio-section animate-on-scroll">
@@ -1484,7 +2094,17 @@
             </section>
         </div>
 
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 1rem;">This website was officially launched on 2025.11.04.</p>
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <button id="footer-developer-btn" class="terms-btn">Developer Team</button>
+        </div>
         <footer class="portfolio-footer">
+            <div class="footer-logos" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <img src="meroon Transparent logo prefect.png" alt="Prefect Logo" style="height: 50px;">
+                <img src="logo12.png" alt="School Logo" style="height: 50px;">
+            </div>
+            <p style="margin: 0; font-weight: 600; color: var(--text-color);">Eheliyagoda Central College</p>
+            <p style="margin: 0; font-weight: 600; color: var(--text-color);">2025 Prefects' Guild</p>
             <div class="social-icons">
                 <a href="https://www.facebook.com/profile.php?id=61552015108523" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="tel:0779912589" target="_blank" aria-label="Phone"><i class="fa-solid fa-phone"></i></a>
@@ -1498,78 +2118,170 @@
     <div id="creators-modal" class="modal">
         <div class="modal-content-wrapper">
              <div class="auth-card creators-card">
+                <div id="developer-content-wrapper">
                 <div class="swimming-symbols-background"></div> <!-- New element for animation -->
                 <span class="close-button">×</span>
                 <h3>PMS DEVELOPER TEAM</h3>
                 <div class="hero-divider"></div>
-                                    <div class="developer-cards-container" id="developer-accordion">
-                                        <!-- Adeesha -->
-                                        <div class="developer-accordion-item">
-                                            <div class="developer-accordion-header">
-                                                <img src="Developer Team/no-dp_16.webp" alt="Adeesha Ravimal">
-                                                <div class="developer-info">
-                                                    <h4>Adeesha Ravimal</h4>
-                                                    <p class="role">UI/UX & System Dev</p>
+                                    <div class="developer-cards-container">
+                                        <h4 class="section-title" style="font-size: 1.5rem; color: var(--primary-color); text-align: center; margin-top: 0; margin-bottom: 1.5rem;">Developers</h4>
+                                        <div class="developer-grid">
+                                            <div class="developer-card-new" data-name="Adeesha Ravimal" data-role="System Architect & Desktop App Dev" data-img="Developer Team/Adeesha.jpg" data-desc="Planned the system architecture and developed the desktop application." data-comment="I enjoy creating intuitive and beautiful interfaces." data-skills='["fab fa-react", "fab fa-html5", "fab fa-css3-alt", "fas fa-database", "fab fa-npm"]'>
+                                                <img src="Developer Team/Adeesha.jpg" alt="Adeesha Ravimal">
+                                                <h4>Adeesha Ravimal</h4>
+                                                <p class="role">System Architect & Desktop App Dev</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Planned the system architecture and developed the desktop application.</p>
+                                                    <p class="dev-comment">"I enjoy creating intuitive and beautiful interfaces."</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fab fa-react"></i>
+                                                        <i class="fab fa-html5"></i>
+                                                        <i class="fab fa-css3-alt"></i>
+                                                        <i class="fas fa-database"></i>
+                                                        <i class="fab fa-npm"></i>
+                                                    </div>
                                                 </div>
-                                                <i class="fas fa-chevron-down accordion-icon"></i>
                                             </div>
-                                            <div class="developer-accordion-content">
-                                                <div class="dev-skills"><i class="fas fa-palette" title="UI/UX Design"></i><i class="fas fa-code" title="System Development"></i><i class="fab fa-python" title="Python"></i></div>
-                                                <div class="dev-social-icons"><a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="#" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a><a href="mailto:adeesharavimal@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a></div>
-                                            </div>
-                                        </div>
-                                        <!-- Thevindu -->
-                                        <div class="developer-accordion-item">
-                                            <div class="developer-accordion-header">
+                                            <div class="developer-card-new" data-name="Thevindu Thisev" data-role="Data Collection & Database Management" data-img="Developer Team/thevindu.JPG" data-desc="Managed student data collection and database administration." data-comment="Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!" data-skills='["fas fa-database", "fas fa-video", "fas fa-edit"]'>
                                                 <img src="Developer Team/thevindu.JPG" alt="Thevindu Thisev">
-                                                <div class="developer-info">
-                                                    <h4>Thevindu Thisev</h4>
-                                                    <p class="role">Back-End & Database</p>
+                                                <h4>Thevindu Thisev</h4>
+                                                <p class="role">Data Collection & Database Management</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Managed student data collection and database administration.</p>
+                                                    <p class="dev-comment">"Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!"</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fas fa-database"></i>
+                                                        <i class="fas fa-video"></i>
+                                                        <i class="fas fa-edit"></i>
+                                                    </div>
                                                 </div>
-                                                <i class="fas fa-chevron-down accordion-icon"></i>
                                             </div>
-                                            <div class="developer-accordion-content">
-                                                <div class="dev-skills"><i class="fas fa-server" title="Back-End"></i><i class="fas fa-database" title="Database"></i><i class="fab fa-node-js" title="Node.js"></i></div>
-                                                <div class="dev-social-icons"><a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="#" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a><a href="mailto:#" aria-label="Email"><i class="fas fa-envelope"></i></a></div>
-                                            </div>
-                                        </div>
-                                       <!-- Hansaka -->
-                                        <div class="developer-accordion-item">
-                                            <div class="developer-accordion-header">
+                                            <div class="developer-card-new" data-name="Hansaka Fernando" data-role="Web & Mobile App Developer" data-img="Developer Team/Hansaka.png" data-desc="Designed and developed the web interface and mobile application." data-comment="I am truly proud to be able to contribute to a project like this." data-skills='["fab fa-react", "fas fa-mobile-alt", "fab fa-html5", "fab fa-css3-alt", "fab fa-js-square", "fab fa-npm"]'>
                                                 <img src="Developer Team/Hansaka.png" alt="Hansaka Fernando">
-                                                <div class="developer-info">
-                                                    <h4>Hansaka Fernando</h4>
-                                                    <p class="role">UI/UX & Front-End</p>
+                                                <h4>Hansaka Fernando</h4>
+                                                <p class="role">Web & Mobile App Developer</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Designed and developed the web interface and mobile application.</p>
+                                                    <p class="dev-comment">"I am truly proud to be able to contribute to a project like this."</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fab fa-react"></i>
+                                                        <i class="fas fa-mobile-alt"></i>
+                                                        <i class="fab fa-html5"></i>
+                                                        <i class="fab fa-css3-alt"></i>
+                                                        <i class="fab fa-js-square"></i>
+                                                        <i class="fab fa-npm"></i>
+                                                    </div>
                                                 </div>
-                                                <i class="fas fa-chevron-down accordion-icon"></i>
-                                            </div>
-                                            <div class="developer-accordion-content">
-                                                <div class="dev-skills"><i class="fab fa-figma" title="Figma"></i><i class="fab fa-html5" title="HTML5"></i><i class="fab fa-css3-alt" title="CSS3"></i><i class="fab fa-js-square" title="JavaScript"></i></div>
-                                                <div class="dev-social-icons"><a href="https://www.facebook.com/share/1A2sZTerYJ/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="https://chat.whatsapp.com/C4aXtP8cV1QD2VwJ6EgEIK" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a><a href="mailto:emmvprefects@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a></div>
                                             </div>
                                         </div>
-                                        <!-- Nethmi -->
-                                        <div class="developer-accordion-item">
-                                            <div class="developer-accordion-header">
-                                                <img src="Developer Team/no-dp_16.webp" alt="Nethmi Dananjana">
-                                                <div class="developer-info">
-                                                    <h4>Nethmi Dananjana</h4>
-                                                    <p class="role">Data Collection Assistant</p>
+                                        <h4 class="section-title" style="font-size: 1.5rem; color: var(--primary-color); text-align: center; margin-top: 2rem; margin-bottom: 1.5rem;">Project Coordinators</h4>
+                                        <div class="developer-grid">
+                                            <div class="developer-card-new" data-name="Nethmi Dhananjana" data-role="Student Data Coordinator" data-img="Developer Team/Nethmi.jpg" data-desc="Managed students during the data collection process." data-comment="I’m really proud to be part of a project like this and to have the opportunity to contribute to something meaningful." data-skills='["fas fa-graduation-cap", "fas fa-book-reader", "fas fa-users-cog", "fas fa-chart-bar"]'>
+                                                <img src="Developer Team/Nethmi.jpg" alt="Nethmi Dhananjana">
+                                                <h4>Nethmi Dhananjana</h4>
+                                                <p class="role">Student Data Coordinator</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Managed students during the data collection process.</p>
+                                                    <p class="dev-comment">"I’m really proud to be part of a project like this and to have the opportunity to contribute to something meaningful."</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fas fa-graduation-cap"></i>
+                                                        <i class="fas fa-book-reader"></i>
+                                                        <i class="fas fa-users-cog"></i>
+                                                        <i class="fas fa-chart-bar"></i>
+                                                    </div>
                                                 </div>
-                                                <i class="fas fa-chevron-down accordion-icon"></i>
                                             </div>
-                                            <div class="developer-accordion-content">
-                                                <div class="dev-skills"><i class="fas fa-users" title="Third-Party Coordination"></i><i class="fas fa-file-alt" title="Documentation"></i></div>
-                                                <div class="dev-social-icons"><a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="#" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a><a href="mailto:#" aria-label="Email"><i class="fas fa-envelope"></i></a></div>
+                                            <div class="developer-card-new" data-name="Rashmi Jananjana" data-role="Student Management Lead" data-img="Developer Team/Rashmi.jpg" data-desc="Managed student engagement and participation in the project." data-comment="I am really happy to be involved in this project and manage students." data-skills='["fas fa-user-graduate", "fas fa-handshake-angle", "fas fa-comments", "fas fa-trophy"]'>
+                                                <img src="Developer Team/Rashmi.jpg" alt="Rashmi Jananjana">
+                                                <h4>Rashmi Jananjana</h4>
+                                                <p class="role">Student Management Lead</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Managed student engagement and participation in the project.</p>
+                                                    <p class="dev-comment">"I am really happy to be involved in this project and manage students."</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fas fa-user-graduate"></i>
+                                                        <i class="fas fa-handshake-angle"></i>
+                                                        <i class="fas fa-comments"></i>
+                                                        <i class="fas fa-trophy"></i>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>            </div>
-        </div>
+                                    </div>
+                <div class="guidance-section" style="margin-top: 3rem;">
+                    <h4 class="section-title">Guidance and Mentorship</h4>
+                    <div class="prefects-grid" style="margin-top: 1.5rem;">
+                        <div class="prefect-card teacher-card-style"><h4>W.A. Lasantha Weerasinghe</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>K.K. Kusum Malani</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>R.A.P.S. Rajapaksha</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>M.H. Janitha Chandani</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>R.P. Pramila Jayarathna</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>K.N.B.B.M. Lahiru Bandaranayake</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>D.G.A. Damith Weerasinghe</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>S.K. Upeksha Sewwandi</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>J.L. Nishanthimala</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>S.G.T.P.O. Ranasinghe</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>J.M. Deepani Jayaruwan</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>J.A.S.K. Jayasinghe</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>W.M. Janaki Rathnayake</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>W.M. Mihiri Weerasinghe</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>K.A.K. Saman Priyadarshana</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>D.M. Ruwan Dasanayaka</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>Y. Desika Kumari</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>H.P.S. Nishani</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>H.A.V.S. Jayawardhana</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>M.D.A.I. Kumara</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>A.P. Buddika Mihirani</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>M.M. Fathima Maheesha</h4><p>Guidance and Mentorship</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>P.R.I. Vihara Hemarathna</h4><p>Guidance and Mentorship</p></div>
+                    </div>
+                </div>
+                                <div class="modal-footer-content" style="margin-top: 3rem; text-align: center;">
+                                    <div class="modal-logos" style="margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 2rem;">
+                                        <img src="meroon Transparent logo prefect.png" alt="Prefect Logo" class="modal-logo-item" style="height: 60px;">
+                                        <img src="logo12.png" alt="School Logo" class="modal-logo-item" style="height: 60px;">
+                                    </div>
+                                    <p class="modal-copyright" style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-light);">All rights Reserved 2025</p>
+                                </div> <!-- End of developer-content-wrapper -->
+                    
+                                                </div>        </div>
     </div>
     
-    <div class="creators-fab" id="creators-fab">
-        <i class="fas fa-code"></i>
+<div id="prefect-detail-modal" class="modal">
+    <div class="modal-content-wrapper">
+        <div class="auth-card prefect-detail-card">
+                        <span class="close-button" id="prefect-detail-close-btn">&times;</span>
+                        <img id="prefect-detail-img" src="" alt="" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--secondary-color); margin-bottom: 1rem;">
+                        <h3 id="prefect-detail-name" style="font-size: 1.6rem; color: var(--primary-color); margin: 0.5rem 0;"></h3>
+                        <p id="prefect-detail-destiny" class="role" style="font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.5rem; font-weight: 600;"></p>
+            <div class="prefect-details-grid">
+                            <div><strong>Class:</strong> <span id="prefect-detail-class"></span></div>
+                            <div><strong>Duty:</strong> <span id="prefect-detail-duty"></span></div>
+                        </div>
+        </div>
     </div>
+</div>
+
+<div id="developer-detail-modal" class="modal">
+        <div class="modal-content-wrapper">
+            <div class="auth-card developer-detail-card" style="text-align: center;">
+                <img id="developer-detail-img" src="" alt="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--secondary-color); margin-bottom: 1rem;">
+                <h3 id="developer-detail-name" style="font-size: 1.5rem; color: var(--primary-color); margin: 0.5rem 0;"></h3>
+                <p id="developer-detail-role" class="role" style="font-size: 1rem; color: var(--text-light); margin-bottom: 1rem;"></p>
+                <p id="developer-detail-desc" style="font-size: 0.9rem; color: var(--text-color); margin-bottom: 1rem;"></p>
+                <p id="developer-detail-comment" class="dev-comment" style="font-style: italic; color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.9rem;"></p>
+                <div id="developer-detail-skills" class="dev-skills" style="justify-content: center; gap: 1rem; font-size: 1.5rem;"></div>
+                <button id="developer-detail-close-btn" class="btn btn-danger">Close</button>
+            </div>
+        </div>
+    </div>
+
+
 
     <button class="chat-fab" id="chatFab" aria-label="සහායතාවක් සඳහා සංවාද විවෘත කරන්න">
     <i class="fas fa-comments"></i>
@@ -1589,7 +2301,8 @@
             placeholder="Type Your Message..."
             autocomplete="off"
         >
-        <button class="chat-send" id="chatSend">
+        <button class="chat-send" id="chatSend"></button>
+
             <i class="fas fa-paper-plane"></i>
         </button>
     </div>
@@ -1612,17 +2325,9 @@
     </div>
 </div>
 
-<div id="gallery-lightbox" class="lightbox">
-    <span class="lightbox-close">&times;</span>
-    <a class="lightbox-prev">&#10094;</a>
-    <a class="lightbox-next">&#10095;</a>
-    <img class="lightbox-content" id="lightbox-img">
-    <div id="lightbox-caption"></div>
-</div>
+
 
 <script type="module">
-    // --- START: FULLY CORRECTED SCRIPT WITH DYNAMIC GALLERY ---
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
     import { 
         getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
@@ -1630,7 +2335,7 @@
     } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
     import { 
         getFirestore, collection, getDocs, initializeFirestore, 
-        doc, addDoc, setDoc, serverTimestamp, onSnapshot, query, orderBy, limit
+        doc, addDoc, setDoc, serverTimestamp, onSnapshot, query, orderBy, limit, where
     } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
     
     const firebaseConfig = {
@@ -1646,19 +2351,6 @@
     const app = initializeApp(firebaseConfig);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
-
-        // ===================================================
-
-        // === 1. AUTHENTICATION LOGIC & UI SETUP ===
-
-        // ===================================================
-
-    
-
-        // === START: MODIFIED JS VARIABLES ===
-
-        // Mobile controls (original)
-
         const loginNavBtn = document.getElementById('login-nav-btn');
 
         const logoutNavBtn = document.getElementById('logout-nav-btn');
@@ -1669,8 +2361,6 @@
 
         
 
-        // Desktop controls (new)
-
         const loginNavBtnDesktop = document.getElementById('login-nav-btn-desktop');
 
         const logoutNavBtnDesktop = document.getElementById('logout-nav-btn-desktop');
@@ -1678,10 +2368,6 @@
         const userStatusDesktop = document.getElementById('user-status-desktop');
 
         const userEmailSpanDesktop = document.getElementById('user-email-desktop');
-
-        // === END: MODIFIED JS VARIABLES ===
-
-    
 
         const authModal = document.getElementById('auth-modal');
 
@@ -1702,6 +2388,46 @@
         const authPasswordInput = document.getElementById('auth-password');
 
         const chatFab = document.getElementById('chatFab');
+
+
+
+        const developerCards = document.querySelectorAll('.developer-card-new');
+        const developerDetailModal = document.getElementById('developer-detail-modal');
+        const developerDetailCloseBtn = document.getElementById('developer-detail-close-btn');
+
+        const developerDetailImg = document.getElementById('developer-detail-img');
+        const developerDetailName = document.getElementById('developer-detail-name');
+        const developerDetailRole = document.getElementById('developer-detail-role');
+        const developerDetailDesc = document.getElementById('developer-detail-desc');
+        const developerDetailComment = document.getElementById('developer-detail-comment');
+        const developerDetailSkills = document.getElementById('developer-detail-skills');
+
+        developerCards.forEach(card => {
+            const viewBtn = card.querySelector('.view-details-btn');
+            viewBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                card.classList.toggle('expanded');
+                if (card.classList.contains('expanded')) {
+                    viewBtn.textContent = 'Close';
+                } else {
+                    viewBtn.textContent = 'View';
+                }
+            });
+        });
+
+        function closeDeveloperDetailModal() {
+            developerDetailModal.classList.remove('show');
+            setTimeout(() => {
+                developerDetailModal.style.display = 'none';
+            }, 300);
+        }
+
+        developerDetailCloseBtn.addEventListener('click', closeDeveloperDetailModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == developerDetailModal) {
+                closeDeveloperDetailModal();
+            }
+        });
 
         
 
@@ -1729,8 +2455,6 @@
 
             authModal.style.display = 'block';
 
-            // Use a timeout to allow the display property to apply before starting the transition
-
             setTimeout(() => authModal.classList.add('show'), 10);
 
         }
@@ -1738,8 +2462,6 @@
         function closeAuthModal() {
 
             authModal.classList.remove('show');
-
-            // Wait for the transition to finish before hiding the element
 
             setTimeout(() => {
 
@@ -1749,21 +2471,15 @@
 
                 authError.style.display = 'none';
 
-            }, 300); // Match CSS transition duration
+            }, 300);
 
         }
 
     
 
-        // === START: MODIFIED JS CLICK HANDLERS ===
-
         loginNavBtn.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
 
-        loginNavBtnDesktop.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); }); // Add this
-
-        // === END: MODIFIED JS CLICK HANDLERS ===
-
-    
+        loginNavBtnDesktop.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
 
         authCloseBtn.addEventListener('click', closeAuthModal);
 
@@ -1797,13 +2513,9 @@
 
     
 
-        // === START: MODIFIED onAuthStateChanged ===
-
         onAuthStateChanged(auth, async user => {
 
             if (user) {
-
-                // Mobile
 
                 loginNavBtn.style.display = 'none';
 
@@ -1811,13 +2523,11 @@
 
                 userStatus.style.display = 'none'; 
 
-                userEmailSpan.textContent = user.email;
+                                userEmailSpan.textContent = user.email;
 
                 
 
-                // Desktop
-
-                loginNavBtnDesktop.style.display = 'none';
+                                loginNavBtnDesktop.style.display = 'none';
 
                 logoutNavBtnDesktop.style.display = 'block';
 
@@ -1829,13 +2539,11 @@
 
                 chatFab.style.display = 'flex';
 
-                closeAuthModal();
+                                closeAuthModal();
 
-    
+                
 
-                // Update prefects collection with display name and photo URL if not already set
-
-                try {
+                                try {
 
                     const prefectsRef = collection(db, "prefects");
 
@@ -1887,21 +2595,17 @@
 
             } else {
 
-                // Mobile
-
                 loginNavBtn.style.display = 'block';
 
                 logoutNavBtn.style.display = 'none';
 
                 userStatus.style.display = 'none';
 
-                userEmailSpan.textContent = '';
+                                userEmailSpan.textContent = '';
 
                 
 
-                // Desktop
-
-                loginNavBtnDesktop.style.display = 'block';
+                                loginNavBtnDesktop.style.display = 'block';
 
                 logoutNavBtnDesktop.style.display = 'none';
 
@@ -1915,19 +2619,17 @@
 
                 chatContainer.classList.remove('active');
 
-                isChatOpen = false;
+                                isChatOpen = false;
 
-                if (chatUnsubscribe) chatUnsubscribe();
+                                if (chatUnsubscribe) chatUnsubscribe();
 
-            }
+                            }
 
-        });
+                        });
 
-        // === END: MODIFIED onAuthStateChanged ===
+                
 
-    
-
-        authForm.addEventListener('submit', async (e) => {
+                        authForm.addEventListener('submit', async (e) => {
 
             e.preventDefault();
 
@@ -1967,8 +2669,6 @@
 
     
 
-        // === START: MODIFIED LOGOUT HANDLERS ===
-
         logoutNavBtn.addEventListener('click', async (e) => {
 
             e.preventDefault();
@@ -1983,8 +2683,7 @@
 
         });
 
-        logoutNavBtnDesktop.addEventListener('click', async (e) => { // Add this
-
+        logoutNavBtnDesktop.addEventListener('click', async (e) => {
             e.preventDefault();
 
             try {
@@ -1995,14 +2694,9 @@
 
             } catch (error) { console.error("Logout Error:", error); }
 
-        });
+                });
 
-        // === END: MODIFIED LOGOUT HANDLERS ===
-
-    // ===================================================
-    // === 2. AUTH-INTEGRATED REAL-TIME CHAT BOT LOGIC ===
-    // ===================================================
-    const chatClose = document.getElementById('chatClose');
+            const chatClose = document.getElementById('chatClose');
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
@@ -2013,6 +2707,19 @@
     function listenForMessages(uid) {
         if (chatUnsubscribe) chatUnsubscribe();
         const messagesRef = collection(db, 'chats', uid, 'messages');
+
+    document.querySelectorAll('.section-accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+            console.log('Section accordion header clicked!');
+            const sectionAccordionItem = header.closest('.section-accordion-item');
+            sectionAccordionItem.classList.toggle('active');
+
+            const developerAccordionItems = sectionAccordionItem.querySelectorAll('.developer-accordion-item');
+            developerAccordionItems.forEach(item => {
+                item.classList.toggle('active', sectionAccordionItem.classList.contains('active'));
+            });
+        });
+    });
         const q = query(messagesRef, orderBy('timestamp'));
         chatUnsubscribe = onSnapshot(q, (snapshot) => {
             chatMessages.innerHTML = '';
@@ -2097,10 +2804,6 @@
     chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUserInput(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isChatOpen) { chatClose.click(); } });
 
-    // ===================================================
-    // === 3. OTHER PAGE LOGIC (Scroll, Modals, etc.) ===
-    // ===================================================
-
     window.onload = () => {
         const loader = document.getElementById('loader');
         if(loader) loader.classList.add('hidden');
@@ -2124,7 +2827,6 @@
         animatedElements.forEach(el => observer.observe(el));
     }
 
-    // --- Counter Animation ---
     const statsSection = document.getElementById('stats-counter');
 
     if (statsSection) {
@@ -2136,10 +2838,8 @@
 
                 const target = +counter.getAttribute('data-target');
                 let count = 0;
-                const duration = 2000; // 2 seconds
+                const duration = 2000;
                 
-                // This calculates the increment needed for each frame to finish in 'duration'
-                // It assumes roughly 60 frames per second (1000ms / 16.6ms)
                 const frameDuration = 1000 / 60;
                 const totalFrames = Math.round(duration / frameDuration);
                 const increment = target / totalFrames;
@@ -2151,7 +2851,7 @@
                         counter.innerText = Math.ceil(count);
                         requestAnimationFrame(updateCount);
                     } else {
-                        counter.innerText = target; // Ensure it ends on the exact target
+                        counter.innerText = target;
                     }
                 };
                 requestAnimationFrame(updateCount);
@@ -2170,8 +2870,6 @@
         observer.observe(statsSection);
     }
 
-    // === JS for mobile menu (NO CHANGES NEEDED) ===
-    // This correctly targets the mobile nav wrapper (#main-nav) and toggle
     const menuToggle = document.getElementById('menu-toggle');
     const mainNav = document.getElementById('main-nav');
     if(menuToggle && mainNav) {
@@ -2210,12 +2908,20 @@
         }, 500); // Must match the CSS transition duration for the drawer
     };
 
-    creatorsFab.addEventListener('click', openCreatorsModal);
+    const footerDeveloperBtn = document.getElementById('footer-developer-btn');
+    if (footerDeveloperBtn) {
+        footerDeveloperBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCreatorsModal();
+        });
+    }
     // Add a null check to prevent script crash if button isn't found
     if (closeCreatorsModalBtn) {
         closeCreatorsModalBtn.addEventListener('click', closeCreatorsModal);
     }
     window.addEventListener('click', (event) => { if (event.target == creatorsModal) closeCreatorsModal(); });
+
+
 
     // Accordion logic for Developer List
     const accordion = document.getElementById('developer-accordion');
@@ -2224,15 +2930,11 @@
             const header = e.target.closest('.developer-accordion-header');
             if (header) {
                 const item = header.parentElement;
-                // Optional: Close other items when one is opened
-                // const allItems = accordion.querySelectorAll('.developer-accordion-item');
-                // allItems.forEach(i => { if (i !== item) i.classList.remove('active'); });
                 item.classList.toggle('active');
             }
         });
     }
 
-    // --- Manual and Auto scroll for testimonials ---
     const slider = document.querySelector('.testimonials-grid');
     if (slider) {
         let isDown = false;
@@ -2241,7 +2943,6 @@
         let autoScrollInterval;
 
         const startAutoScroll = () => {
-            // To make it seamless, we need to duplicate the content
             const scroller = slider.querySelector('.testimonials-scroller');
             if (scroller && !scroller.classList.contains('duplicated')) {
                 const scrollerContent = Array.from(scroller.children);
@@ -2258,7 +2959,7 @@
                 if (slider.scrollLeft >= scroller.scrollWidth / 2) {
                     slider.scrollLeft = 0;
                 }
-            }, 25); // Adjust speed here
+            }, 25);
         };
 
         const stopAutoScroll = () => {
@@ -2289,14 +2990,13 @@
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - slider.offsetLeft;
-            const walk = (x - startX) * 2; //scroll-fast
+            const walk = (x - startX) * 2;
             slider.scrollLeft = scrollLeft - walk;
         });
 
         startAutoScroll();
     }
 
-    // --- Show More/Less for Teachers ---
     const teachersGrid = document.getElementById('teachers-grid');
     if (teachersGrid) {
         const showMoreTeachersBtn = document.getElementById('show-more-teachers-btn');
@@ -2306,7 +3006,6 @@
 
         const updateTeacherVisibility = (showAll) => {
             allTeachers.forEach((teacher, index) => {
-                // The principal card is not in this grid, so no need to check for it.
                 if (showAll || index < initialTeacherCount) {
                     teacher.classList.remove('element-hidden');
                 } else {
@@ -2331,13 +3030,8 @@
         }
     }
 
-    // ===================================================
-    // === 4. DYNAMIC DATA LOADING (Prefects & Gallery) ===
-    // ===================================================
-    
-    // --- Prefects List Logic ---
     const prefectsGrid = document.getElementById('prefects-grid');
-    const searchBar = document.getElementById('prefect-search-bar');
+    const prefectSearchBar = document.getElementById('prefect-search-bar');
     const categoryFilterList = document.getElementById('category-filter-list');
     const showMoreBtn = document.getElementById('show-more-btn');
     const showLessBtn = document.getElementById('show-less-btn');
@@ -2357,7 +3051,7 @@
             updatePrefectCardVisibility();
         } catch (error) {
             console.error("Error fetching prefects: ", error);
-            prefectsGrid.innerHTML = `<p>Error loading prefects.</p>`;
+            prefectsGrid.innerHTML = `<p class="error-message">Error loading prefects.</p>`;
         }
     }
 
@@ -2380,24 +3074,30 @@
 
     function initializePrefectCards() {
         if (!prefectsGrid) return;
-        prefectsGrid.innerHTML = ''; // Clear loading message
+        prefectsGrid.innerHTML = '';
         fetchedPrefects.forEach((prefect, index) => {
-            const card = document.createElement('div');
-            card.className = 'prefect-card animate-child element-hidden';
-            card.dataset.name = (prefect.name || '').toLowerCase();
-            card.dataset.category = prefect.section || '';
-            card.innerHTML = `
-                <img src="${prefect.picture || '25.jpg'}" alt="${prefect.name || 'Prefect'}">
-                <h4>${prefect.name || 'No Name'}</h4>
-                <p>${prefect.destiny || 'No Position'}</p>
+            const prefectCard = document.createElement('div');
+            prefectCard.className = 'prefect-card';
+
+            // Add data attributes for the modal
+            prefectCard.dataset.name = prefect.name || '';
+            prefectCard.dataset.picture = prefect.picture || '';
+            prefectCard.dataset.destiny = prefect.destiny || '';
+            prefectCard.dataset.class = prefect.class || '';
+            prefectCard.dataset.duty = prefect.current_duty || '';
+
+            prefectCard.innerHTML = `
+                <img src="${prefect.picture}" alt="${prefect.name}" loading="lazy">
+                <h4>${prefect.name}</h4>
+                <p>${prefect.destiny}</p>
             `;
-            prefectsGrid.appendChild(card);
+            prefectsGrid.appendChild(prefectCard);
         });
     }
 
     function updatePrefectCardVisibility() {
         if (!prefectsGrid) return;
-        const searchTerm = searchBar.value.toLowerCase();
+        const searchTerm = prefectSearchBar.value.toLowerCase();
         
         const allCards = Array.from(prefectsGrid.children).filter(child => child.classList.contains('prefect-card'));
         let visibleCards = [];
@@ -2418,11 +3118,9 @@
         const cardsToShow = visibleCards.slice(0, visiblePrefectCount);
         cardsToShow.forEach(card => card.classList.remove('element-hidden'));
 
-        // Manage Show More/Less buttons
         showMoreBtn.style.display = visibleCards.length > visiblePrefectCount ? 'inline-block' : 'none';
         showLessBtn.style.display = visiblePrefectCount > initialVisibleCount && visibleCards.length > 0 ? 'inline-block' : 'none';
         
-        // Handle no results message
         const noResultsMsg = prefectsGrid.querySelector('.no-results-message');
         if (visibleCards.length === 0) {
             if (!noResultsMsg) {
@@ -2439,7 +3137,7 @@
     }
     
     if (prefectsGrid) {
-        searchBar.addEventListener('input', () => {
+        prefectSearchBar.addEventListener('input', () => {
             visiblePrefectCount = initialVisibleCount; // Reset count on new search
             updatePrefectCardVisibility();
         });
@@ -2468,8 +3166,12 @@
         });
     }
 
-    // --- Dynamic Public Gallery Logic ---
     const publicGalleryGrid = document.getElementById('gallery-grid-public');
+    const showMoreGalleryBtn = document.getElementById('show-more-gallery-btn');
+    const showLessGalleryBtn = document.getElementById('show-less-gallery-btn');
+    const initialGalleryImageCount = 6; // Number of images to show initially
+    let visibleGalleryImageCount = initialGalleryImageCount;
+    let fetchedGalleryImages = []; // To store all fetched images
 
     async function loadPublicGallery() {
         if (!publicGalleryGrid) return;
@@ -2477,150 +3179,350 @@
             const q = query(collection(db, 'gallery'), orderBy('uploadedAt', 'desc'));
             const querySnapshot = await getDocs(q);
             
-            publicGalleryGrid.innerHTML = '';
-            if (querySnapshot.empty) { publicGalleryGrid.innerHTML = '<p>No images in the gallery yet.</p>'; return; }
+            fetchedGalleryImages = [];
+            querySnapshot.forEach(docSnap => fetchedGalleryImages.push(docSnap.data()));
 
-            querySnapshot.forEach(docSnap => {
-                const imageData = docSnap.data();
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item animate-child';
-                galleryItem.innerHTML = `<img src="${imageData.url}" alt="Gallery image">`;
-                publicGalleryGrid.appendChild(galleryItem);
-            });
+            updateGalleryVisibility();
         } catch (error) {
             console.error("Error loading public gallery:", error);
-            publicGalleryGrid.innerHTML = '<p>Could not load gallery images.</p>';
+            publicGalleryGrid.innerHTML = '<p class="error-message">Could not load gallery images.</p>';
         }
     }
 
-    // --- INITIALIZE ALL DYNAMIC CONTENT ---
-    loadAndDisplayPrefects();
-    loadPublicGallery();
-    loadAnnouncementsAndEvents();
+    function updateGalleryVisibility() {
+        if (!publicGalleryGrid) return;
 
-    // --- Dynamic Announcements & Events Logic ---
-    const announcementsContainer = document.querySelector('.announcements-container');
+        publicGalleryGrid.innerHTML = '';
 
-    async function loadAnnouncementsAndEvents() {
-        if (!announcementsContainer) return;
+        if (fetchedGalleryImages.length === 0) {
+            publicGalleryGrid.innerHTML = '<p>No images in the gallery yet.</p>';
+            showMoreGalleryBtn.style.display = 'none';
+            showLessGalleryBtn.style.display = 'none';
+            return;
+        }
 
-        const eventsRef = collection(db, 'events');
-        const q = query(eventsRef, orderBy('date', 'desc'), limit(3));
+        const imagesToShow = fetchedGalleryImages.slice(0, visibleGalleryImageCount);
 
-        onSnapshot(q, (snapshot) => {
-            if (snapshot.empty) {
-                announcementsContainer.innerHTML = '<p>No recent announcements or events.</p>';
-                return;
-            }
+        imagesToShow.forEach(imageData => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item animate-child';
+            galleryItem.innerHTML = `<img src="${imageData.url}" alt="Gallery image" loading="lazy">`;
+            publicGalleryGrid.appendChild(galleryItem);
+        });
 
-            announcementsContainer.innerHTML = ''; // Clear existing static content
-            snapshot.forEach(doc => {
-                const event = doc.data();
-                const eventCard = document.createElement('div');
-                eventCard.className = 'announcement-card animate-child';
+        showMoreGalleryBtn.style.display = fetchedGalleryImages.length > visibleGalleryImageCount ? 'inline-block' : 'none';
+        showLessGalleryBtn.style.display = visibleGalleryImageCount > initialGalleryImageCount ? 'inline-block' : 'none';
+    }
 
-                // Date formatting from "YYYY-MM-DD" string
-                const [year, monthNum, dayNum] = event.date.split('-');
-                const eventDate = new Date(year, monthNum - 1, dayNum);
-                const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
+    if (showMoreGalleryBtn) {
+        showMoreGalleryBtn.addEventListener('click', () => {
+            visibleGalleryImageCount += initialGalleryImageCount;
+            updateGalleryVisibility();
+        });
+    }
 
-                eventCard.innerHTML = `
-                    <div class="announcement-date">
-                        <span class="day">${dayNum}</span>
-                        <span class="month">${month}</span>
-                    </div>
-                    <div class="announcement-content">
-                        <h4>${event.title}</h4>
-                        <p>${event.description}</p>
-                    </div>
-                `;
-                announcementsContainer.appendChild(eventCard);
+    if (showLessGalleryBtn) {
+        showLessGalleryBtn.addEventListener('click', () => {
+            visibleGalleryImageCount = initialGalleryImageCount;
+            updateGalleryVisibility();
+            document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZE ALL DYNAMIC CONTENT ---
+        loadAndDisplayPrefects();
+        loadPublicGallery();
+
+        // --- Theme Toggle Logic ---
+        const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn, .theme-toggle-btn-mobile');
+        const currentTheme = localStorage.getItem('theme');
+
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        themeToggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-mode')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
             });
         });
-    }
 
-    // --- Theme Toggle Logic ---
-    const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn, .theme-toggle-btn-mobile');
-    const currentTheme = localStorage.getItem('theme');
+        // --- Gallery Lightbox Logic ---
+        const lightbox = document.getElementById('gallery-lightbox');
+        if (lightbox) {
+            const publicGalleryGrid = document.getElementById('gallery-grid-public');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxClose = lightbox.querySelector('.lightbox-close');
+            const lightboxPrev = lightbox.querySelector('.lightbox-prev');
+            const lightboxNext = lightbox.querySelector('.lightbox-next');
 
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
+            let currentImageIndex = -1;
+            let galleryImages = [];
 
-    themeToggleBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            let theme = 'light';
-            if (document.body.classList.contains('dark-mode')) {
-                theme = 'dark';
-            }
-            localStorage.setItem('theme', theme);
-        });
-    });
+            const openLightbox = (index) => {
+                if (index < 0 || index >= galleryImages.length) return;
+                currentImageIndex = index;
+                lightbox.style.display = 'block';
+                lightboxImg.src = galleryImages[currentImageIndex].src;
+            };
 
-    // --- Gallery Lightbox Logic ---
-    const lightbox = document.getElementById('gallery-lightbox');
-    if (lightbox) {
-        const publicGalleryGrid = document.getElementById('gallery-grid-public');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const lightboxClose = lightbox.querySelector('.lightbox-close');
-        const lightboxPrev = lightbox.querySelector('.lightbox-prev');
-        const lightboxNext = lightbox.querySelector('.lightbox-next');
+            const closeLightbox = () => {
+                lightbox.style.display = 'none';
+            };
 
-        let currentImageIndex = -1;
-        let galleryImages = [];
+            const showNextImage = () => {
+                openLightbox((currentImageIndex + 1) % galleryImages.length);
+            };
 
-        const openLightbox = (index) => {
-            if (index < 0 || index >= galleryImages.length) return;
-            currentImageIndex = index;
-            lightbox.style.display = 'block';
-            lightboxImg.src = galleryImages[currentImageIndex].src;
-        };
+            const showPrevImage = () => {
+                openLightbox((currentImageIndex - 1 + galleryImages.length) % galleryImages.length);
+            };
 
-        const closeLightbox = () => {
-            lightbox.style.display = 'none';
-        };
-
-        const showNextImage = () => {
-            openLightbox((currentImageIndex + 1) % galleryImages.length);
-        };
-
-        const showPrevImage = () => {
-            openLightbox((currentImageIndex - 1 + galleryImages.length) % galleryImages.length);
-        };
-
-        if (publicGalleryGrid) {
-            publicGalleryGrid.addEventListener('click', (e) => {
-                if (e.target.tagName === 'IMG') {
-                    galleryImages = Array.from(publicGalleryGrid.querySelectorAll('img'));
-                    const clickedIndex = galleryImages.findIndex(img => img.src === e.target.src);
-                    if (clickedIndex !== -1) {
-                        openLightbox(clickedIndex);
+            if (publicGalleryGrid) {
+                publicGalleryGrid.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'IMG') {
+                        galleryImages = Array.from(publicGalleryGrid.querySelectorAll('img'));
+                        const clickedIndex = galleryImages.findIndex(img => img.src === e.target.src);
+                        if (clickedIndex !== -1) {
+                            openLightbox(clickedIndex);
+                        }
                     }
+                });
+            }
+
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxNext.addEventListener('click', showNextImage);
+            lightboxPrev.addEventListener('click', showPrevImage);
+
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (lightbox.style.display === 'block') {
+                    if (e.key === 'ArrowRight') showNextImage();
+                    else if (e.key === 'ArrowLeft') showPrevImage();
+                    else if (e.key === 'Escape') closeLightbox();
                 }
             });
         }
 
-        lightboxClose.addEventListener('click', closeLightbox);
-        lightboxNext.addEventListener('click', showNextImage);
-        lightboxPrev.addEventListener('click', showPrevImage);
-
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
+        // Section Accordion Logic
+        document.querySelectorAll('.section-accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                console.log('Section accordion header clicked!'); // Added console.log
+                const sectionAccordionItem = header.closest('.section-accordion-item');
+                sectionAccordionItem.classList.toggle('active');
+            });
         });
-        
-        document.addEventListener('keydown', (e) => {
-            if (lightbox.style.display === 'block') {
-                if (e.key === 'ArrowRight') showNextImage();
-                else if (e.key === 'ArrowLeft') showPrevImage();
-                else if (e.key === 'Escape') closeLightbox();
-            }
+
+        // --- Custom Audio Player Logic ---
+        const audio = document.getElementById('prefect-anthem-audio');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const seekBar = document.getElementById('seek-bar');
+        const timeDisplay = document.getElementById('time-display');
+
+        if (audio && playPauseBtn && seekBar && timeDisplay) {
+            const playPauseIcon = playPauseBtn.querySelector('i');
+
+            const togglePlayPause = () => {
+                if (audio.paused) {
+                    audio.play();
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                } else {
+                    audio.pause();
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                }
+            };
+
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            };
+
+            const updateSeekBar = () => {
+                if (audio.duration) {
+                    seekBar.value = (audio.currentTime / audio.duration) * 100;
+                    timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+                }
+            };
+
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            
+            audio.addEventListener('timeupdate', updateSeekBar);
+            
+            audio.addEventListener('loadedmetadata', () => {
+                if (audio.duration) {
+                    timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
+                }
+            });
+
+            seekBar.addEventListener('input', () => {
+                if (audio.duration) {
+                    audio.currentTime = (seekBar.value / 100) * audio.duration;
+                }
+            });
+        }
+    });
+
+function throttle(callback, delay) {
+    let isThrottled = false;
+    return function(...args) {
+        if (!isThrottled) {
+            callback.apply(this, args);
+            isThrottled = true;
+            setTimeout(() => {
+                isThrottled = false;
+            }, delay);
+        }
+    };
+}
+
+function apply3dTiltEffect(selector) {
+    const cards = document.querySelectorAll(selector);
+
+    cards.forEach(card => {
+        const throttledMouseMove = throttle((e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = card.offsetWidth / 2;
+            const centerY = card.offsetHeight / 2;
+            const rotateX = (y - centerY) / 15;
+            const rotateY = (centerX - x) / 15;
+
+            window.requestAnimationFrame(() => {
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+        }, 16); // Roughly 60fps
+
+        card.addEventListener('mousemove', throttledMouseMove);
+
+        card.addEventListener('mouseleave', () => {
+            window.requestAnimationFrame(() => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    apply3dTiltEffect('.prefect-card');
+    apply3dTiltEffect('.gallery-item');
+    apply3dTiltEffect('.testimonial-card');
+    apply3dTiltEffect('.developer-card-new');
+    apply3dTiltEffect('.vision-mission-card');
+    apply3dTiltEffect('.stat-item');
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Launch Banner functionality
+    const launchBanner = document.getElementById('launch-banner');
+    const closeBannerBtn = document.querySelector('.close-banner-btn');
+
+    if (launchBanner && closeBannerBtn) {
+        // Check if banner was previously dismissed
+        if (localStorage.getItem('launchBannerDismissed') === 'true') {
+            launchBanner.style.display = 'none';
+        }
+
+        closeBannerBtn.addEventListener('click', () => {
+            launchBanner.style.display = 'none';
+            localStorage.setItem('launchBannerDismissed', 'true'); // Remember dismissal
         });
     }
+});
 
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Prefect Detail Modal Functionality ---
+    const prefectDetailModal = document.getElementById('prefect-detail-modal');
+    const prefectDetailCloseBtn = document.getElementById('prefect-detail-close-btn');
+    const prefectModalCloseBtnBottom = document.getElementById('prefect-modal-close-btn-bottom');
+
+    // Modal fields
+    const prefectDetailImg = document.getElementById('prefect-detail-img');
+    const prefectDetailName = document.getElementById('prefect-detail-name');
+    const prefectDetailDestiny = document.getElementById('prefect-detail-destiny');
+    const prefectDetailClass = document.getElementById('prefect-detail-class');
+    const prefectDetailDuty = document.getElementById('prefect-detail-duty');
+
+    function openPrefectModal(card) {
+        // Populate modal from data attributes
+        prefectDetailImg.src = card.dataset.picture;
+        prefectDetailName.textContent = card.dataset.name;
+        prefectDetailDestiny.textContent = card.dataset.destiny;
+        prefectDetailClass.textContent = card.dataset.class;
+        prefectDetailDuty.textContent = card.dataset.duty;
+
+        prefectDetailModal.style.display = 'block';
+        setTimeout(() => prefectDetailModal.classList.add('show'), 10);
+    }
+
+    function closePrefectModal() {
+        prefectDetailModal.classList.remove('show');
+        setTimeout(() => {
+            prefectDetailModal.style.display = 'none';
+        }, 400);
+    }
+
+    // Event Listeners
+    // prefectsGrid is used here, so it must be accessible from the global scope.
+    prefectsGrid.addEventListener('click', (e) => {
+        const card = e.target.closest('.prefect-card');
+        if (card) {
+            openPrefectModal(card);
+        }
+    });
+
+    prefectDetailCloseBtn.addEventListener('click', closePrefectModal);
+    window.addEventListener('click', (event) => {
+        if (event.target == prefectDetailModal) {
+            closePrefectModal();
+        }
+    });
+    // Scroll-to-top button functionality
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+    if (scrollToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) { // Show button after scrolling down 300px
+                scrollToTopBtn.style.display = 'flex'; // Use flex to center icon
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Smooth scroll to top
+            });
+        });
+    }
+});
 </script>
+
+    <div id="gallery-lightbox" class="modal">
+        <span class="lightbox-close">&times;</span>
+        <span class="lightbox-prev">&#10094;</span>
+        <span class="lightbox-next">&#10095;</span>
+        <img class="lightbox-content" id="lightbox-img">
+    </div>
+
+    <div id="scroll-to-top" class="scroll-to-top-btn">
+        <i class="fas fa-chevron-up"></i>
+    </div>
 
 </body>
 </html>
