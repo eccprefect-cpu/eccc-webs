@@ -1093,7 +1093,22 @@
             }
         }
 
+        @media (min-width: 993px) {
+            .creators-card {
+                width: 450px; /* Adjust as needed */
+                max-width: 450px;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: -8px 0 20px rgba(0,0,0,0.15);
+                padding: 2.5rem;
+            }
+        }
 
+        @media (min-width: 993px) {
+            .portfolio-header {
+                padding: 1.5rem 2rem;
+            }
+        }
 
         .background-particles {
             position: fixed;
@@ -1794,7 +1809,6 @@
             </nav>
             <div class="header-right">
                 <ul class="header-controls-desktop">
-                    <li id="login-nav-btn-desktop" style="display: block;"><a href="#" class="login-btn">Login</a></li>
                     <li id="logout-nav-btn-desktop" style="display: none;"><a href="#" class="login-btn">Logout</a></li>
                     <li id="user-status-desktop" style="display: none;">Welcome, <span id="user-email-desktop"></span></li>
                 </ul>
@@ -1814,8 +1828,7 @@
                     <li><a href="#prefects-list">Prefects</a></li>
                     <li><a href="#gallery">Gallery</a></li>
                     <li><a href="#contact">Contact</a></li>
-                    <li id="login-nav-btn" style="display: block;"><a href="#" class="login-btn-mobile">Login</a></li>
-                    <li id="logout-nav-btn" style="display: none;"><a href="#">Logout</a></li>
+                    <li id="logout-nav-btn" style="display: none;"><a href="#" class="login-btn">Logout</a></li>
                     <li id="user-status" style="display: none;">Welcome, <span id="user-email"></span></li>
                 </ul>
             </nav>
@@ -2308,7 +2321,7 @@
     </div>
 </div>
 
-<div id="auth-modal" class="modal" style="display: none;">
+<div id="auth-modal" class="modal">
     <div class="modal-content-wrapper">
         <div class="auth-card" style="text-align: center;">
             <span class="close-button" id="auth-close-btn"><i class="fas fa-times"></i></span>
@@ -2351,8 +2364,6 @@
     const app = initializeApp(firebaseConfig);
     const db = initializeFirestore(app, { experimentalForceLongPolling: true });
     const auth = getAuth(app);
-        const loginNavBtn = document.getElementById('login-nav-btn');
-
         const logoutNavBtn = document.getElementById('logout-nav-btn');
 
         const userStatus = document.getElementById('user-status');
@@ -2360,8 +2371,6 @@
         const userEmailSpan = document.getElementById('user-email');
 
         
-
-        const loginNavBtnDesktop = document.getElementById('login-nav-btn-desktop');
 
         const logoutNavBtnDesktop = document.getElementById('logout-nav-btn-desktop');
 
@@ -2451,13 +2460,19 @@
 
     
 
-        function openAuthModal() {
+            function openAuthModal() {
 
-            authModal.style.display = 'block';
+    
 
-            setTimeout(() => authModal.classList.add('show'), 10);
+                authModal.style.setProperty('display', 'block', 'important');
 
-        }
+    
+
+                setTimeout(() => authModal.classList.add('show'), 10);
+
+    
+
+            }
 
         function closeAuthModal() {
 
@@ -2477,9 +2492,7 @@
 
     
 
-        loginNavBtn.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
 
-        loginNavBtnDesktop.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(); });
 
         authCloseBtn.addEventListener('click', closeAuthModal);
 
@@ -2517,8 +2530,6 @@
 
             if (user) {
 
-                loginNavBtn.style.display = 'none';
-
                 logoutNavBtn.style.display = 'block';
 
                 userStatus.style.display = 'none'; 
@@ -2526,8 +2537,6 @@
                                 userEmailSpan.textContent = user.email;
 
                 
-
-                                loginNavBtnDesktop.style.display = 'none';
 
                 logoutNavBtnDesktop.style.display = 'block';
 
@@ -2594,8 +2603,6 @@
     
 
             } else {
-
-                loginNavBtn.style.display = 'block';
 
                 logoutNavBtn.style.display = 'none';
 
@@ -3085,12 +3092,9 @@
             prefectCard.dataset.destiny = prefect.destiny || '';
             prefectCard.dataset.class = prefect.class || '';
             prefectCard.dataset.duty = prefect.current_duty || '';
+            prefectCard.dataset.category = prefect.section || ''; // Added for category filtering
 
-            prefectCard.innerHTML = `
-                <img src="${prefect.picture}" alt="${prefect.name}" loading="lazy">
-                <h4>${prefect.name}</h4>
-                <p>${prefect.destiny}</p>
-            `;
+            prefectCard.innerHTML = `\n                <img src="${prefect.picture}" alt="${prefect.name}" loading="lazy">\n                <h4>${prefect.name}</h4>\n                <p>${prefect.destiny}</p>\n            `;
             prefectsGrid.appendChild(prefectCard);
         });
     }
