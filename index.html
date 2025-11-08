@@ -27,9 +27,9 @@
             --secondary-color: #D4AF37;
             --text-color: #3b3b3b;
             --text-light: #5f5f5f;
-            --card-bg-color: #FDFDFD;
+            --card-bg-color: #FFFCF7; /* Warmer card background */
             --light-text-color: #ffffff;
-            --glass-bg: rgba(253, 253, 253, 0.75);
+            --glass-bg: rgba(255, 252, 247, 0.75); /* Warmer glass background */
             --success-color: #28a745;
         }
 
@@ -38,6 +38,7 @@
             --text-light: #b0b0b0;
             --card-bg-color: #121212;
             --glass-bg: rgba(30, 30, 30, 0.75);
+            --secondary-color: #C0A030; /* Refined gold for dark mode */
 
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
             background-attachment: fixed;
@@ -93,7 +94,7 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             color: var(--text-color);
-            background: linear-gradient(135deg, #F8F8F8 0%, #F0F0F0 100%); /* Slightly darker background */
+            background: linear-gradient(135deg, #FCF8F3 0%, #F5EFE6 100%); /* Warmer background */
             background-attachment: fixed;
         }
         h1, h2, h3, h4 {
@@ -409,7 +410,7 @@
         .contact-item-content a:hover { text-decoration: underline; }
         .contact-map iframe { width: 100%; height: 350px; border-radius: 12px; border: 0; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1); }
         .show-more-container { text-align: center; margin-top: 1rem; display: flex; justify-content: center; gap: 1rem; }
-        #show-more-teachers-btn, #show-less-teachers-btn, #show-more-btn, #show-less-btn { background-color: var(--primary-color); color: var(--light-text-color); border: none; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; text-transform: uppercase; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); letter-spacing: 0.5px; }
+        #show-more-teachers-btn, #show-less-teachers-btn, #show-more-btn, #show-less-btn { background-image: linear-gradient(to top, #7A150F, #941a12); color: var(--light-text-color); border: none; padding: 0.8rem 2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; text-transform: uppercase; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); letter-spacing: 0.5px; }
         #show-more-teachers-btn:hover, #show-less-teachers-btn:hover { background-color: #70160F; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
         #show-less-teachers-btn { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); box-shadow: none; }
         #show-less-teachers-btn:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
@@ -1664,7 +1665,7 @@
     z-index: 1001;
 }
 .view-details-btn {
-    background-color: var(--primary-color);
+    background-image: linear-gradient(to top, #7A150F, #941a12);
     color: white;
     border: none;
     padding: 0.6rem 1.2rem;
@@ -1685,7 +1686,7 @@
 }
 
 .terms-btn {
-    background-color: var(--secondary-color);
+    background-image: linear-gradient(to top, #D4AF37, #e0bb41);
     color: var(--primary-color);
     border: none;
     padding: 0.8rem 2rem;
@@ -1880,11 +1881,79 @@
         color: var(--primary-color);
         cursor: pointer;
     }
-    .volume-bar {
-        width: 70px;
-    }
-    </style></head>
-<body>
+            .volume-bar {
+                width: 70px;
+            }
+    
+            /* Prefect of the Month Section */
+            .prefect-month-card {
+                display: flex;
+                align-items: center;
+                gap: 2rem;
+                background: var(--card-bg-color);
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            }
+            .prefect-month-img img {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 5px solid var(--secondary-color);
+            }
+            .prefect-month-content h4 {
+                color: var(--primary-color);
+                font-size: 1.5rem;
+                margin-top: 0;
+                margin-bottom: 0.5rem;
+            }
+            .prefect-month-content .role {
+                font-weight: 600;
+                color: var(--text-light);
+                margin-bottom: 1rem;
+            }
+            .prefect-month-content .quote {
+                font-style: italic;
+                color: var(--text-color);
+                line-height: 1.6;
+            }
+            .teacher-list li {
+            background: var(--card-bg-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        body.dark-mode .teacher-list li {
+            background: #2c2c2c;
+        }
+
+        /* New styles for teacher cards */
+        .teacher-card {
+            background: var(--card-bg-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .teacher-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+        .teacher-card h4 {
+            margin: 0.8rem 0 0.2rem;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+        .teacher-card p {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+    </style></head><body>
 <ul class="background-particles">
     <li></li>
     <li></li>
@@ -2056,6 +2125,13 @@
                 </div>
             </section>
 
+            <section id="prefect-of-the-month" class="portfolio-section animate-on-scroll">
+                <h3>Prefect of the Month</h3>
+                <div id="prefect-month-container" class="prefect-month-card">
+                    <!-- Prefect of the month will be loaded here -->
+                </div>
+            </section>
+
 
             
             <section id="teachers-in-charge" class="portfolio-section animate-on-scroll">
@@ -2070,39 +2146,75 @@
                 </div>
 
                 <h3 class="section-title">Teachers in Charge</h3>
-                <div class="custom-accordion" id="teachers-accordion">
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <span>Click to view the list of teachers</span>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <ul class="teacher-list">
-                                <li>W.A. Lasantha Weerasinghe</li>
-                                <li>K.K. Kusum Malani</li>
-                                <li>R.A.P.S. Rajapaksha</li>
-                                <li>M.H. Janitha Chandani</li>
-                                <li>R.P. Pramila Jayarathna</li>
-                                <li>K.N.B.B.M. Lahiru Bandaranayake</li>
-                                <li>D.G.A. Damith Weerasinghe</li>
-                                <li>S.K. Upeksha Sewwandi</li>
-                                <li>J.L. Nishanthimala</li>
-                                <li>S.G.T.P.O. Ranasinghe</li>
-                                <li>J.M. Deepani Jayaruwan</li>
-                                <li>J.A.S.K. Jayasinghe</li>
-                                <li>W.M. Janaki Rathnayake</li>
-                                <li>W.M. Mihiri Weerasinghe</li>
-                                <li>K.A.K. Saman Priyadarshana</li>
-                                <li>D.M. Ruwan Dasanayaka</li>
-                                <li>Y. Desika Kumari</li>
-                                <li>H.P.S. Nishani</li>
-                                <li>H.A.V.S. Jayawardhana</li>
-                                <li>M.D.A.I. Kumara</li>
-                                <li>A.P. Buddika Mihirani</li>
-                                <li>M.M. Fathima Maheesha</li>
-                                <li>P.R.I. Vihara Hemarathna</li>
-                            </ul>
-                        </div>
+                <div class="prefects-grid">
+                    <div class="teacher-card animate-child">
+                        <h4>W.A. Lasantha Weerasinghe</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>K.K. Kusum Malani</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>R.A.P.S. Rajapaksha</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>M.H. Janitha Chandani</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>R.P. Pramila Jayarathna</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>K.N.B.B.M. Lahiru Bandaranayake</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>D.G.A. Damith Weerasinghe</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>S.K. Upeksha Sewwandi</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>J.L. Nishanthimala</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>S.G.T.P.O. Ranasinghe</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>J.M. Deepani Jayaruwan</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>J.A.S.K. Jayasinghe</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>W.M. Janaki Rathnayake</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>W.M. Mihiri Weerasinghe</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>K.A.K. Saman Priyadarshana</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>D.M. Ruwan Dasanayaka</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>Y. Desika Kumari</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>H.P.S. Nishani</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>H.A.V.S. Jayawardhana</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>M.D.A.I. Kumara</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>A.P. Buddika Mihirani</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>M.M. Fathima Maheesha</h4>
+                    </div>
+                    <div class="teacher-card animate-child">
+                        <h4>P.R.I. Vihara Hemarathna</h4>
                     </div>
                 </div>
             </section>
@@ -2291,21 +2403,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="developer-card-new" data-name="Thevindu Thisev" data-role="Data Collector" data-img="Developer Team/thevindu.JPG" data-desc="Managed student data collection and database administration." data-comment="Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!" data-skills='["fas fa-database", "fas fa-video", "fas fa-edit"]'>
-                                                <img src="Developer Team/thevindu.JPG" alt="Thevindu Thisev">
-                                                <h4>Thevindu Thisev</h4>
-                                                <p class="role">Data Collector</p>
-                                                <button class="view-details-btn">View</button>
-                                                <div class="developer-card-details">
-                                                    <p>Managed student data collection and database administration.</p>
-                                                    <p class="dev-comment">Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!</p>
-                                                    <div class="dev-skills">
-                                                        <i class="fas fa-database"></i>
-                                                        <i class="fas fa-video"></i>
-                                                        <i class="fas fa-edit"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                             <div class="developer-card-new" data-name="Hansaka Fernando" data-role="Web & Mobile App Developer" data-img="Developer Team/Hansaka.png" data-desc="Designed and developed the web interface and mobile application." data-comment="I am truly proud to be able to contribute to a project like this." data-skills='["fab fa-react", "fas fa-mobile-alt", "fab fa-html5", "fab fa-css3-alt", "fab fa-js-square", "fab fa-npm"]'>
                                                 <img src="Developer Team/Hansaka.png" alt="Hansaka Fernando">
                                                 <h4>Hansaka Fernando</h4>
@@ -2321,6 +2419,24 @@
                                                         <i class="fab fa-css3-alt"></i>
                                                         <i class="fab fa-js-square"></i>
                                                         <i class="fab fa-npm"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h4 class="section-title" style="font-size: 1.5rem; color: var(--primary-color); text-align: center; margin-top: 2rem; margin-bottom: 1.5rem;">Data Collector</h4>
+                                        <div class="developer-grid">
+                                            <div class="developer-card-new" data-name="Thevindu Thisev" data-role="Data Collector" data-img="Developer Team/thevindu.JPG" data-desc="Managed student data collection and database administration." data-comment="Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!" data-skills='["fas fa-database", "fas fa-video", "fas fa-edit"]'>
+                                                <img src="Developer Team/thevindu.JPG" alt="Thevindu Thisev">
+                                                <h4>Thevindu Thisev</h4>
+                                                <p class="role">Data Collector</p>
+                                                <button class="view-details-btn">View</button>
+                                                <div class="developer-card-details">
+                                                    <p>Managed student data collection and database administration.</p>
+                                                    <p class="dev-comment">Proud to be a part of the team that made this awesome prefects' project come true massive support and school spirit💕!</p>
+                                                    <div class="dev-skills">
+                                                        <i class="fas fa-database"></i>
+                                                        <i class="fas fa-video"></i>
+                                                        <i class="fas fa-edit"></i>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2387,6 +2503,15 @@
                         <div class="prefect-card teacher-card-style"><h4>Mr. W.A. Lasantha Weerasinghe</h4><p>Teacher in Charge</p></div>
                         <div class="prefect-card teacher-card-style"><h4>S.G.T.P.O. Ranasinghe</h4><p>Teacher in Charge</p></div>
                     </div>
+                </div>
+                <div class="guidance-section" style="margin-top: 3rem;">
+                    <h4 class="section-title">Special Thanks</h4>
+                    <div class="prefects-grid" style="margin-top: 1.5rem;">
+                        <div class="prefect-card teacher-card-style"><h4>Home Science Section</h4><p>For providing their classroom for data collection and programming.</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>Gayindu Wijesooriya</h4><p>Photography President (Provided photography support)</p></div>
+                        <div class="prefect-card teacher-card-style"><h4>Dimal Svinda</h4><p>Official photographer of ECCMU (Provided photography support)</p></div>
+                    </div>
+                    <p style="text-align: center; color: var(--text-light); margin-top: 1rem;">For providing their classroom for data collection and programming.</p>
                 </div>
                                 <div class="modal-footer-content" style="margin-top: 3rem; text-align: center;">
                                     <div class="modal-logos" style="margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 2rem;">
@@ -3665,5 +3790,939 @@ document.addEventListener('DOMContentLoaded', () => {
         <i class="fas fa-chevron-up"></i>
     </div>
 
-</body>
+        <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+    import { 
+        getAuth, onAuthStateChanged, createUserWithEmailAndPassword, 
+        signInWithEmailAndPassword, signOut 
+    } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+    import { 
+        getFirestore, collection, getDocs, initializeFirestore, 
+        doc, addDoc, setDoc, serverTimestamp, onSnapshot, query, orderBy, limit, where
+    } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+        authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+        projectId: "prefect-management-syste-e1575",
+        storageBucket: "prefect-management-syste-e1575.appspot.com",
+        messagingSenderId: "973932803095",
+        appId: "1:973932803095:web:a7f2db386cafb53330d852",
+        measurementId: "G-FLF7R3B8J3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+    const auth = getAuth(app);
+
+    // All other script logic follows here...
+    const userStatus = document.getElementById('user-status');
+    const userEmailSpan = document.getElementById('user-email');
+    const userStatusDesktop = document.getElementById('user-status-desktop');
+    const userEmailSpanDesktop = document.getElementById('user-email-desktop');
+    const authModal = document.getElementById('auth-modal');
+    const authCloseBtn = document.getElementById('auth-close-btn');
+    const authForm = document.getElementById('auth-form');
+    const authTitle = document.getElementById('auth-title');
+    const authError = document.getElementById('auth-error');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authToggleText = document.getElementById('auth-toggle-text');
+    const authEmailInput = document.getElementById('auth-email');
+    const authPasswordInput = document.getElementById('auth-password');
+    const chatFab = document.getElementById('chatFab');
+
+    const developerCards = document.querySelectorAll('.developer-card-new');
+    const developerDetailModal = document.getElementById('developer-detail-modal');
+    const developerDetailCloseBtn = document.getElementById('developer-detail-close-btn');
+    const developerDetailImg = document.getElementById('developer-detail-img');
+    const developerDetailName = document.getElementById('developer-detail-name');
+    const developerDetailRole = document.getElementById('developer-detail-role');
+    const developerDetailDesc = document.getElementById('developer-detail-desc');
+    const developerDetailComment = document.getElementById('developer-detail-comment');
+    const developerDetailSkills = document.getElementById('developer-detail-skills');
+
+    developerCards.forEach(card => {
+        const viewBtn = card.querySelector('.view-details-btn');
+        viewBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            card.classList.toggle('expanded');
+            if (card.classList.contains('expanded')) {
+                viewBtn.textContent = 'Close';
+            } else {
+                viewBtn.textContent = 'View';
+            }
+        });
+    });
+
+    function closeDeveloperDetailModal() {
+        developerDetailModal.classList.remove('show');
+        setTimeout(() => {
+            developerDetailModal.style.display = 'none';
+        }, 300);
+    }
+
+    developerDetailCloseBtn.addEventListener('click', closeDeveloperDetailModal);
+    window.addEventListener('click', (event) => {
+        if (event.target == developerDetailModal) {
+            closeDeveloperDetailModal();
+        }
+    });
+
+    let isLoginMode = true;
+
+    function showSuccessToast(message) {
+        const toast = document.getElementById('success-toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    function openAuthModal() {
+        authModal.style.setProperty('display', 'block', 'important');
+        setTimeout(() => authModal.classList.add('show'), 10);
+    }
+
+    function closeAuthModal() {
+        authModal.classList.remove('show');
+        setTimeout(() => {
+            authModal.style.display = 'none';
+            authForm.reset();
+            authError.style.display = 'none';
+        }, 300);
+    }
+
+    authCloseBtn.addEventListener('click', closeAuthModal);
+    window.addEventListener('click', (event) => { if (event.target == authModal) { closeAuthModal(); } });
+
+    authToggleText.addEventListener('click', (e) => {
+        if (e.target.id === 'auth-toggle-link') {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            authTitle.textContent = isLoginMode ? 'Login' : 'Sign Up';
+            authSubmitBtn.textContent = isLoginMode ? 'Login' : 'Sign Up';
+            authToggleText.innerHTML = isLoginMode 
+                ? `Don\'t have an account? <a href="#" id="auth-toggle-link" style="color: var(--primary-color); font-weight: 600;">Sign Up</a>`
+                : `Already have an account? <a href="#" id="auth-toggle-link" style="color: var(--primary-color); font-weight: 600;">Login</a>`;
+            authError.style.display = 'none';
+        }
+    });
+
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            userStatus.style.display = 'none'; 
+            userEmailSpan.textContent = user.email;
+            userStatusDesktop.style.display = 'none'; 
+            userEmailSpanDesktop.textContent = user.email;
+            chatFab.style.display = 'flex';
+            closeAuthModal();
+            try {
+                const prefectsRef = collection(db, "prefects");
+                const q = query(prefectsRef, where("uid", "==", user.uid));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const prefectDocRef = doc(db, "prefects", querySnapshot.docs[0].id);
+                    const prefectData = querySnapshot.docs[0].data();
+                    const updateData = {};
+                    if (!prefectData.name) {
+                        updateData.name = user.displayName || user.email.split('@')[0];
+                    }
+                    if (!prefectData.picture) {
+                        updateData.picture = user.photoURL || 'no-dp_16.webp';
+                    }
+                    if (Object.keys(updateData).length > 0) {
+                        await setDoc(prefectDocRef, updateData, { merge: true });
+                    }
+                }
+            } catch (error) {
+                console.error("Error updating prefect profile:", error);
+            }
+        } else {
+            userStatus.style.display = 'none';
+            userEmailSpan.textContent = '';
+            userStatusDesktop.style.display = 'none';
+            userEmailSpanDesktop.textContent = '';
+            chatFab.style.display = 'none';
+            chatContainer.classList.remove('active');
+            isChatOpen = false;
+            if (chatUnsubscribe) chatUnsubscribe();
+        }
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = authEmailInput.value;
+        const password = authPasswordInput.value;
+        authError.style.display = 'none';
+        try {
+            if (isLoginMode) {
+                await signInWithEmailAndPassword(auth, email, password);
+                showSuccessToast('Login Successful!');
+            } else {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showSuccessToast('Sign Up Successful!');
+            }
+        } catch (error) {
+            console.error("Authentication Error:", error.message);
+            authError.textContent = error.message;
+            authError.style.display = 'block';
+        }
+    });
+
+    const chatClose = document.getElementById('chatClose');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    let isChatOpen = false;
+    let chatUnsubscribe = null;
+
+    function listenForMessages(uid) {
+        if (chatUnsubscribe) chatUnsubscribe();
+        const messagesRef = collection(db, 'chats', uid, 'messages');
+        document.querySelectorAll('.section-accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                console.log('Section accordion header clicked!');
+                const sectionAccordionItem = header.closest('.section-accordion-item');
+                sectionAccordionItem.classList.toggle('active');
+                const developerAccordionItems = sectionAccordionItem.querySelectorAll('.developer-accordion-item');
+                developerAccordionItems.forEach(item => {
+                    item.classList.toggle('active', sectionAccordionItem.classList.contains('active'));
+                });
+            });
+        });
+        const q = query(messagesRef, orderBy('timestamp'));
+        chatUnsubscribe = onSnapshot(q, (snapshot) => {
+            chatMessages.innerHTML = '';
+            if (snapshot.empty && isChatOpen) { addBotMessage('ආයුබෝවන්! ඔබට සහය විය හැක්කේ කෙසේද?'); }
+            snapshot.forEach((doc) => {
+                const message = doc.data();
+                if (message.senderId === uid) { addUserMessageToScreen(message.text); } 
+                else { addBotMessage(message.text); }
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    }
+
+    function addBotMessage(text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message bot-message';
+        msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+        chatMessages.appendChild(msgDiv);
+    }
+
+    function addUserMessageToScreen(text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message user-message';
+        msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+        chatMessages.appendChild(msgDiv);
+    }
+
+    async function handleUserInput() {
+        const currentUser = auth.currentUser;
+        if (!currentUser) { alert("කරුණාකර පණිවිඩයක් යැවීමට ලොග් වන්න."); return; }
+        const userInput = chatInput.value.trim();
+        if (!userInput) return;
+        const tempUserInput = userInput;
+        chatInput.value = '';
+        try {
+            const uid = currentUser.uid;
+            const email = currentUser.email;
+            const sessionDocRef = doc(db, "chats", uid);
+            const messagesColRef = collection(sessionDocRef, "messages");
+            await setDoc(sessionDocRef, {
+                lastUpdate: serverTimestamp(),
+                lastMessageSnippet: tempUserInput.substring(0, 50),
+                userEmail: email
+            }, { merge: true });
+            await addDoc(messagesColRef, {
+                text: tempUserInput,
+                senderId: uid,
+                timestamp: serverTimestamp()
+            });
+        } catch (error) {
+            console.error("Error sending message:", error);
+            chatInput.value = tempUserInput;
+        }
+    }
+
+    chatFab.addEventListener('click', () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) { openAuthModal(); return; }
+        isChatOpen = !isChatOpen;
+        chatContainer.classList.toggle('active');
+        if (isChatOpen) {
+            listenForMessages(currentUser.uid);
+            chatInput.focus();
+        } else {
+            if (chatUnsubscribe) chatUnsubscribe();
+        }
+    });
+
+    chatClose.addEventListener('click', () => {
+        isChatOpen = false;
+        chatContainer.classList.remove('active');
+        if (chatUnsubscribe) chatUnsubscribe();
+    });
+
+    chatSend.addEventListener('click', handleUserInput);
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleUserInput(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isChatOpen) { chatClose.click(); } });
+
+    window.onload = () => {
+        const loader = document.getElementById('loader');
+        if(loader) loader.classList.add('hidden');
+    };
+    
+    const header = document.getElementById('portfolio-header');
+    if (header) { window.addEventListener('scroll', () => { header.classList.toggle('header-scrolled', window.scrollY > 50); }); }
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    const children = entry.target.querySelectorAll('.animate-child');
+                    children.forEach((child, index) => { child.style.transitionDelay = `${index * 100}ms`; });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedElements.forEach(el => observer.observe(el));
+    }
+
+    const statsSection = document.getElementById('stats-counter');
+    if (statsSection) {
+        const animateCounters = () => {
+            const counters = statsSection.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                if(counter.dataset.animated) return;
+                counter.dataset.animated = "true";
+                const target = +counter.getAttribute('data-target');
+                let count = 0;
+                const duration = 2000;
+                const frameDuration = 1000 / 60;
+                const totalFrames = Math.round(duration / frameDuration);
+                const increment = target / totalFrames;
+                const updateCount = () => {
+                    count += increment;
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count);
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                requestAnimationFrame(updateCount);
+            });
+        };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+        observer.observe(statsSection);
+    }
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const mainNav = document.getElementById('main-nav');
+    if(menuToggle && mainNav) {
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            mainNav.classList.toggle('mobile-nav-active');
+        });
+        mainNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (!link.parentElement.id.includes('nav-btn')) {
+                   menuToggle.classList.remove('active');
+                   mainNav.classList.remove('mobile-nav-active');
+                }
+            });
+        });
+    }
+    
+    const creatorsFab = document.getElementById('creators-fab');
+    const creatorsModal = document.getElementById('creators-modal');
+    const closeCreatorsModalBtn = creatorsModal.querySelector('.close-button');
+
+    const openCreatorsModal = () => {
+        creatorsModal.style.display = 'block';
+        setTimeout(() => {
+            creatorsModal.classList.add('show');
+            creatorsModal.classList.add('visible');
+        }, 10);
+    };
+
+    const closeCreatorsModal = () => {
+        creatorsModal.classList.remove('show');
+        creatorsModal.classList.remove('visible');
+        setTimeout(() => {
+            creatorsModal.style.display = 'none';
+        }, 500);
+    };
+
+    const footerDeveloperBtn = document.getElementById('footer-developer-btn');
+    if (footerDeveloperBtn) {
+        footerDeveloperBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCreatorsModal();
+        });
+    }
+    if (closeCreatorsModalBtn) {
+        closeCreatorsModalBtn.addEventListener('click', closeCreatorsModal);
+    }
+    window.addEventListener('click', (event) => { if (event.target == creatorsModal) closeCreatorsModal(); });
+
+    const accordion = document.getElementById('developer-accordion');
+    if (accordion) {
+        accordion.addEventListener('click', (e) => {
+            const header = e.target.closest('.developer-accordion-header');
+            if (header) {
+                const item = header.parentElement;
+                item.classList.toggle('active');
+            }
+        });
+    }
+
+    const slider = document.querySelector('.testimonials-grid');
+    if (slider) {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        let autoScrollInterval;
+
+        const startAutoScroll = () => {
+            const scroller = slider.querySelector('.testimonials-scroller');
+            if (scroller && !scroller.classList.contains('duplicated')) {
+                const scrollerContent = Array.from(scroller.children);
+                scrollerContent.forEach(item => {
+                    const duplicatedItem = item.cloneNode(true);
+                    duplicatedItem.setAttribute('aria-hidden', true);
+                    scroller.appendChild(duplicatedItem);
+                });
+                scroller.classList.add('duplicated');
+            }
+            autoScrollInterval = setInterval(() => {
+                slider.scrollLeft += 1;
+                if (slider.scrollLeft >= scroller.scrollWidth / 2) {
+                    slider.scrollLeft = 0;
+                }
+            }, 25);
+        };
+
+        const stopAutoScroll = () => {
+            clearInterval(autoScrollInterval);
+        };
+
+        slider.addEventListener('mouseenter', stopAutoScroll);
+        slider.addEventListener('mouseleave', () => {
+            if (!isDown) {
+                startAutoScroll();
+            }
+        });
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            stopAutoScroll();
+            slider.classList.add('active');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+
+        startAutoScroll();
+    }
+
+    const teachersGrid = document.getElementById('teachers-grid');
+    if (teachersGrid) {
+        const showMoreTeachersBtn = document.getElementById('show-more-teachers-btn');
+        const showLessTeachersBtn = document.getElementById('show-less-teachers-btn');
+        const allTeachers = Array.from(teachersGrid.children);
+        const initialTeacherCount = 8;
+
+        const updateTeacherVisibility = (showAll) => {
+            allTeachers.forEach((teacher, index) => {
+                if (showAll || index < initialTeacherCount) {
+                    teacher.classList.remove('element-hidden');
+                } else {
+                    teacher.classList.add('element-hidden');
+                }
+            });
+            showMoreTeachersBtn.style.display = !showAll && allTeachers.length > initialTeacherCount ? 'inline-block' : 'none';
+            showLessTeachersBtn.style.display = showAll && allTeachers.length > initialTeacherCount ? 'inline-block' : 'none';
+        };
+
+        if (allTeachers.length > initialTeacherCount) {
+            updateTeacherVisibility(false);
+            showMoreTeachersBtn.addEventListener('click', () => {
+                updateTeacherVisibility(true);
+            });
+            showLessTeachersBtn.addEventListener('click', () => {
+                updateTeacherVisibility(false);
+                document.getElementById('teachers-in-charge').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+    }
+
+    const prefectsGrid = document.getElementById('prefects-grid');
+    const prefectSearchBar = document.getElementById('prefect-search-bar');
+    const categoryFilterList = document.getElementById('category-filter-list');
+    const showMoreBtn = document.getElementById('show-more-btn');
+    const showLessBtn = document.getElementById('show-less-btn');
+    let fetchedPrefects = [];
+    let currentCategory = 'All';
+    const initialVisibleCount = 8;
+    let visiblePrefectCount = initialVisibleCount;
+
+    async function loadAndDisplayPrefects() {
+        if (!prefectsGrid) return;
+        try {
+            const querySnapshot = await getDocs(collection(db, "prefects"));
+            fetchedPrefects = [];
+            querySnapshot.forEach((doc) => fetchedPrefects.push(doc.data()));
+            populateCategories();
+            initializePrefectCards();
+            updatePrefectCardVisibility();
+        } catch (error) {
+            console.error("Error fetching prefects: ", error);
+            prefectsGrid.innerHTML = `<p class="error-message">Error loading prefects.</p>`;
+        }
+    }
+
+    function populateCategories() {
+        if (!categoryFilterList) return;
+        const categories = ['All', ...new Set(fetchedPrefects.map(p => p.section).filter(Boolean))];
+        categoryFilterList.innerHTML = '';
+        categories.forEach(category => {
+            const li = document.createElement('li');
+            const button = document.createElement('button');
+            button.textContent = category;
+            button.dataset.category = category;
+            if (category === 'All') {
+                button.classList.add('active');
+            }
+            li.appendChild(button);
+            categoryFilterList.appendChild(li);
+        });
+    }
+
+    function initializePrefectCards() {
+        if (!prefectsGrid) return;
+        prefectsGrid.innerHTML = '';
+        fetchedPrefects.forEach((prefect, index) => {
+            const prefectCard = document.createElement('div');
+            prefectCard.className = 'prefect-card element-hidden';
+            prefectCard.dataset.name = prefect.name || '';
+            prefectCard.dataset.picture = prefect.picture || '';
+            prefectCard.dataset.destiny = prefect.destiny || '';
+            prefectCard.dataset.class = prefect.class || '';
+            prefectCard.dataset.duty = prefect.current_duty || '';
+            prefectCard.dataset.category = prefect.section || '';
+            prefectCard.innerHTML = `\n                <img src="${prefect.picture}" alt="${prefect.name}" loading="lazy">\n                <h4>${prefect.name}</h4>\n                <p>${prefect.destiny}</p>\n            `;
+            prefectsGrid.appendChild(prefectCard);
+        });
+    }
+
+    function updatePrefectCardVisibility() {
+        if (!prefectsGrid) return;
+        const searchTerm = prefectSearchBar.value.toLowerCase();
+        const allCards = Array.from(prefectsGrid.children).filter(child => child.classList.contains('prefect-card'));
+        const cardsToProcess = [];
+        allCards.forEach(card => {
+            const nameMatch = card.dataset.name.toLowerCase().includes(searchTerm);
+            const categoryMatch = currentCategory === 'All' || card.dataset.category === currentCategory;
+            const shouldBeVisible = nameMatch && categoryMatch;
+            const isCurrentlyVisible = !card.classList.contains('element-hidden');
+            if (shouldBeVisible && !isCurrentlyVisible) {
+                cardsToProcess.push({ card, action: 'show' });
+            } else if (!shouldBeVisible && isCurrentlyVisible) {
+                cardsToProcess.push({ card, action: 'hide' });
+            }
+        });
+
+        setTimeout(() => {
+            cardsToProcess.filter(item => item.action === 'hide').forEach(item => {
+                item.card.classList.add('element-hidden');
+                item.card.style.opacity = '1';
+                item.card.style.transform = 'scale(1)';
+            });
+
+            const visibleCardsAfterFilter = allCards.filter(card => {
+                const nameMatch = card.dataset.name.toLowerCase().includes(searchTerm);
+                const categoryMatch = currentCategory === 'All' || card.dataset.category === currentCategory;
+                return nameMatch && categoryMatch;
+            });
+
+            const cardsToDisplay = visibleCardsAfterFilter.slice(0, visiblePrefectCount);
+
+            cardsToDisplay.forEach((item, index) => {
+                item.classList.remove('element-hidden');
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'scale(1)';
+                }, 50 * index);
+            });
+
+            showMoreBtn.style.display = visibleCardsAfterFilter.length > visiblePrefectCount ? 'inline-block' : 'none';
+            showLessBtn.style.display = visiblePrefectCount > initialVisibleCount && visibleCardsAfterFilter.length > 0 ? 'inline-block' : 'none';
+            
+            const noResultsMsg = prefectsGrid.querySelector('.no-results-message');
+            if (visibleCardsAfterFilter.length === 0) {
+                if (!noResultsMsg) {
+                    const p = document.createElement('p');
+                    p.textContent = 'No prefects found matching your criteria.';
+                    p.className = 'no-results-message';
+                    prefectsGrid.appendChild(p);
+                }
+            } else {
+                if (noResultsMsg) {
+                    noResultsMsg.remove();
+                }
+            }
+        }, 300);
+    }
+    
+    if (prefectsGrid) {
+        prefectSearchBar.addEventListener('input', () => {
+            visiblePrefectCount = initialVisibleCount;
+            updatePrefectCardVisibility();
+        });
+
+        categoryFilterList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                currentCategory = e.target.dataset.category;
+                visiblePrefectCount = initialVisibleCount;
+                categoryFilterList.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                updatePrefectCardVisibility();
+            }
+        });
+
+        showMoreBtn.addEventListener('click', () => {
+            visiblePrefectCount += initialVisibleCount;
+            updatePrefectCardVisibility();
+        });
+
+        showLessBtn.addEventListener('click', () => {
+            visiblePrefectCount = initialVisibleCount;
+            updatePrefectCardVisibility();
+            document.getElementById('prefects-list').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    const publicGalleryGrid = document.getElementById('gallery-grid-public');
+    const showMoreGalleryBtn = document.getElementById('show-more-gallery-btn');
+    const showLessGalleryBtn = document.getElementById('show-less-gallery-btn');
+    const initialGalleryImageCount = 6;
+    let visibleGalleryImageCount = initialGalleryImageCount;
+    let fetchedGalleryImages = [];
+
+    async function loadPublicGallery() {
+        if (!publicGalleryGrid) return;
+        try {
+            const q = query(collection(db, 'gallery'), orderBy('uploadedAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            fetchedGalleryImages = [];
+            querySnapshot.forEach(docSnap => fetchedGalleryImages.push(docSnap.data()));
+            updateGalleryVisibility();
+        } catch (error) {
+            console.error("Error loading public gallery:", error);
+            publicGalleryGrid.innerHTML = '<p class="error-message">Could not load gallery images.</p>';
+        }
+    }
+
+    function updateGalleryVisibility() {
+        if (!publicGalleryGrid) return;
+        publicGalleryGrid.innerHTML = '';
+        if (fetchedGalleryImages.length === 0) {
+            publicGalleryGrid.innerHTML = '<p>No images in the gallery yet.</p>';
+            showMoreGalleryBtn.style.display = 'none';
+            showLessGalleryBtn.style.display = 'none';
+            return;
+        }
+        const imagesToShow = fetchedGalleryImages.slice(0, visibleGalleryImageCount);
+        imagesToShow.forEach(imageData => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item animate-child';
+            galleryItem.innerHTML = `<img src="${imageData.url}" alt="Gallery image" loading="lazy">`;
+            publicGalleryGrid.appendChild(galleryItem);
+        });
+        showMoreGalleryBtn.style.display = fetchedGalleryImages.length > visibleGalleryImageCount ? 'inline-block' : 'none';
+        showLessGalleryBtn.style.display = visibleGalleryImageCount > initialGalleryImageCount ? 'inline-block' : 'none';
+    }
+
+    if (showMoreGalleryBtn) {
+        showMoreGalleryBtn.addEventListener('click', () => {
+            visibleGalleryImageCount += initialGalleryImageCount;
+            updateGalleryVisibility();
+        });
+    }
+
+    if (showLessGalleryBtn) {
+        showLessGalleryBtn.addEventListener('click', () => {
+            visibleGalleryImageCount = initialGalleryImageCount;
+            updateGalleryVisibility();
+            document.getElementById('gallery').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    async function loadPrefectOfTheMonth() {
+        const prefectMonthContainer = document.getElementById('prefect-month-container');
+        if (!prefectMonthContainer) return;
+        try {
+            const prefectsRef = collection(db, "prefects");
+            const q = query(prefectsRef, orderBy("points", "desc"), limit(1));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                const topPrefect = querySnapshot.docs[0].data();
+                prefectMonthContainer.innerHTML = `
+                    <div class="prefect-month-img">
+                        <img src="${topPrefect.picture}" alt="Prefect of the Month">
+                    </div>
+                    <div class="prefect-month-content">
+                        <h4>${topPrefect.name}</h4>
+                        <p class="role">${topPrefect.destiny}</p>
+                        <p class="quote">This month's top prefect with the highest points!</p>
+                    </div>
+                `;
+            } else {
+                prefectMonthContainer.innerHTML = "<p>Prefect of the month will be updated soon.</p>";
+            }
+        } catch (error) {
+            console.error("Error loading prefect of the month: ", error);
+            prefectMonthContainer.innerHTML = "<p>Could not load prefect of the month.</p>";
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const teachersAccordion = document.getElementById('teachers-accordion');
+        if (teachersAccordion) {
+            teachersAccordion.addEventListener('click', (e) => {
+                const header = e.target.closest('.accordion-header');
+                if (header) {
+                    const item = header.closest('.accordion-item');
+                    item.classList.toggle('active');
+                }
+            });
+        }
+
+        loadAndDisplayPrefects();
+        loadPublicGallery();
+        loadPrefectOfTheMonth();
+
+        const themeToggleBtns = document.querySelectorAll('.theme-toggle-btn, .theme-toggle-btn-mobile');
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        themeToggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                let theme = 'light';
+                if (document.body.classList.contains('dark-mode')) {
+                    theme = 'dark';
+                }
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        const lightbox = document.getElementById('gallery-lightbox');
+        if (lightbox) {
+            const publicGalleryGrid = document.getElementById('gallery-grid-public');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxClose = lightbox.querySelector('.lightbox-close');
+            const lightboxPrev = lightbox.querySelector('.lightbox-prev');
+            const lightboxNext = lightbox.querySelector('.lightbox-next');
+            let currentImageIndex = -1;
+            let galleryImages = [];
+
+            const openLightbox = (index) => {
+                if (index < 0 || index >= galleryImages.length) return;
+                currentImageIndex = index;
+                lightbox.style.display = 'block';
+                lightboxImg.src = galleryImages[currentImageIndex].src;
+            };
+
+            const closeLightbox = () => {
+                lightbox.style.display = 'none';
+            };
+
+            const showNextImage = () => {
+                openLightbox((currentImageIndex + 1) % galleryImages.length);
+            };
+
+            const showPrevImage = () => {
+                openLightbox((currentImageIndex - 1 + galleryImages.length) % galleryImages.length);
+            };
+
+            if (publicGalleryGrid) {
+                publicGalleryGrid.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'IMG') {
+                        galleryImages = Array.from(publicGalleryGrid.querySelectorAll('img'));
+                        const clickedIndex = galleryImages.findIndex(img => img.src === e.target.src);
+                        if (clickedIndex !== -1) {
+                            openLightbox(clickedIndex);
+                        }
+                    }
+                });
+            }
+
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxNext.addEventListener('click', showNextImage);
+            lightboxPrev.addEventListener('click', showPrevImage);
+
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (lightbox.style.display === 'block') {
+                    if (e.key === 'ArrowRight') showNextImage();
+                    else if (e.key === 'ArrowLeft') showPrevImage();
+                    else if (e.key === 'Escape') closeLightbox();
+                }
+            });
+        }
+
+        document.querySelectorAll('.section-accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                console.log('Section accordion header clicked!');
+                const sectionAccordionItem = header.closest('.section-accordion-item');
+                sectionAccordionItem.classList.toggle('active');
+            });
+        });
+
+        const audio = document.getElementById('prefect-anthem-audio');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const seekBar = document.getElementById('seek-bar');
+        const timeDisplay = document.getElementById('time-display');
+
+        if (audio && playPauseBtn && seekBar && timeDisplay) {
+            const playPauseIcon = playPauseBtn.querySelector('i');
+            const togglePlayPause = () => {
+                if (audio.paused) {
+                    audio.play();
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                } else {
+                    audio.pause();
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play');
+                }
+            };
+
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            };
+
+            const updateSeekBar = () => {
+                if (audio.duration) {
+                    seekBar.value = (audio.currentTime / audio.duration) * 100;
+                    timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+                }
+            };
+
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            audio.addEventListener('timeupdate', updateSeekBar);
+            audio.addEventListener('loadedmetadata', () => {
+                if (audio.duration) {
+                    timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
+                }
+            });
+
+            seekBar.addEventListener('input', () => {
+                if (audio.duration) {
+                    audio.currentTime = (seekBar.value / 100) * audio.duration;
+                }
+            });
+        }
+
+        const launchBanner = document.getElementById('launch-banner');
+        const closeBannerBtn = document.querySelector('.close-banner-btn');
+
+        if (launchBanner && closeBannerBtn) {
+            if (localStorage.getItem('launchBannerDismissed') === 'true') {
+                launchBanner.style.display = 'none';
+            }
+            closeBannerBtn.addEventListener('click', () => {
+                launchBanner.style.display = 'none';
+                localStorage.setItem('launchBannerDismissed', 'true');
+            });
+        }
+
+        const prefectDetailModal = document.getElementById('prefect-detail-modal');
+        const prefectDetailCloseBtn = document.getElementById('prefect-detail-close-btn');
+        const prefectDetailImg = document.getElementById('prefect-detail-img');
+        const prefectDetailName = document.getElementById('prefect-detail-name');
+        const prefectDetailDestiny = document.getElementById('prefect-detail-destiny');
+        const prefectDetailClass = document.getElementById('prefect-detail-class');
+        const prefectDetailDuty = document.getElementById('prefect-detail-duty');
+
+        function openPrefectModal(card) {
+            prefectDetailImg.src = card.dataset.picture;
+            prefectDetailName.textContent = card.dataset.name;
+            prefectDetailDestiny.textContent = card.dataset.destiny;
+            prefectDetailClass.textContent = card.dataset.class;
+            prefectDetailDuty.textContent = card.dataset.duty;
+            prefectDetailModal.style.display = 'block';
+            setTimeout(() => prefectDetailModal.classList.add('show'), 10);
+        }
+
+        function closePrefectModal() {
+            prefectDetailModal.classList.remove('show');
+            setTimeout(() => {
+                prefectDetailModal.style.display = 'none';
+            }, 400);
+        }
+
+        prefectsGrid.addEventListener('click', (e) => {
+            const card = e.target.closest('.prefect-card');
+            if (card) {
+                openPrefectModal(card);
+            }
+        });
+
+        prefectDetailCloseBtn.addEventListener('click', closePrefectModal);
+        window.addEventListener('click', (event) => {
+            if (event.target == prefectDetailModal) {
+                closePrefectModal();
+            }
+        });
+
+        const scrollToTopBtn = document.getElementById('scroll-to-top');
+        if (scrollToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.style.display = 'flex';
+                } else {
+                    scrollToTopBtn.style.display = 'none';
+                }
+            });
+            scrollToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    });
+</script>
+    </body>
 </html>
