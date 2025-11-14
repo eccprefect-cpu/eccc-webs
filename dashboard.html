@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
     <style>
-        /* Styles for Absent Reason Form */
-        #absent-reason-container .dashboard-card {
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+        /* Universal box-sizing for better responsiveness */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
         }
 
+        /* Styles for Absent Reason Form */
         #absence-reason-form select,
         #absence-reason-form textarea {
             width: 100%;
@@ -23,6 +25,7 @@
             border: 1px solid var(--border-color);
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         #absence-reason-form button {
@@ -34,32 +37,46 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 1rem;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
         }
 
-        #absence-reason-form button:hover {
-            background-color: #70160F;
+        #absence-reason-form button:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+        }
+
+        /* Disabled State Styles */
+        #absence-reason-form select:disabled,
+        #absence-reason-form textarea:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        #absence-reason-form button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+            opacity: 0.65;
         }
 
         @media (max-width: 768px) {
             #absent-reason-container {
-                padding: 2rem 1rem;
+                padding: 0; /* Padding is now on the main content area */
             }
         }
     </style>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap');
 
         :root {
             --primary-color: #8C1C13;
+            --primary-dark: #70160F;
             --secondary-color: #C6A98F;
             --accent-color: #FFA500;
-            --text-color: #3b3b3b;
-            --text-light: #5f5f5f;
-            --bg-color: #FFFBEB;
+            --text-color: #212529;
+            --text-light: #6c757d;
+            --bg-color: #f8f9fa;
             --card-bg-color: #FFFFFF;
-            --border-color: #EAEAEA;
+            --border-color: #dee2e6;
             --light-text-color: #FFFFFF;
         }
 
@@ -67,7 +84,18 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             color: var(--text-color);
-            background-color: var(--bg-color);
+            background-color: #f0f2f5; /* Fallback */
+            /* New Mesh Gradient Background with Cream */
+            background-image: 
+                radial-gradient(at 1% 1%, hsla(212, 96%, 26%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 98% 98%, hsla(320, 100%, 50%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, hsla(0, 0%, 100%, 1) 0px, transparent 50%),
+                radial-gradient(at 99% 1%, hsla(180, 100%, 50%, 0.3) 0px, transparent 50%),
+                radial-gradient(at 20% 80%, hsla(48, 83%, 94%, 0.3) 0px, transparent 50%);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         /* --- Header Styles --- */
@@ -76,40 +104,508 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2.5rem;
-            background-color: var(--card-bg-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: none; /* Remove shadow */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 1001; /* Ensure header is above sidebar */
         }
 
         .header-left { display: flex; align-items: center; gap: 1rem; }
         .header-left img { height: 50px; }
         .header-left .school-name { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
-        .main-nav ul { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 2rem; }
-        .main-nav a { text-decoration: none; color: var(--text-color); font-weight: 600; font-size: 1rem; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: color 0.3s, border-color 0.3s; }
-        .main-nav a:hover, .main-nav a.active { color: var(--primary-color); border-color: var(--primary-color); }
-        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* Space between elements */
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--text-light);
+            position: relative;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .icon-button:hover {
+            color: var(--primary-color);
+            background-color: rgba(140, 28, 19, 0.05);
+        }
+        .header-profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .header-profile-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        #header-notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50%;
+            line-height: 1;
+            min-width: 18px;
+            text-align: center;
+            transform: translate(50%, -50%);
+        }
 
-        /* Notification styles */
-        .notification-container { position: relative; }
-        .notification-bell { font-size: 1.5rem; color: var(--text-light); cursor: pointer; position: relative; }
-        .notification-badge { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--card-bg-color); }
-        .notification-panel { position: absolute; top: 65px; right: 2.5rem; width: 350px; max-height: 400px; overflow-y: auto; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--border-color); z-index: 1001; }
-        .notification-header { padding: 1rem; font-weight: 700; border-bottom: 1px solid var(--border-color); }
-        .notification-header h4 { margin: 0; }
-        #notification-list .notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); }
-        #notification-list .notification-item:last-child { border-bottom: none; }
-        #notification-list .notification-item h5 { margin: 0 0 0.25rem 0; font-size: 1rem; }
-        #notification-list .notification-item p { margin: 0; font-size: 0.9rem; color: var(--text-light); }
+/* Notification Dropdown Panel */
+.notification-dropdown-panel {
+    position: absolute;
+    top: 100%; /* Position below the header */
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: top right;
+    animation: dropdownFadeIn 0.2s ease-out forwards;
+}
+.notification-dropdown-panel.active {
+    display: flex;
+}
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.notification-dropdown-panel .dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+.notification-dropdown-panel .dropdown-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+}
+.notification-dropdown-panel .mark-all-read-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+.notification-dropdown-panel .mark-all-read-btn:hover {
+    color: var(--primary-color);
+}
+
+.notification-dropdown-panel .dropdown-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+.notification-dropdown-panel .dropdown-messages .notification-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.notification-dropdown-panel .dropdown-messages .notification-item:hover {
+    background-color: rgba(140, 28, 19, 0.05);
+}
+.notification-dropdown-panel .dropdown-messages .notification-item h5 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--text-color);
+}
+.notification-dropdown-panel .dropdown-messages .notification-item p {
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notification-dropdown-panel .dropdown-messages .notification-item small {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    text-align: right;
+}
+.notification-dropdown-panel .dropdown-messages .no-notifications {
+    text-align: center;
+    color: var(--text-light);
+    padding: 1rem;
+}
+
+.notification-dropdown-panel .dropdown-footer {
+    padding: 0.8rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+}
+.notification-dropdown-panel .dropdown-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+.notification-dropdown-panel .dropdown-footer a:hover {
+    color: var(--primary-dark);
+}
+
+/* Master-Detail Notifications Layout */
+.notifications-container {
+    display: flex;
+    flex-direction: column; /* Default to column for smaller screens */
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) { /* For larger screens, use a stacked layout */
+    .notifications-container {
+        /* flex-direction: row; Removed side-by-side */
+        /* align-items: flex-start; Removed side-by-side */
+    }
+    .notification-master-panel {
+        /* flex: 1; Removed flex properties */
+        min-width: auto; /* Removed min-width constraint */
+        max-width: none; /* Removed max-width constraint */
+    }
+    .notification-detail-panel {
+        /* flex: 2; Removed flex properties */
+    }
+}
+
+.notification-master-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem;
+}
+
+.notification-detail-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notification-detail-panel h3 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.notification-detail-panel .notification-detail-meta {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.notification-detail-panel .notification-detail-content {
+    flex-grow: 1;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+
+.notification-detail-panel .back-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    transition: color 0.3s ease;
+    align-self: flex-start; /* Align to the left */
+}
+.notification-detail-panel .back-button:hover {
+    color: var(--primary-dark);
+}
+
+/* GMAIL UI Redesign for Notifications Tab - THEMED & RESPONSIVE */
+#notifications .notifications-container {
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+}
+#notifications .notification-master-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0;
+    overflow: hidden;
+}
+#notifications .notification-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(140, 28, 19, 0.15);
+    cursor: pointer;
+    position: relative;
+    background-color: transparent;
+    font-weight: normal;
+    transition: background-color 0.2s ease;
+}
+#notifications .notification-item:last-child {
+    border-bottom: none;
+}
+#notifications .notification-item.unread {
+    background-color: rgba(140, 28, 19, 0.05);
+    font-weight: bold;
+}
+#notifications .notification-item:hover {
+    background-color: rgba(140, 28, 19, 0.1);
+    z-index: 2;
+}
+.gmail-col {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-light);
+}
+.gmail-col-avatar { display: none; } /* Hidden on desktop */
+.gmail-col-select {
+    gap: 1rem;
+    color: var(--text-light);
+}
+.gmail-checkbox {
+    cursor: pointer;
+}
+.gmail-star {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.gmail-star:hover, .gmail-star.starred {
+    color: var(--accent-color);
+}
+.gmail-col-title {
+    flex-basis: 200px;
+    flex-shrink: 0;
+    font-weight: bold;
+    color: var(--text-color);
+}
+#notifications .notification-item.read .gmail-col-title {
+    font-weight: normal;
+}
+.gmail-col-content {
+    flex-grow: 1;
+}
+.gmail-col-content p {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gmail-col-date {
+    flex-basis: 100px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    font-weight: bold;
+    color: var(--text-color);
+}
+#notifications .notification-item.read .gmail-col-date {
+    font-weight: normal;
+}
+.gmail-hover-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.6) 70%, transparent 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+#notifications .notification-item:hover .gmail-hover-actions {
+    opacity: 1;
+    visibility: visible;
+}
+#notifications .notification-item:hover .gmail-col-date {
+    opacity: 0;
+}
+.gmail-hover-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    padding: 0.5rem;
+}
+
+/* Gmail Detail View (Themed) */
+#notifications .back-button {
+    background: rgba(140, 28, 19, 0.1);
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px; /* Pill shape */
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+#notifications .back-button:hover {
+    background: var(--primary-color);
+    color: white;
+}
+#notifications #notification-detail-title {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+/* Responsive Gmail Layout */
+@media (max-width: 768px) {
+    #notifications .gmail-col-select { display: none; }
+    #notifications .gmail-hover-actions { display: none; }
+    #notifications .notification-item:hover .gmail-col-date { opacity: 1; }
+
+    #notifications .notification-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+            "avatar title date"
+            "avatar content content";
+        gap: 0.1rem 0.75rem;
+        padding: 0.75rem;
+    }
+    .gmail-col-avatar {
+        grid-area: avatar;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .gmail-col-title { grid-area: title; padding: 0; }
+    .gmail-col-content { grid-area: content; padding: 0; }
+    .gmail-col-date { grid-area: date; padding: 0; font-size: 0.8rem; align-self: start; }
+}
+
+/* Starred State */
+.gmail-star.fas {
+    color: var(--accent-color);
+}
+
+/* Delete Animation */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        max-height: 100px; /* Start at its natural height */
+    }
+    to {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        border-width: 0;
+    }
+}
+.notification-item.fading-out {
+    animation: fadeOut 0.4s ease-out forwards;
+    overflow: hidden;
+}
+
+.context-menu {
+    position: fixed;
+    z-index: 1010;
+    background: var(--card-bg-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 0.5rem 0;
+    display: none;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.context-menu.active {
+    display: flex;
+}
+.context-menu button {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 1rem;
+    white-space: nowrap;
+}
+.context-menu button:hover {
+    background-color: rgba(140, 28, 19, 0.05);
+}
+.context-menu button i {
+    width: 20px;
+    text-align: center;
+    color: var(--text-light);
+}
 
         /* Button and Toggle styles */
-        #logout-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; transition: background-color 0.3s; }
-        #logout-btn:hover { background-color: #70160F; }
         #menu-toggle { display: none; }
 
         /* Footer */
-        .portfolio-footer { padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color); color: var(--text-light); border-top: 1px solid #eee; }
+                .portfolio-footer {
+                    padding: 2rem 2.5rem;
+                    text-align: center;
+                    background: rgba(255, 255, 255, 0.5);
+                    -webkit-backdrop-filter: blur(10px);
+                    backdrop-filter: blur(10px);
+                    color: var(--text-light);
+                    border-top: 1px solid rgba(255, 255, 255, 0.2);
+                }
         .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem; }
         .social-icons a { color: var(--primary-color); background-color: rgba(140, 28, 19, 0.1); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; text-decoration: none; border-radius: 50%; font-size: 1rem; transition: all 0.3s ease; }
         .social-icons a:hover { background-color: var(--primary-color); color: var(--light-text-color); transform: translateY(-5px); }
@@ -117,58 +613,489 @@
         .copyright-credits { margin: 0; font-size: 0.8rem; color: var(--text-light); }
 
         /* --- Dashboard Layout --- */
-        .dashboard-container { padding: 2rem 2.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; }
-        .dashboard-card { background-color: var(--card-bg-color); padding: 1.5rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); }
-        .card-title { font-size: 1.2rem; font-weight: 700; color: var(--text-color); margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 3px solid var(--accent-color); }
-
-        /* Profile Card Specific Styles */
-        .profile-card { grid-row: span 2; text-align: center; }
-        #profile-picture { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--secondary-color); margin-bottom: 1rem; }
-        #welcome-name { font-size: 1.3rem; font-weight: 600; color: var(--text-color); margin: 0.5rem 0; }
-        .profile-details p { margin: 0.5rem 0; font-size: 1rem; color: var(--text-light); }
-        .profile-details p strong { color: var(--text-color); }
-        .profile-divider { height: 2px; background-color: var(--accent-color); border: none; margin: 1rem 0; }
-        
-        /* Stats List Styles */
-        .stats-list { list-style: none; padding: 0; margin: 0; }
-        .stats-list li { display: flex; justify-content: space-between; font-size: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
-        .stats-list li:last-child { border-bottom: none; }
-        .stats-list li span { font-weight: 600; color: var(--primary-color); }
-        .card-span-2 { grid-column: span 2; }
         #loading-state { text-align: center; padding-top: 150px; font-family: 'Poppins', sans-serif; }
 
-        /* --- Responsive Design --- */
-        @media (max-width: 1024px) {
-            .dashboard-container { grid-template-columns: 1fr 1fr; }
-            .profile-card { grid-row: auto; grid-column: span 2; }
-            .card-span-2 { grid-column: span 2; }
+
+        /* --- New Dashboard Layout --- */
+        .dashboard-body {
+            display: flex;
+            flex-grow: 1;
         }
-        
+
+        .dashboard-sidebar {
+            width: 260px;
+            background-color: rgba(255, 255, 255, 0.5); /* Glass effect */
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease; /* Smoother transition */
+            height: 100vh; /* Full viewport height */
+            position: fixed; /* Keep it fixed */
+            top: 0; /* Align to the top */
+            z-index: 999; /* Ensure it's above other content but below header */
+            padding-top: 70px; /* Account for header height */
+            overflow-y: auto; /* Allow internal scrolling */
+        }
+
+        .sidebar-profile {
+            text-align: center;
+            padding: 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        .sidebar-profile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238C1C13' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .sidebar-profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        .sidebar-profile h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .sidebar-profile p {
+            margin: 0.25rem 0 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .sidebar-secondary-nav {
+            padding: 1rem 0;
+            margin: 0 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-secondary-nav a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .sidebar-secondary-nav a:hover {
+            color: var(--primary-color);
+        }
+        .sidebar-secondary-nav a i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+            flex-grow: 1;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.5rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1rem;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0; /* Add rounded corners */
+            margin-right: 1rem; /* Add margin */
+        }
+        .sidebar-nav a:hover {
+            background-color: rgba(140, 28, 19, 0.05);
+            color: var(--primary-color);
+        }
+        .sidebar-nav a.active {
+            color: var(--light-text-color);
+            border-left-color: var(--accent-color); /* Use accent for more pop */
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(140, 28, 19, 0.3);
+        }
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .sidebar-nav a:hover i {
+            transform: scale(1.1);
+        }
+        .sidebar-nav a.active i {
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar-nav .has-submenu .submenu {
+            display: none;
+            list-style: none;
+            padding-left: 2.5rem;
+        }
+
+        .sidebar-nav .has-submenu.active .submenu {
+            display: block;
+        }
+
+        .sidebar-nav .has-submenu .submenu-arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-nav .has-submenu.active .submenu-arrow {
+            transform: rotate(180deg);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            position: sticky; /* Make it sticky */
+            bottom: 0; /* Stick to the bottom */
+            background-color: var(--card-bg-color); /* Ensure background is solid */
+            z-index: 10; /* Ensure it's above other scrolling content */
+        }
+
+        #logout-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: background-color 0.3s;
+        }
+
+        #logout-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .dashboard-main-content {
+            flex-grow: 1;
+            padding: 2rem 2.5rem;
+            margin-left: 260px; /* Account for fixed sidebar width */
+            padding-top: 80px; /* Adjust for header height */
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .content-section.active {
+            display: block;
+        }
+        #overview {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(248, 249, 250, 0.5));
+            border-radius: 12px;
+            padding: 2rem;
+        }
+        .section-title {
+            font-family: 'Lora', serif; /* New font */
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: left; /* Align with title */
+        }
+
+        .stat-icon {
+            display: none; /* Hide the old icon */
+        }
+
+        .dashboard-card {
+            /* Glassmorphism */
+            background: rgba(255, 255, 255, 0.6);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+
+            border-radius: 16px; /* Softer corners */
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); /* Softer shadow */
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* For staggered animation - override the default */
+        .overview-grid .dashboard-card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: none; /* Disable the default fadeIn */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .overview-grid .dashboard-card.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* New Profile Card Styles */
+        .profile-overview-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            grid-column: 1 / -1; /* Make it span the full width */
+        }
+        .dashboard-profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary-color);
+        }
+        .profile-overview-info {
+            flex-grow: 1;
+        }
+        .profile-overview-info h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .profile-overview-info p {
+            margin: 0.25rem 0 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .edit-profile-btn {
+            background: rgba(140, 28, 19, 0.1);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .edit-profile-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        /* New styles for card title and icon */
+        .dashboard-card .card-title {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem; /* Space between title and number */
+        }
+
+        .dashboard-card .card-title i {
+            font-size: 1rem; /* Icon size */
+            color: var(--primary-color);
+            background: rgba(140, 28, 19, 0.1);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+        }
+
+        .bar-chart-container {
+            height: 200px;
+            margin-top: 1.5rem;
+        }
+
+        .bar-chart {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 100%;
+        }
+
+        @keyframes growBar {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        .bar {
+            width: 15%;
+            background-image: linear-gradient(to top, var(--primary-dark), var(--primary-color));
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            transform-origin: bottom;
+            animation: growBar 0.5s ease-out forwards;
+        }
+
+        .bar:hover {
+            background-image: linear-gradient(to top, #58120c, #70160F); /* Darken on hover */
+        }
+
+        .bar::before {
+            content: attr(data-value);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .bar::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* --- Responsive Design --- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; /* Align to the top */
+            left: 0;
+            width: 100%;
+            height: 100%; /* Full height */
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 997; /* Below sidebar, above content */
+            animation: fadeIn 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
         @media (max-width: 992px) {
-            .main-header { padding: 1rem; }
-            .main-nav { display: none; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--card-bg-color); box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 999; }
-            .main-nav.mobile-nav-active { display: block; }
-            .main-nav ul { flex-direction: column; padding: 1rem 0; gap: 0; }
-            .main-nav a { display: block; padding: 1rem; border: none; text-align: center; }
-            .header-right { gap: 0.5rem; }
-            #menu-toggle { display: block; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--primary-color); z-index: 1000; }
-            .notification-panel { right: 1rem; }
+            .main-header {
+                padding: 0.5rem 1rem; /* Reduce header padding */
+            }
+            .header-right {
+                gap: 0.5rem;
+            }
+            #menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                font-size: 1.8rem;
+                cursor: pointer;
+                color: var(--primary-color);
+                z-index: 1000;
+                transition: transform 0.3s ease, color 0.3s ease; /* Add transition */
+            }
+            #menu-toggle.is-active {
+                transform: rotate(90deg); /* Rotate to make it look like it's transforming */
+                color: var(--text-light); /* Change color when active */
+            }
+            .notification-panel {
+                right: 1rem;
+            }
+            .dashboard-sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0; /* Align to the top */
+                height: 100vh; /* Full viewport height */
+                z-index: 998;
+                transition: left 0.3s ease;
+                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            }
+            .dashboard-sidebar.mobile-nav-active {
+                left: 0;
+            }
+            .dashboard-main-content {
+                padding: 2rem 1.5rem;
+                margin-left: 0; /* Remove margin on mobile */
+            }
         }
 
         @media (max-width: 768px) {
-            .school-name { display: none; }
-            .dashboard-container { grid-template-columns: 1fr; padding: 2rem 1rem; }
-            .profile-card, .card-span-2 { grid-column: auto; }
-            #logout-btn span { display: none; }
-            #logout-btn { padding: 0.7rem; }
-            .notification-bell { font-size: 1.3rem; }
-            /* --- Updated Notification Panel for Mobile --- */
-            .notification-panel { 
-                position: fixed;
-                top: 100px; /* Adjust as needed */
+            .school-name {
+                display: none;
+            }
+            .notification-bell {
+                font-size: 1.3rem;
+            }
+            .notification-panel {
+                top: 80px;
                 left: 50%;
                 transform: translateX(-50%);
                 width: 90vw;
+            }
+            .dashboard-main-content {
+                padding: 1.5rem 1rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+            .stat-number {
+                font-size: 2rem;
             }
         }
         .chat-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--primary-color); color: var(--light-text-color); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 995; transition: all 0.3s ease; animation: pulse-chat-fab 2s infinite ease-in-out; border: none; }
@@ -200,7 +1127,7 @@
         @keyframes pulse-chat-fab { 0% { border-radius: 50%; } 50% { border-radius: 20%; } 100% { border-radius: 50%; } }
     </style>
     <style>
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal { display: none; position: fixed; z-index: 1003; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100%; }
         .auth-card { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1); width: 100%; max-width: 420px; margin: 1rem; }
         .close-button { position: absolute; top: 10px; right: 25px; color: #aaa; font-size: 32px; font-weight: bold; cursor: pointer; }
@@ -264,7 +1191,7 @@
             font-weight: bold; 
             cursor: pointer; 
             transition: color 0.3s, transform 0.3s;
-            z-index: 10;
+            z-index: 9999;
         }
         .creators-card .close-button:hover { color: #000; transform: rotate(90deg); }
 
@@ -287,7 +1214,7 @@
             overflow-x: hidden;
             transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
             padding: 2.5rem 1.5rem;
-            z-index: 1001;
+            z-index: 1002;
             box-sizing: border-box;
         }
 
@@ -437,112 +1364,683 @@
             color: var(--primary-color);
         }
     </style>
-</head>
+    <style>
+        /* Styles from events.html and ideas.html */
+        .events-container, .ideas-container, .about-container { padding: 2rem 2.5rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: var(--primary-color); margin-bottom: 1.5rem; border-bottom: 4px solid var(--accent-color); padding-bottom: 0.5rem; }
+        .event-card { background-color: var(--card-bg-color); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .event-header h3 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+        .event-header p { font-size: 1rem; color: var(--text-light); margin: 0.25rem 0 1rem 0; }
+        .event-description { margin-bottom: 1.5rem; }
+        .duties-list { list-style: none; padding: 0; margin: 0; }
+        .duty-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem; }
+        .duty-title { font-weight: 600; }
+        .duty-status { display: flex; align-items: center; gap: 1rem; }
+        .duty-assignee { font-weight: 600; color: var(--taken-color); }
+        .take-duty-btn { background-color: var(--success-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        .take-duty-btn:hover { background-color: #218838; }
+        .take-duty-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .card { background-color: var(--card-bg-color); padding: 1.5rem 2rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); border: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Poppins', sans-serif; font-size: 1rem; box-sizing: border-box; }
+        .submit-btn { background-color: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.3s; }
+        .submit-btn:disabled { background-color: #ccc; }
+        .idea-item { border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        .idea-header h3 { font-size: 1.2rem; margin: 0 0 0.5rem 0; }
+        .idea-meta { font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem; }
+        .idea-status { display: inline-block; padding: 0.3rem 0.7rem; border-radius: 15px; font-weight: 700; font-size: 0.8rem; color: white; }
+        .status-pending_approval { background-color: var(--text-light); }
+        .status-pending { background-color: var(--status-pending); }
+        .status-approved { background-color: var(--status-approved); }
+        .status-rejected { background-color: var(--status-rejected); }
+        .status-completed { background-color: var(--status-completed); }
+        .idea-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+        .upvote-btn { background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+        .upvote-btn.upvoted, .upvote-btn:disabled { background-color: var(--primary-color); color: white; cursor: not-allowed; }
+        .about-section { background-color: var(--card-bg-color); padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07); margin-bottom: 3rem; }
+        .about-section .section-title { font-size: 2rem; font-weight: 700; color: var(--primary-color); margin-top: 0; margin-bottom: 1.5rem; border-bottom: 3px solid var(--accent-color); padding-bottom: 0.75rem; display: inline-block; }
+        .about-section p { font-size: 1.1rem; line-height: 1.8; color: var(--text-light); }
+        .team-subtitle { font-size: 1.5rem; color: var(--text-color); margin-top: 2.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .developer-card { background: var(--card-bg-color); border-radius: 12px; padding: 1rem; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; display: flex; align-items: center; gap: 1rem; }
+        .developer-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .developer-card img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary-color); }
+        .developer-card h4 { margin: 0; font-size: 1.1rem; color: var(--text-color); }
+        .developer-card .developer-info-text { display: flex; flex-direction: column; justify-content: center; }
+        .developer-card h4 { margin: 0 0 0.2rem 0; font-size: 1.1rem; color: var(--text-color); line-height: 1.2; }
+        .developer-card .role { margin: 0; font-size: 0.85rem; color: var(--primary-color); font-weight: 600; line-height: 1.2; }
+        .user-guide h4 { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .user-guide p { margin-bottom: 1rem; }
+
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            animation: slideInRight 0.3s ease-out;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .toast-content h5 {
+            margin: 0 0 5px 0;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .toast-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            margin-left: auto;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        #notifications-list .notification-item {
+            background-color: var(--card-bg-color);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        #notifications-list .notification-item h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .user-guide p { margin-bottom: 1rem; }
+
+        @media (max-width: 768px) {
+            .about-container {
+                padding: 0 1rem;
+            }
+            .about-section {
+                padding: 1.5rem;
+            }
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            .developer-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .developer-card img {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+    <style>
+        /* New Styles for Redesigned About Us Page */
+        .about-us-redesigned {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-us-redesigned .about-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .about-us-redesigned .about-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .about-us-redesigned .about-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .about-us-redesigned .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+        }
+
+        .about-us-redesigned .about-grid-item .icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .about-us-redesigned .about-grid-item h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .about-us-redesigned .about-grid-item p {
+            line-height: 1.7;
+            color: var(--text-light);
+        }
+
+        /* Team Section */
+        .team-section-redesigned {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .team-section-redesigned h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+            .team-grid-redesigned {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+                justify-items: center;
+            }
+        .team-card-redesigned {
+            background: var(--card-bg-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+        }
+
+        .team-card-redesigned:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+        }
+
+        .team-card-redesigned img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .team-card-redesigned h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0.5rem 0 0.2rem;
+        }
+
+        .team-card-redesigned .role {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .team-card-redesigned .description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            min-height: 40px; /* To prevent cards from changing height */
+        }
+
+        .team-card-redesigned .social-links a:hover {
+            color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        /* Accordion for User Guide */
+        .accordion-section {
+            margin-bottom: 3rem;
+        }
+        .accordion-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        .accordion-item {
+            background: var(--card-bg-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+            .accordion-header::after {
+                content: "\f078"; /* Correct unicode escape for chevron-down */
+                font-family: "Font Awesome 6 Free"; /* Match the loaded library */
+                font-weight: 900; /* Use the 'solid' style weight */
+                font-display: block; /* Helps with font loading issues */
+                -moz-osx-font-smoothing: grayscale;
+                -webkit-font-smoothing: antialiased;
+                font-style: normal;
+                font-variant: normal;
+                text-rendering: auto;
+                line-height: 1;
+                transition: transform 0.3s ease;
+            }        .accordion-item.active .accordion-header::after {
+            transform: rotate(180deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 1.5rem;
+            line-height: 1.7;
+            color: var(--text-light);
+        }
+        .accordion-item.active .accordion-content {
+            padding: 1rem 1.5rem;
+        }
+
+            @media (max-width: 768px) {
+                .about-us-redesigned .about-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        
+            @media (max-width: 480px) {
+                .about-us-redesigned .about-header h2 {
+                    font-size: 2rem;
+                }
+                .about-us-redesigned .about-header p {
+                    font-size: 1rem;
+                }
+                .team-section-redesigned h2,
+                .accordion-section h2 {
+                    font-size: 1.7rem;
+                }
+                .team-card-redesigned {
+                    padding: 1.5rem;
+                }
+                .team-grid-redesigned {
+                    gap: 1.5rem;
+                }
+                .accordion-header {
+                    padding: 0.8rem 1rem;
+                    font-size: 1rem;
+                }
+                .accordion-content {
+                    padding: 0 1rem;
+                }
+                .accordion-item.active .accordion-content {
+                    padding: 1rem 1rem;
+                }
+                .about-us-redesigned .about-grid {
+                    gap: 1.5rem;
+                }
+                .about-us-redesigned .about-grid-item {
+                    text-align: center;
+                }
+            }
+        </style></head>
 <body>
 
     <header class="main-header">
         <div class="header-left">
             <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
                 <img src="meroon Transparent logo prefect.png" alt="School Logo">
-                <span class="school-name">R/Eheliyagoda Central College</span>
+                <span class="school-name">ECCPMS</span>
             </a>
         </div>
-        <nav class="main-nav" id="main-nav">
-            <ul>
-                <li><a href="dashboard.html" class="active">Dashboard</a></li>
-                <li><a href="events.html">Events</a></li>
-                <li><a href="ideas.html">Ideas & Proposals</a></li>
-            </ul>
-        </nav>
         <div class="header-right">
-            <div class="notification-container">
-                <i class="fas fa-bell notification-bell">
-                    <span class="notification-badge" style="display: none;"></span>
-                </i>
-                <div class="notification-panel" style="display: none;">
-                    <div class="notification-header">
-                        <h4>Announcements</h4>
-                    </div>
-                    <div id="notification-list"></div>
-                </div>
-            </div>
+            <!-- New elements -->
+                            <button class="icon-button" id="header-notification-btn" aria-label="Notifications">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge" id="header-notification-badge" style="display: none;"></span>
+                            </button>
+                            <!-- Notification Dropdown Panel -->
+                            <div id="notification-dropdown-panel" class="notification-dropdown-panel">
+                                <div class="dropdown-header">
+                                    <h4>Notifications</h4>
+                                    <button id="mark-all-read-btn" class="mark-all-read-btn">Mark all as read</button>
+                                </div>
+                                <div class="dropdown-messages" id="dropdown-notification-list">
+                                    <!-- Notifications will be loaded here -->
+                                    <p class="no-notifications">No new notifications.</p>
+                                </div>
+                                <div class="dropdown-footer">
+                                    <a href="#notifications" id="view-all-notifications-btn">View All</a>
+                                </div>
+                            </div>            <img id="header-profile-picture" src="https://via.placeholder.com/120" alt="Profile" class="header-profile-img">
             <button id="menu-toggle">☰</button>
-            <button id="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </button>
         </div>
     </header>
 
-    <main id="dashboard-content" style="display: none;">
-        <div class="dashboard-container">
-            <div class="dashboard-card profile-card">
-                <img id="profile-picture" src="https://via.placeholder.com/120" alt="Profile Picture">
-                <p>Welcome,</p>
-                <h2 id="welcome-name">Prefect Name</h2>
-                <hr class="profile-divider">
-                <div class="profile-details">
-                    <p><strong>Role:</strong> <span id="profile-role">Prefect</span></p>
-                    <p><strong>Class:</strong> <span id="profile-class">13-B</span></p>
+    <div class="dashboard-body">
+        <nav class="dashboard-sidebar">
+            <div class="sidebar-secondary-nav">
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="#overview" class="active"><i class="fas fa-tachometer-alt"></i><span>Overview</span></a></li>
+                <li><a href="#events"><i class="fas fa-calendar-alt"></i><span>Events</span></a></li>
+                <li><a href="#ideas"><i class="fas fa-lightbulb"></i><span>Ideas</span></a></li>
+                <li><a href="#notifications"><i class="fas fa-bell"></i><span>Notifications</span></a></li>
+                <li><a href="#attendance"><i class="fas fa-user-check"></i><span>Attendance</span></a></li>
+                <li><a href="#points"><i class="fas fa-star"></i><span>Points</span></a></li>
+                <li><a href="#performance"><i class="fas fa-chart-line"></i><span>Performance</span></a></li>
+                <li><a href="#profile"><i class="fas fa-user-circle"></i><span>My Profile</span></a></li>
+                <li><a href="#about"><i class="fas fa-info-circle"></i><span>About Us</span></a></li>
+                        </ul>
+                        <div class="sidebar-footer">
+                            <button id="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </nav>                <div class="sidebar-overlay"></div>
+                <main id="dashboard-content" class="dashboard-main-content" style="display: none;">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <h2 class="section-title">Dashboard Overview</h2>
+                <div class="overview-grid">
+                    <div class="dashboard-card profile-overview-card">
+                        <img id="dashboard-profile-picture" src="https://via.placeholder.com/120" alt="Profile Picture" class="dashboard-profile-img">
+                        <div class="profile-overview-info">
+                            <h4 id="dashboard-welcome-name">Prefect Name</h4>
+                            <p id="dashboard-profile-role">Prefect</p>
+                        </div>
+                        <button id="dashboard-edit-profile-btn" class="edit-profile-btn" aria-label="Edit Profile">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3 class="card-title"><i class="fas fa-star"></i> Total Points</h3>
+                        <div class="stat-number" id="total-points">0</div>
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3 class="card-title"><i class="fas fa-user-times"></i> Absences</h3>
+                        <div class="stat-number" id="total-absences">0</div>
+                        <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3 class="card-title"><i class="fas fa-clock"></i> Late Arrivals</h3>
+                        <div class="stat-number" id="total-late">0</div>
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="dashboard-card">
-                <h3 class="card-title">Key Stats</h3>
-                <ul class="stats-list">
-                    <li>Total Points: <span id="total-points">0</span></li>
-                    <li>Absences: <span id="total-absences">0</span></li>
-                    <li>Late Arrivals: <span id="total-late">0</span></li>
-                </ul>
-            </div>
-
-            <div class="dashboard-card">
-                <h3 class="card-title">Recent Attendance</h3>
-                <div id="recent-attendance-list">
-                    <p>No recent attendance records found.</p>
+                 <div class="dashboard-card">
+                    <h3 class="card-title">Recent Points</h3>
+                    <div class="bar-chart-container">
+                        <div class="bar-chart" id="recent-points-chart">
+                            <div class="bar" style="height: 60%;" data-label="Week 1" data-value="6"></div>
+                            <div class="bar" style="height: 80%;" data-label="Week 2" data-value="8"></div>
+                            <div class="bar" style="height: 40%;" data-label="Week 3" data-value="4"></div>
+                            <div class="bar" style="height: 90%;" data-label="Week 4" data-value="9"></div>
+                            <div class="bar" style="height: 70%;" data-label="Week 5" data-value="7"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="dashboard-card card-span-2">
-                <h3 class="card-title">Recent Points</h3>
-                <div id="recent-points-list">
-                    <p>No recent points awarded.</p>
+            <!-- Attendance Section -->
+            <section id="attendance" class="content-section">
+                <h2 class="section-title">Attendance Details</h2>
+                <div class="dashboard-card">
+                    <h3 class="card-title">Recent Attendance</h3>
+                    <div id="recent-attendance-list">
+                        <p>No recent attendance records found.</p>
+                    </div>
                 </div>
-            </div>
-
-            <div class="dashboard-card card-span-2">
-                <h3 class="card-title">Performance Issues</h3>
-                <div id="bad-work-list">
-                    <p>No performance issues recorded.</p>
+                <div id="absent-reason-container" style="margin-top: 2rem;"> <!-- Removed display: none -->
+                    <div class="dashboard-card">
+                        <h3 class="card-title">Reason for Absence</h3>
+                        <p id="absence-prompt-message" style="display: none;">You were marked absent on <span id="absence-date"></span>. Please provide a reason for your absence.</p>
+                        <p id="absence-status-message">You have no pending absences to report.</p>
+                        <form id="absence-reason-form">
+                            <select id="absence-reason-select" disabled style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <option value="">Select a reason...</option>
+                                <option value="Sick">Sick</option>
+                                <option value="Family Emergency">Family Emergency</option>
+                                <option value="Appointment">Appointment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <textarea id="absence-reason-other" rows="4" disabled style="width: 100%; margin-bottom: 1rem; display: none;" placeholder="Please specify the reason..."></textarea>
+                            <button type="submit" id="absence-submit-btn" disabled>Submit Reason</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </main>
+            </section>
 
-    <div id="absent-reason-container" style="display: none; padding: 2rem 2.5rem;">
-        <div class="dashboard-card">
-            <h3 class="card-title">Reason for Absence</h3>
-            <p>You were marked absent on <span id="absence-date"></span>. Please provide a reason for your absence.</p>
-            <form id="absence-reason-form">
-                <select id="absence-reason-select" style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <option value="">Select a reason...</option>
-                    <option value="Sick">Sick</option>
-                    <option value="Family Emergency">Family Emergency</option>
-                    <option value="Appointment">Appointment</option>
-                    <option value="Other">Other</option>
-                </select>
-                <textarea id="absence-reason-other" rows="4" style="width: 100%; margin-bottom: 1rem; display: none;" placeholder="Please specify the reason..."></textarea>
-                <button type="submit">Submit Reason</button>
-            </form>
-        </div>
+            <!-- Points Section -->
+            <section id="points" class="content-section">
+                <h2 class="section-title">Points History</h2>
+                <div class="dashboard-card">
+                    <h3 class="card-title">All Points Awarded</h3>
+                    <div id="recent-points-list">
+                        <p>No recent points awarded.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Section -->
+            <section id="performance" class="content-section">
+                <h2 class="section-title">Performance Issues</h2>
+                <div class="dashboard-card">
+                    <h3 class="card-title">All Recorded Issues</h3>
+                    <div id="bad-work-list">
+                        <p>No performance issues recorded.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="content-section">
+                <h2 class="section-title">My Profile</h2>
+                <div class="dashboard-card">
+                    <h3 class="card-title">Profile Details</h3>
+                    <div class="profile-details">
+                        <p><strong>Role:</strong> <span id="profile-role-detail">Prefect</span></p>
+                        <p><strong>Class:</strong> <span id="profile-class">13-B</span></p>
+                        <!-- Add more profile details here if needed -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events" class="content-section">
+                <h2 class="section-title">Events</h2>
+                <div class="events-container">
+                    <h1 class="page-title">Upcoming Events</h1>
+                    <div id="events-list"></div>
+                </div>
+            </section>
+
+            <!-- Ideas Section -->
+            <section id="ideas" class="content-section">
+                <h2 class="section-title">Ideas & Proposals</h2>
+                <div class="ideas-container">
+                    <div class="card">
+                        <h2 class="page-title">Submit an Idea</h2>
+                        <form id="idea-form">
+                            <div class="form-group">
+                                <input type="text" id="idea-title" placeholder="Title of your idea" required>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="idea-description" rows="4" placeholder="Describe your idea in detail..." required></textarea>
+                            </div>
+                            <button type="submit" id="idea-submit-btn" class="submit-btn">Submit for Approval</button>
+                            <p id="submit-message" style="margin-top: 1rem;"></p>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <h2 class="page-title">My Submissions</h2>
+                        <div id="my-ideas-list"></div>
+                    </div>
+                    <div class="card">
+                        <h2 class="page-title">Public Proposals</h2>
+                        <div id="public-ideas-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="content-section">
+                <div class="about-us-redesigned">
+                    <div class="about-header">
+                        <h2>About Our Mission</h2>
+                        <p>We are a team of passionate and innovative students from Eheliyagoda Central College, brought together by a shared vision of leveraging technology to improve our school's ecosystem.</p>
+                    </div>
+
+                    <div class="about-grid">
+                        <div class="about-grid-item">
+                            <div class="icon"><i class="fas fa-rocket"></i></div>
+                            <h3>About The Project</h3>
+                            <p>Welcome to the official portal for the Eheliyagoda Central College Prefect Management System (ECCPMS). This project represents a significant leap forward in digitizing and streamlining the responsibilities and tracking of our esteemed Prefects' Guild.</p>
+                        </div>
+                        <div class="about-grid-item">
+                            <div class="icon"><i class="fas fa-code-branch"></i></div>
+                            <h3>Project Version</h3>
+                            <p>Current Version: <strong>1.0.0 (Initial Release)</strong>. This is the first official release of the ECCPMS. As we continue to develop and improve the platform, new versions with more features and enhancements will be released.</p>
+                        </div>
+                    </div>
+
+                    <div class="team-section-redesigned">
+                        <h2>Meet The Team</h2>
+                        <div class="team-grid-redesigned">
+                            <!-- Developers -->
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/Adeesha.jpg" alt="Adeesha Ravimal">
+                                <h4>Adeesha Ravimal</h4>
+                                <p class="role">Backend Developer & Desktop App Dev</p>
+                                <p class="description">System Architect and lead developer for the desktop application.</p>
+                            </div>
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/Hansaka.png" alt="Hansaka Fernando">
+                                <h4>Hansaka Fernando</h4>
+                                <p class="role">Web & Mobile App Developer</p>
+                                <p class="description">Designed and developed the responsive web and mobile user interface.</p>
+                            </div>
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/thevindu.JPG" alt="Thevindu Thisev">
+                                <h4>Thevindu Thisev</h4>
+                                <p class="role">Data Collector</p>
+                                <p class="description">Managed the crucial task of student data collection and database administration.</p>
+                            </div>
+                            <!-- Coordinators -->
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/Nethmi.jpg" alt="Nethmi Dhananjana">
+                                <h4>Nethmi Dhananjana</h4>
+                                <p class="role">Student Data Coordinator</p>
+                                <p class="description">Coordinated student data management, ensuring accuracy and integrity.</p>
+                            </div>
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/Rashmi.jpg" alt="Rashmi Jananjana">
+                                <h4>Rashmi Jananjana</h4>
+                                <p class="role">Student Management Lead</p>
+                                <p class="description">Led student engagement and participation throughout the project lifecycle.</p>
+                            </div>
+                            <!-- Media Partner -->
+                            <div class="team-card-redesigned">
+                                <img src="Developer Team/Avishka.jpg" alt="Avishka Kalhara">
+                                <h4>Avishka Kalhara</h4>
+                                <p class="role">Official Media Partner</p>
+                                <p class="description">Provided official media coverage and creative support for the project.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-section">
+                        <h2>User Guide</h2>
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <div class="accordion-header">Step 1: Logging In</div>
+                                <div class="accordion-content">
+                                    <p>Access the system by using your official credentials on the <a href="login.html">Login Page</a>. Upon successful login, you will be directed to your personal dashboard.</p>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header">Step 2: Navigating the Dashboard</div>
+                                <div class="accordion-content">
+                                    <p>Use the sidebar on the left to navigate between different sections. You can get a quick summary on the 'Overview' page, or dive into detailed records for 'Attendance', 'Points', and 'Performance'.</p>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header">Step 3: Checking Your Profile</div>
+                                <div class="accordion-content">
+                                    <p>Your basic information is displayed at the top of the sidebar. For more details, navigate to the 'My Profile' section.</p>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header">Step 4: Reporting an Absence</div>
+                                <div class="accordion-content">
+                                    <p>If you are marked absent, a form will become active in the 'Attendance' section. You can select a reason from the dropdown or provide a custom one to inform the administrators.</p>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header">Step 5: Getting Help</div>
+                                <div class="accordion-content">
+                                    <p>If you encounter any issues or have questions, use the chat widget at the bottom right of the screen to contact an administrator for real-time support.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications" class="content-section">
+                <h2 class="section-title">Notifications</h2>
+                <div class="notifications-container">
+                    <div id="notification-master-panel" class="notification-master-panel">
+                        <div id="notifications-list"></div>
+                    </div>
+                    <div id="notification-detail-panel" class="notification-detail-panel" style="display: none;">
+                        <button id="back-to-notifications-list" class="back-button"><i class="fas fa-arrow-left"></i> Back to List</button>
+                        <h3 id="notification-detail-title"></h3>
+                        <p class="notification-detail-meta"><small id="notification-detail-date"></small></p>
+                        <div id="notification-detail-content"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
     
     <div id="loading-state">
         <h2>Loading Dashboard...</h2>
         <p>Please wait while we fetch your details.</p>
-    </div>
-    <div style="text-align: center; margin-bottom: 1.5rem;">
-            <button id="footer-developer-btn" class="terms-btn">Development Team</button>
     </div>
     <footer class="portfolio-footer">
             <div class="social-icons">
@@ -554,10 +2052,12 @@
             <p class="copyright-credits">Adeesha Ravimal Kannangara | Thevindu Thisev Rajapaksha | Hansaka Fernando</p>
         </footer>
 
+    <div id="toast-container"></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, limit, orderBy, onSnapshot, doc, updateDoc, addDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, limit, orderBy, onSnapshot, doc, updateDoc, addDoc, setDoc, serverTimestamp, writeBatch, getDoc, runTransaction, arrayUnion } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
@@ -575,73 +2075,297 @@
 
         const dashboardContent = document.getElementById('dashboard-content');
         const loadingState = document.getElementById('loading-state');
+        const eventsListDiv = document.getElementById('events-list');
+        let currentPrefect = null;
 
         // --- MOBILE MENU LOGIC ---
         const menuToggle = document.getElementById('menu-toggle');
-        const mainNav = document.getElementById('main-nav');
-        if(menuToggle && mainNav) {
+        const sidebar = document.querySelector('.dashboard-sidebar'); // Target new sidebar
+        const overlay = document.querySelector('.sidebar-overlay');
+        if(menuToggle && sidebar && overlay) {
             menuToggle.addEventListener('click', () => {
-                const isActive = mainNav.classList.toggle('mobile-nav-active');
+                const isActive = sidebar.classList.toggle('mobile-nav-active');
+                overlay.classList.toggle('active');
                 menuToggle.innerHTML = isActive ? '&times;' : '☰';
+                menuToggle.classList.toggle('is-active', isActive); // Add/remove class for animation
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('mobile-nav-active');
+                overlay.classList.remove('active');
+                menuToggle.innerHTML = '☰';
             });
         }
+
+        // --- NEW DASHBOARD NAVIGATION ---
+        const sidebarNavLinks = document.querySelectorAll('.sidebar-nav a');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        sidebarNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Deactivate all
+                sidebarNavLinks.forEach(l => l.classList.remove('active'));
+                contentSections.forEach(s => s.classList.remove('active'));
+
+                // Activate clicked
+                link.classList.add('active');
+                const targetSection = document.querySelector(link.getAttribute('href'));
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Close mobile nav if open
+                if(sidebar.classList.contains('mobile-nav-active')) {
+                    sidebar.classList.remove('mobile-nav-active');
+                    overlay.classList.remove('active');
+                    menuToggle.innerHTML = '☰';
+                }
+            });
+        });
+
+        // --- DROPDOWN SUBMENU LOGIC ---
+        const submenuToggles = document.querySelectorAll('.submenu-toggle');
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parentLi = toggle.parentElement;
+                parentLi.classList.toggle('active');
+            });
+        });
         
         // --- ANNOUNCEMENT LOGIC ---
-        const notificationBell = document.querySelector('.notification-bell');
-        const notificationPanel = document.querySelector('.notification-panel');
-        const notificationBadge = document.querySelector('.notification-badge');
-        const notificationList = document.getElementById('notification-list');
-
-        notificationBell.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = notificationPanel.style.display === 'block';
-            notificationPanel.style.display = isVisible ? 'none' : 'block';
-            
-            if (!isVisible) {
-                notificationBadge.style.display = 'none';
-                const latestTimestamp = notificationList.firstChild?.dataset.timestamp;
-                if (latestTimestamp) {
-                    localStorage.setItem('lastSeenAnnouncement', latestTimestamp);
-                }
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!notificationPanel.contains(e.target) && !notificationBell.contains(e.target)) {
-                notificationPanel.style.display = 'none';
-            }
-        });
-
-        function loadAnnouncements() {
-            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
-            onSnapshot(q, (snapshot) => {
+        function loadNotificationsIntoDropdown() {
+            const dropdownNotificationList = document.getElementById('dropdown-notification-list');
+            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(5)); // Limit to 5 for dropdown
+            getDocs(q).then((snapshot) => {
                 if (snapshot.empty) {
-                    notificationList.innerHTML = '<div class="notification-item"><p>No announcements right now.</p></div>';
+                    dropdownNotificationList.innerHTML = '<p class="no-notifications">No new notifications.</p>';
                     return;
                 }
-                notificationList.innerHTML = '';
-                let latestTimestamp = snapshot.docs[0].data().timestamp?.toMillis();
+                dropdownNotificationList.innerHTML = '';
                 snapshot.forEach(doc => {
-                    notificationList.appendChild(renderAnnouncement(doc.data()));
+                    const announcement = { id: doc.id, ...doc.data() };
+                    const dropdownItem = document.createElement('div');
+                    dropdownItem.className = 'notification-item';
+                    dropdownItem.innerHTML = `
+                        <h5>${announcement.title}</h5>
+                        <p>${announcement.content.substring(0, 50)}...</p> <!-- Truncate for dropdown -->
+                        <small>${announcement.timestamp ? announcement.timestamp.toDate().toLocaleDateString() : ''}</small>
+                    `;
+                    dropdownItem.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent dropdown from closing immediately
+                        // First, navigate to the notifications tab
+                        const notificationsLink = document.querySelector('.sidebar-nav a[href="#notifications"]');
+                        if (notificationsLink) {
+                            notificationsLink.click();
+                            // Then show the detail after a short delay to allow tab switch
+                            setTimeout(() => showNotificationDetail(announcement.id), 100);
+                            notificationDropdownPanel.classList.remove('active'); // Close dropdown
+                        }
+                    });
+                    dropdownNotificationList.appendChild(dropdownItem);
                 });
-                const lastSeenTimestamp = localStorage.getItem('lastSeenAnnouncement');
-                if (latestTimestamp && (!lastSeenTimestamp || latestTimestamp > lastSeenTimestamp)) {
-                    notificationBadge.style.display = 'block';
-                }
             });
         }
 
-        function renderAnnouncement(announcement) {
-            const item = document.createElement('div');
-            item.className = 'notification-item';
-            item.dataset.timestamp = announcement.timestamp?.toMillis();
-            item.innerHTML = `
-                <h5>${announcement.title}</h5>
-                <p>${announcement.content}</p>
-                <small style="color: var(--accent-color)">${announcement.timestamp ? announcement.timestamp.toDate().toLocaleString() : ''}</small>
-            `;
-            return item;
+        // Context Menu for Mobile Long Press
+        const contextMenu = document.getElementById('notification-context-menu');
+        let currentContextMenuTarget = null;
+        let pressTimer = null;
+
+        function showContextMenu(targetElement) {
+            // Only show context menu on mobile
+            if (window.innerWidth > 768) return;
+
+            currentContextMenuTarget = targetElement;
+            const rect = targetElement.getBoundingClientRect();
+            contextMenu.style.top = `${rect.top + rect.height / 2}px`;
+            contextMenu.style.left = `${rect.left + rect.width / 2}px`;
+            contextMenu.style.transform = 'translate(-50%, -50%)';
+            contextMenu.classList.add('active');
         }
+
+        // Hide context menu when clicking anywhere else
+        document.addEventListener('click', (e) => {
+            if (contextMenu.classList.contains('active') && !contextMenu.contains(e.target)) {
+                contextMenu.classList.remove('active');
+            }
+        });
+
+        // Context Menu Actions
+        contextMenu.querySelector('[data-action="star-context"]').addEventListener('click', () => {
+            if (currentContextMenuTarget) {
+                const starBtn = currentContextMenuTarget.querySelector('.gmail-star');
+                if(starBtn) {
+                    starBtn.classList.toggle('fas');
+                    starBtn.classList.toggle('far');
+                }
+            }
+            contextMenu.classList.remove('active');
+        });
+
+        contextMenu.querySelector('[data-action="read-context"]').addEventListener('click', () => {
+            if (currentContextMenuTarget) {
+                currentContextMenuTarget.classList.remove('unread');
+                currentContextMenuTarget.classList.add('read');
+            }
+            contextMenu.classList.remove('active');
+        });
+
+        contextMenu.querySelector('[data-action="delete-context"]').addEventListener('click', () => {
+            if (currentContextMenuTarget) {
+                currentContextMenuTarget.classList.add('fading-out');
+                currentContextMenuTarget.addEventListener('animationend', () => currentContextMenuTarget.remove());
+            }
+            contextMenu.classList.remove('active');
+        });
+
+        function attachLongPressEvents(element) {
+            const startPress = (e) => {
+                pressTimer = window.setTimeout(() => {
+                    e.preventDefault();
+                    showContextMenu(element);
+                }, 500); // 500ms for long press
+            };
+
+            const cancelPress = () => {
+                clearTimeout(pressTimer);
+            };
+
+            element.addEventListener('touchstart', startPress);
+            element.addEventListener('touchend', cancelPress);
+            element.addEventListener('touchmove', cancelPress);
+        }
+
+        function loadAnnouncements() {
+            const notificationsList = document.getElementById('notifications-list');
+            const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allAnnouncements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // Store all announcements
+
+                // Handle toasts for new announcements
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') {
+                        const announcement = change.doc.data();
+                        const lastSeenTimestamp = localStorage.getItem('lastSeenAnnouncement');
+                        const currentTimestamp = announcement.timestamp?.toMillis();
+                        if (!lastSeenTimestamp || currentTimestamp > lastSeenTimestamp) {
+                            showToast(announcement);
+                        }
+                    }
+                });
+                if (!snapshot.empty) {
+                    const latestTimestamp = snapshot.docs[0].data().timestamp?.toMillis();
+                    if (latestTimestamp) {
+                        localStorage.setItem('lastSeenAnnouncement', latestTimestamp);
+                    }
+                }
+
+                // Populate the main notifications page
+                if (snapshot.empty) {
+                    notificationsList.innerHTML = '<p style="padding: 1rem;">No announcements found.</p>';
+                    return;
+                }
+                notificationsList.innerHTML = '';
+                allAnnouncements.forEach(announcement => {
+                    const item = document.createElement('div');
+                    // To demonstrate unread dot, let's make the first one unread.
+                    const isUnread = (announcement.id === allAnnouncements[0].id);
+                    item.className = `notification-item ${isUnread ? 'unread' : 'read'}`; 
+                    const firstLetter = announcement.title.charAt(0).toUpperCase();
+                    item.innerHTML = `
+                        <div class="gmail-col gmail-col-avatar">${firstLetter}</div>
+                        <div class="gmail-col gmail-col-select">
+                            <input type="checkbox" class="gmail-checkbox" onclick="event.stopPropagation();">
+                            <i class="far fa-star gmail-star" onclick="event.stopPropagation();"></i>
+                        </div>
+                        <div class="gmail-col gmail-col-title">
+                            <h5>${announcement.title}</h5>
+                        </div>
+                        <div class="gmail-col gmail-col-content">
+                            <p>${announcement.content}</p>
+                        </div>
+                        <div class="gmail-col gmail-col-date">
+                            <small>${announcement.timestamp ? announcement.timestamp.toDate().toLocaleDateString() : ''}</small>
+                        </div>
+                        <div class="gmail-hover-actions">
+                            <button class="action-btn" data-action="archive"><i class="fas fa-archive"></i></button>
+                            <button class="action-btn" data-action="delete"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn" data-action="read"><i class="fas fa-envelope-open"></i></button>
+                        </div>
+                    `;
+
+                    // --- Event Listeners for Actions ---
+                    const starBtn = item.querySelector('.gmail-star');
+                    starBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        starBtn.classList.toggle('fas'); // Toggle solid state
+                        starBtn.classList.toggle('far'); // Toggle regular state
+                    });
+
+                    item.querySelector('[data-action="read"]').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                    });
+
+                    item.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        item.classList.add('fading-out');
+                        item.addEventListener('animationend', () => item.remove());
+                    });
+
+                    item.addEventListener('click', () => showNotificationDetail(announcement.id));
+                    attachLongPressEvents(item); // Attach long press for mobile
+                    notificationsList.appendChild(item);
+                });
+            });
+        }
+
+        function showToast(announcement) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <h5>${announcement.title}</h5>
+                    <p>${announcement.content}</p>
+                </div>
+                <button class="toast-close">&times;</button>
+            `;
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.remove();
+            });
+            toastContainer.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        let allAnnouncements = []; // Global array to store announcements for easy access
+
+        // Function to show notification detail
+        function showNotificationDetail(notificationId) {
+            const notification = allAnnouncements.find(ann => ann.id === notificationId);
+            if (!notification) {
+                console.error("Notification not found:", notificationId);
+                return;
+            }
+
+            document.getElementById('notification-detail-title').textContent = notification.title;
+            document.getElementById('notification-detail-date').textContent = notification.timestamp ? notification.timestamp.toDate().toLocaleString() : '';
+            document.getElementById('notification-detail-content').innerHTML = `<p>${notification.content}</p>`;
+
+            document.getElementById('notification-master-panel').style.display = 'none';
+            document.getElementById('notification-detail-panel').style.display = 'flex';
+        }
+
+        // Event listener for "Back to List" button
+        document.getElementById('back-to-notifications-list').addEventListener('click', () => {
+            document.getElementById('notification-master-panel').style.display = 'block';
+            document.getElementById('notification-detail-panel').style.display = 'none';
+        });
 
         function formatDate(date) {
             if (!date) {
@@ -681,21 +2405,54 @@
                     const prefectDoc = querySnapshot.docs[0];
                     const prefectData = prefectDoc.data();
                     const prefectId = prefectDoc.id;
-                    document.getElementById('profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
-                    document.getElementById('welcome-name').textContent = prefectData.name || 'Prefect Name';
-                    document.getElementById('profile-role').textContent = prefectData.destiny || 'N/A';
+                    currentPrefect = { id: prefectId, ...prefectData };
+
+                    // Populate new Dashboard Profile Card
+                    document.getElementById('dashboard-profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
+                    // Populate Header Profile Picture
+                    document.getElementById('header-profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
+                    document.getElementById('dashboard-welcome-name').textContent = prefectData.name || 'Please add your name';
+                    document.getElementById('dashboard-profile-role').textContent = prefectData.destiny || 'N/A';
+
+                    // Populate the separate Profile page details
+                    document.getElementById('profile-role-detail').textContent = prefectData.destiny || 'N/A';
                     document.getElementById('profile-class').textContent = prefectData.class || 'N/A';
+
+                    // Add event listener for the new edit button
+                    const dashboardEditBtn = document.getElementById('dashboard-edit-profile-btn');
+                    if (dashboardEditBtn) {
+                        dashboardEditBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const profileLink = document.querySelector('.sidebar-nav a[href="#profile"]');
+                            if (profileLink) {
+                                profileLink.click();
+                            }
+                        });
+                    }
+                    
                     await fetchKeyStats(prefectId);
                     await fetchRecentPoints(prefectId);
                     await fetchRecentAttendance(prefectId);
                     await checkForAbsenceReason(prefectId);
                     await fetchBadWork(prefectId);
+                    loadEvents();
+                    initializeIdeas();
                 } else {
                     console.error("Could not find a prefect profile linked to this user.");
                     document.getElementById('welcome-name').textContent = user.email;
                 }
                 loadingState.style.display = 'none';
                 dashboardContent.style.display = 'block';
+
+                // Staggered animation for overview cards
+                const overviewCards = document.querySelectorAll('.overview-grid .dashboard-card');
+                overviewCards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('is-visible');
+                    }, 150 * index);
+                });
+
+                updateChatNotificationBadge(user.uid); // Initialize chat notification badge
             } else {
                 window.location.href = 'login.html';
             }
@@ -723,19 +2480,41 @@
 
         async function fetchRecentPoints(prefectId) {
             const pointsList = document.getElementById('recent-points-list');
+            const recentPointsChart = document.getElementById('recent-points-chart');
             const q = query(collection(db, "points"), where("prefect_id", "==", prefectId), orderBy("date", "desc"), limit(5));
             const querySnapshot = await getDocs(q);
+
             if (querySnapshot.empty) {
                 pointsList.innerHTML = '<p>No recent points awarded.</p>';
+                if (recentPointsChart) {
+                    recentPointsChart.innerHTML = '<p>No recent points to display in chart.</p>';
+                }
                 return;
             }
-            let html = '<ul class="stats-list">';
+
+            let pointsData = [];
             querySnapshot.forEach(doc => {
-                const point = doc.data();
-                html += `<li>${point.reason || 'No reason'} <span>+${point.points || 0}</span></li>`;
+                pointsData.push(doc.data());
             });
-            html += '</ul>';
-            pointsList.innerHTML = html;
+
+            // For the list view in the "Points" section
+            let listHtml = '<ul class="stats-list">';
+            pointsData.forEach(point => {
+                listHtml += `<li>${point.reason || 'No reason'} <span>+${point.points || 0}</span></li>`;
+            });
+            listHtml += '</ul>';
+            pointsList.innerHTML = listHtml;
+
+            // For the bar chart in the "Overview" section
+            if (recentPointsChart) {
+                let chartHtml = '';
+                const maxPoints = Math.max(...pointsData.map(p => p.points || 0));
+                pointsData.forEach((point, index) => {
+                    const barHeight = maxPoints > 0 ? ((point.points || 0) / maxPoints) * 100 : 0;
+                    chartHtml += `<div class="bar" style="height: ${barHeight}%;" data-label="${formatDate(point.date)}" data-value="${point.points || 0}"></div>`;
+                });
+                recentPointsChart.innerHTML = chartHtml;
+            }
         }
 
         async function fetchRecentAttendance(prefectId) {
@@ -755,48 +2534,72 @@
             attendanceList.innerHTML = html;
         }
 
+        // --- ABSENCE REASON LOGIC ---
+        // Setup listeners once on page load
+        const absenceReasonSelect = document.getElementById('absence-reason-select');
+        const absenceReasonOther = document.getElementById('absence-reason-other');
+        absenceReasonSelect.addEventListener('change', () => {
+            if (absenceReasonSelect.value === 'Other') {
+                absenceReasonOther.style.display = 'block';
+            } else {
+                absenceReasonOther.style.display = 'none';
+            }
+        });
+
         async function checkForAbsenceReason(prefectId) {
+            // Get all the elements
+            const absentReasonContainer = document.getElementById('absent-reason-container');
+            const absencePrompt = document.getElementById('absence-prompt-message');
+            const absenceStatus = document.getElementById('absence-status-message');
+            const absenceDate = document.getElementById('absence-date');
+            const absenceReasonForm = document.getElementById('absence-reason-form');
+            const absenceSubmitBtn = document.getElementById('absence-submit-btn');
+
             const attendanceRef = collection(db, "attendance");
-            const q = query(attendanceRef, where("prefect_id", "==", prefectId), orderBy("date", "desc"), limit(1));
+            const q = query(attendanceRef, where("prefect_id", "==", prefectId), where("status", "==", "Absent"), where("reason", "==", null), orderBy("date", "desc"), limit(1));
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
                 const latestAttendance = querySnapshot.docs[0];
                 const data = latestAttendance.data();
 
-                if (data.status === 'Absent' && !data.reason) {
-                    const absentReasonContainer = document.getElementById('absent-reason-container');
-                    const absenceDate = document.getElementById('absence-date');
-                    absenceDate.textContent = formatDate(data.date);
-                    absentReasonContainer.style.display = 'block';
+                // An absence needs a reason, so enable the form
+                absencePrompt.style.display = 'block';
+                absenceStatus.style.display = 'none';
+                absenceDate.textContent = formatDate(data.date);
+                
+                absenceReasonSelect.disabled = false;
+                absenceReasonOther.disabled = false;
+                absenceSubmitBtn.disabled = false;
 
-                    const absenceReasonForm = document.getElementById('absence-reason-form');
-                    const absenceReasonSelect = document.getElementById('absence-reason-select');
-                    const absenceReasonOther = document.getElementById('absence-reason-other');
+                // Handle the form submission
+                absenceReasonForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    absenceSubmitBtn.disabled = true;
+                    absenceSubmitBtn.textContent = 'Submitting...';
 
-                    absenceReasonSelect.addEventListener('change', () => {
-                        if (absenceReasonSelect.value === 'Other') {
-                            absenceReasonOther.style.display = 'block';
-                        } else {
-                            absenceReasonOther.style.display = 'none';
-                        }
-                    });
+                    let reason = absenceReasonSelect.value;
+                    if (reason === 'Other') {
+                        reason = absenceReasonOther.value.trim();
+                    }
 
-                    absenceReasonForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        let reason = absenceReasonSelect.value;
-                        if (reason === 'Other') {
-                            reason = absenceReasonOther.value;
-                        }
-
-                        if (reason) {
-                            const attendanceDocRef = doc(db, "attendance", latestAttendance.id);
-                            await updateDoc(attendanceDocRef, { reason: reason });
-                            absentReasonContainer.innerHTML = '<p>Thank you for submitting your reason.</p>';
-                        }
-                    });
-                }
+                    if (reason) {
+                        const attendanceDocRef = doc(db, "attendance", latestAttendance.id);
+                        await updateDoc(attendanceDocRef, { reason: reason });
+                        
+                        const card = absentReasonContainer.querySelector('.dashboard-card');
+                        card.innerHTML = `
+                            <h3 class="card-title">Reason for Absence</h3>
+                            <p>Thank you for submitting your reason.</p>
+                        `;
+                    } else {
+                        absenceSubmitBtn.disabled = false;
+                        absenceSubmitBtn.textContent = 'Submit Reason';
+                        alert('Please select or provide a reason.');
+                    }
+                };
             }
+            // If the query is empty, the form remains disabled and the default message is shown, so no 'else' block is needed.
         }
 
         async function fetchBadWork(prefectId) {
@@ -815,9 +2618,214 @@
             html += '</ul>';
             badWorkList.innerHTML = html;
         }
+
+        function loadEvents() {
+            const eventsQuery = query(collection(db, 'events'), orderBy("date", "desc"));
+            onSnapshot(eventsQuery, (snapshot) => {
+                eventsListDiv.innerHTML = snapshot.empty ? "<p>No events scheduled.</p>" : '';
+                snapshot.forEach(eventDoc => {
+                    const event = { id: eventDoc.id, ...eventDoc.data() };
+                    const eventCard = createEventCard(event);
+                    eventsListDiv.appendChild(eventCard);
+                    loadDutiesForEvent(event.id);
+                });
+            });
+        }
+
+        function loadDutiesForEvent(eventId) {
+            const dutiesList = document.getElementById(`duties-for-${eventId}`);
+            const dutiesQuery = query(collection(db, 'event_duties'), where('eventId', '==', eventId));
+            onSnapshot(dutiesQuery, (snapshot) => {
+                dutiesList.innerHTML = snapshot.empty ? "<li>No duties listed.</li>" : '';
+                snapshot.forEach(dutyDoc => {
+                    const duty = { id: dutyDoc.id, ...dutyDoc.data() };
+                    dutiesList.appendChild(createDutyItem(duty));
+                });
+            });
+        }
+
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="event-header">
+                    <h3>${event.title}</h3>
+                    <p>Date: ${formatDate(event.date)}</p>
+                </div>
+                <p class="event-description">${event.description || 'No description.'}</p>
+                <h4>Duties:</h4>
+                <ul class="duties-list" id="duties-for-${event.id}"></ul>`;
+            return card;
+        }
+
+        function createDutyItem(duty) {
+            const item = document.createElement('li');
+            item.className = 'duty-item';
+            const isTaken = !!duty.assignedPrefectName;
+            item.innerHTML = `
+                <span class="duty-title">${duty.title}</span>
+                <div class="duty-status">
+                    ${isTaken ? `<span class="duty-assignee">Taken by: ${duty.assignedPrefectName}</span>` : '<button class="take-duty-btn">Take Duty</button>'}
+                </div>`;
+            if (!isTaken) {
+                item.querySelector('.take-duty-btn').addEventListener('click', () => takeDuty(duty.id));
+            }
+            return item;
+        }
+
+        async function takeDuty(dutyId) {
+            if (!currentPrefect) return alert("Could not verify your identity.");
+            const dutyRef = doc(db, 'event_duties', dutyId);
+            try {
+                const dutySnap = await getDoc(dutyRef);
+                if (dutySnap.exists() && dutySnap.data().assignedPrefectId) {
+                    return alert("Sorry, this duty was just taken!");
+                }
+                await updateDoc(dutyRef, {
+                    assignedPrefectId: currentPrefect.id,
+                    assignedPrefectName: currentPrefect.name
+                });
+                alert("Duty assigned to you successfully!");
+            } catch (error) {
+                console.error("Error taking duty: ", error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function initializeIdeas() {
+            setupForm();
+            loadMyIdeas();
+            loadPublicIdeas();
+        }
+
+        function setupForm() {
+            const form = document.getElementById('idea-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('idea-submit-btn');
+                const messageEl = document.getElementById('submit-message');
+                submitBtn.disabled = true;
+                messageEl.textContent = 'Submitting...';
+                try {
+                    await addDoc(collection(db, 'ideas_proposals'), {
+                        prefectId: currentPrefect.id,
+                        prefectName: currentPrefect.name,
+                        title: document.getElementById('idea-title').value,
+                        description: document.getElementById('idea-description').value,
+                        status: 'Pending_Approval',
+                        timestamp: serverTimestamp(),
+                        upvotes: 0,
+                        upvotedBy: []
+                    });
+                    form.reset();
+                    messageEl.textContent = 'Submitted successfully!';
+                    messageEl.style.color = 'green';
+                } catch (error) {
+                    messageEl.textContent = `Error: ${error.message}`;
+                    messageEl.style.color = 'red';
+                }
+                submitBtn.disabled = false;
+                setTimeout(() => messageEl.textContent = '', 4000);
+            });
+        }
+
+        function loadMyIdeas() {
+            const myList = document.getElementById('my-ideas-list');
+            const q = query(collection(db, 'ideas_proposals'), where('prefectId', '==', currentPrefect.id), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                myList.innerHTML = snapshot.empty ? "<p>You haven't submitted any ideas yet.</p>" : '';
+                snapshot.forEach(doc => myList.appendChild(renderIdea(doc.data(), false, doc.id)));
+            });
+        }
+
+        function loadPublicIdeas() {
+            const publicList = document.getElementById('public-ideas-list');
+            const q = query(collection(db, 'ideas_proposals'), where('status', 'in', ['Pending', 'Approved', 'Completed']), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                publicList.innerHTML = snapshot.empty ? "<p>No public proposals at the moment.</p>" : '';
+                snapshot.forEach(doc => publicList.appendChild(renderIdea(doc.data(), true, doc.id)));
+            });
+        }
+
+        function renderIdea(idea, isPublic, docId) {
+            const item = document.createElement('div');
+            item.className = 'idea-item';
+            const statusClass = `status-${idea.status.toLowerCase()}`;
+            const dateString = idea.timestamp ? idea.timestamp.toDate().toLocaleDateString() : 'N/A';
+            item.innerHTML = `
+                <div class="idea-header">
+                    <h3>${idea.title}</h3>
+                    <span class="idea-status ${statusClass}">${idea.status.replace('_', ' ')}</span>
+                </div>
+                <p class="idea-meta">By ${idea.prefectName} on ${dateString}</p>
+                <p>${idea.description}</p>
+                ${isPublic ? `
+                <div class="idea-footer">
+                    <button class="upvote-btn" data-id="${docId}"><i class="fas fa-thumbs-up"></i> Upvote</button>
+                    <span>${idea.upvotes} Upvotes</span>
+                </div>` : ''}`;
+            if (isPublic) {
+                const upvoteBtn = item.querySelector('.upvote-btn');
+                if (idea.upvotedBy.includes(currentPrefect.id)) {
+                    upvoteBtn.classList.add('upvoted');
+                    upvoteBtn.disabled = true;
+                }
+                upvoteBtn.addEventListener('click', () => handleUpvote(docId));
+            }
+            return item;
+        }
+
+        async function handleUpvote(docId) {
+            const ideaRef = doc(db, "ideas_proposals", docId);
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const ideaDoc = await transaction.get(ideaRef);
+                    if (!ideaDoc.exists()) throw "Document does not exist!";
+                    const data = ideaDoc.data();
+                    if (data.upvotedBy.includes(currentPrefect.id)) return;
+                    transaction.update(ideaRef, {
+                        upvotes: data.upvotes + 1,
+                        upvotedBy: arrayUnion(currentPrefect.id)
+                    });
+                });
+            } catch (e) {
+                console.error("Upvote transaction failed: ", e);
+            }
+        }
         
         document.getElementById('logout-btn').addEventListener('click', () => {
             signOut(auth).then(() => { window.location.href = 'index.html'; });
+        });
+
+        // Header Notification Dropdown Logic
+        const headerNotificationBtn = document.getElementById('header-notification-btn');
+        const notificationDropdownPanel = document.getElementById('notification-dropdown-panel');
+        const viewAllNotificationsBtn = document.getElementById('view-all-notifications-btn');
+
+        headerNotificationBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent document click from closing immediately
+            notificationDropdownPanel.classList.toggle('active');
+            if (notificationDropdownPanel.classList.contains('active')) {
+                // Load notifications into dropdown when opened
+                loadNotificationsIntoDropdown();
+            }
+        });
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', (e) => {
+            if (notificationDropdownPanel && headerNotificationBtn && !notificationDropdownPanel.contains(e.target) && !headerNotificationBtn.contains(e.target)) {
+                notificationDropdownPanel.classList.remove('active');
+            }
+        });
+
+        // Handle "View All" button click in dropdown footer
+        viewAllNotificationsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const notificationsLink = document.querySelector('.sidebar-nav a[href="#notifications"]');
+            if (notificationsLink) {
+                notificationsLink.click(); // Simulate click to switch tab
+                notificationDropdownPanel.classList.remove('active'); // Close dropdown
+            }
         });
 
         // ===================================================
@@ -829,9 +2837,38 @@
         const chatInput = document.getElementById('chatInput');
         const chatSend = document.getElementById('chatSend');
         const chatFab = document.getElementById('chatFab');
+        const chatNotificationBadge = document.getElementById('chat-notification-badge');
 
         let isChatOpen = false;
         let chatUnsubscribe = null;
+        let chatBadgeUnsubscribe = null;
+
+        async function updateChatNotificationBadge(uid) {
+            if (chatBadgeUnsubscribe) chatBadgeUnsubscribe(); // Unsubscribe from previous listener if any
+
+            const messagesRef = collection(db, 'chats', uid, 'messages');
+            const q = query(messagesRef, where('senderId', '!=', uid), where('read', '==', false));
+
+            chatBadgeUnsubscribe = onSnapshot(q, (snapshot) => {
+                if (snapshot.empty || isChatOpen) {
+                    chatNotificationBadge.style.display = 'none';
+                } else {
+                    chatNotificationBadge.style.display = 'block';
+                }
+            });
+        }
+
+        async function markAllMessagesAsRead(uid) {
+            const messagesRef = collection(db, 'chats', uid, 'messages');
+            const q = query(messagesRef, where('senderId', '!=', uid), where('read', '==', false));
+            const querySnapshot = await getDocs(q);
+
+            const batch = writeBatch(db);
+            querySnapshot.forEach((doc) => {
+                batch.update(doc.ref, { read: true });
+            });
+            await batch.commit();
+        }
 
         function listenForMessages(uid) {
             if (chatUnsubscribe) chatUnsubscribe();
@@ -846,6 +2883,7 @@
                     else { addBotMessage(message.text); }
                 });
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                updateChatNotificationBadge(uid); // Update badge after messages are loaded
             });
         }
 
@@ -906,7 +2944,8 @@
                     senderEmail: email,
                     senderName: displayName, // Store display name with message
                     senderPhoto: photoURL, // Store photo URL with message
-                    timestamp: serverTimestamp()
+                    timestamp: serverTimestamp(),
+                    read: true // User messages are always read by the user
                 });
             } catch (error) {
                 console.error("Error sending message:", error);
@@ -920,7 +2959,9 @@
             isChatOpen = !isChatOpen;
             chatContainer.classList.toggle('active');
             if (isChatOpen) {
+                chatNotificationBadge.style.display = 'none'; // Hide badge when chat is opened
                 listenForMessages(currentUser.uid);
+                markAllMessagesAsRead(currentUser.uid); // Mark messages as read when chat is opened
                 chatInput.focus();
             } else {
                 if (chatUnsubscribe) chatUnsubscribe();
@@ -931,6 +2972,10 @@
             isChatOpen = false;
             chatContainer.classList.remove('active');
             if (chatUnsubscribe) chatUnsubscribe();
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                markAllMessagesAsRead(currentUser.uid); // Mark messages as read when chat is closed
+            }
         });
 
         chatSend.addEventListener('click', handleUserInput);
@@ -940,6 +2985,7 @@
 
     <button class="chat-fab" id="chatFab" aria-label="සහායතාවක් සඳහා සංවාද විවෘත කරන්න">
         <i class="fas fa-comments"></i>
+        <div id="chat-notification-badge" class="notification-badge" style="display: none;"></div>
     </button>
 
     <div class="chat-container" id="chatContainer">
@@ -1118,6 +3164,34 @@
                 });
             });
         }
+    </script>
+    <div id="notification-context-menu" class="context-menu">
+        <button data-action="star-context"><i class="far fa-star"></i> <span>Star</span></button>
+        <button data-action="read-context"><i class="fas fa-envelope-open"></i> <span>Mark as Read</span></button>
+        <button data-action="delete-context"><i class="fas fa-trash"></i> <span>Delete</span></button>
+    </div>
+    <script>
+        // Accordion Logic for new About Us page
+        const aboutSection = document.querySelector('#about');
+        aboutSection.addEventListener('click', (e) => {
+            if (e.target.classList.contains('accordion-header')) {
+                const item = e.target.parentElement;
+                const content = item.querySelector('.accordion-content');
+                const currentlyActive = document.querySelector('#about .accordion-item.active');
+
+                if (currentlyActive && currentlyActive !== item) {
+                    currentlyActive.classList.remove('active');
+                    currentlyActive.querySelector('.accordion-content').style.maxHeight = 0;
+                }
+
+                item.classList.toggle('active');
+                if (item.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } else {
+                    content.style.maxHeight = 0;
+                }
+            }
+        });
     </script>
 </body>
 </html>
