@@ -68,30 +68,25 @@
         @import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap');
 
         :root {
-            --primary-color: #8C1C13;
+            --primary-color: #7A150F;
             --primary-dark: #70160F;
-            --secondary-color: #C6A98F;
+            --secondary-color: #D4AF37;
             --accent-color: #FFA500;
-            --text-color: #212529;
-            --text-light: #6c757d;
+            --text-color: #3b3b3b;
+            --text-light: #5f5f5f;
             --bg-color: #f8f9fa;
-            --card-bg-color: #FFFFFF;
+            --card-bg-color: #FDFDFD;
             --border-color: #dee2e6;
-            --light-text-color: #FFFFFF;
+            --light-text-color: #ffffff;
+            --glass-bg: rgba(253, 253, 253, 0.75);
+            --success-color: #28a745;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
             color: var(--text-color);
-            background-color: #f0f2f5; /* Fallback */
-            /* New Mesh Gradient Background with Cream */
-            background-image: 
-                radial-gradient(at 1% 1%, hsla(212, 96%, 26%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 98% 98%, hsla(320, 100%, 50%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, hsla(0, 0%, 100%, 1) 0px, transparent 50%),
-                radial-gradient(at 99% 1%, hsla(180, 100%, 50%, 0.3) 0px, transparent 50%),
-                radial-gradient(at 20% 80%, hsla(48, 83%, 94%, 0.3) 0px, transparent 50%);
+            background: linear-gradient(135deg, #F8F8F8 0%, #F0F0F0 100%); /* Match index.html */
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
@@ -1106,20 +1101,24 @@
         .chat-header { background: var(--primary-color); color: var(--light-text-color); padding: 1rem; border-radius: 15px 15px 0 0; display: flex; justify-content: space-between; align-items: center; }
         .chat-header h3 { margin: 0; font-size: 1.1rem; }
         .chat-close { background: none; border: none; color: var(--light-text-color); font-size: 1.5rem; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
-        .chat-close:hover { color: #ccc; }
+        .chat-close:hover { color: var(--primary-color); transform: rotate(90deg); }
         .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        .chat-messages::-webkit-scrollbar { width: 8px; }
+        .chat-messages::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
         .message { display: flex; margin-bottom: 0.5rem; animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .bot-message { justify-content: flex-start; }
         .user-message { justify-content: flex-end; }
-        .message-content { max-width: 70%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; word-wrap: break-word; }
+        .message-content { max-width: 70%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.5; word-wrap: break-word; border: 1px solid rgba(0,0,0,0.05); } /* Added border */
         .bot-message .message-content { background: #f0f0f0; color: var(--text-color); }
-        .user-message .message-content { background: var(--primary-color); color: var(--light-text-color); }
-        .chat-input-area { padding: 1rem; border-top: 1px solid #eee; display: flex; gap: 0.5rem; }
+        .user-message .message-content { background: var(--primary-color); color: var(--light-text-color); border-color: var(--primary-color); } /* Adjusted border for user message */
+        .chat-input-area { padding: 1rem; border-top: 1px solid rgba(0,0,0,0.1); display: flex; gap: 0.5rem; } /* Adjusted border-top */
         .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 0.75rem 1rem; font-size: 0.9rem; font-family: 'Poppins', sans-serif; transition: border-color 0.3s ease; }
         .chat-input:focus { outline: none; border-color: var(--primary-color); }
         .chat-send { background: var(--primary-color); color: var(--light-text-color); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        .chat-send:hover { transform: scale(1.05); background: #70160F; }
+        .chat-send:hover { transform: scale(1.05); background: var(--primary-dark); } /* Use primary-dark for hover */
         @media (max-width: 480px) {
             .chat-container { width: calc(100% - 20px); height: 70vh; bottom: 80px; right: 10px; left: 10px; margin: 0; border-radius: 15px; }
             .message-content { max-width: 85%; }
@@ -1714,7 +1713,119 @@
                     text-align: center;
                 }
             }
-        </style></head>
+        </style>        <style>
+    /* --- Profile Section --- */
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    .profile-page-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--secondary-color);
+    }
+    .profile-header-info h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    .profile-header-info p {
+        margin: 0.25rem 0 0;
+        font-size: 1rem;
+        color: var(--text-light);
+    }
+    .profile-header-info input {
+        font-size: 1rem;
+        color: var(--text-light);
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin: 0.25rem 0 0;
+        font-family: 'Poppins', sans-serif;
+        width: 100%;
+    }
+    .profile-header-info input:disabled {
+        color: var(--text-light);
+    }
+    .profile-header-info input:not(:disabled) {
+        color: var(--text-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .profile-action-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        margin-left: auto;
+    }
+    .profile-action-btn:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .profile-action-btn.secondary {
+        background-color: var(--text-light);
+        color: var(--text-color);
+    }
+    .profile-action-btn.secondary:hover {
+        background-color: #5a6268;
+        color: white;
+    }
+    .profile-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .profile-detail-item label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+    }
+    .profile-detail-item input {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        background-color: #e9ecef;
+        cursor: not-allowed;
+        transition: all 0.3s ease;
+    }
+    .profile-detail-item input:disabled {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+        color: var(--text-light);
+    }
+    .profile-detail-item input:not(:disabled) {
+        background-color: white;
+        cursor: text;
+        border-color: var(--primary-color);
+    }
+    .profile-actions {
+        border-top: 1px solid var(--border-color);
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+        text-align: right;
+    }
+</style>
+</head>
 <body>
 
     <header class="main-header">
@@ -1743,7 +1854,7 @@
                                 <div class="dropdown-footer">
                                     <a href="#notifications" id="view-all-notifications-btn">View All</a>
                                 </div>
-                            </div>            <img id="header-profile-picture" src="https://via.placeholder.com/120" alt="Profile" class="header-profile-img">
+                            </div>            <img id="header-profile-picture" src="meroon Transparent logo prefect.png" alt="Profile" class="header-profile-img">
             <button id="menu-toggle">☰</button>
         </div>
     </header>
@@ -1776,7 +1887,7 @@
                 <h2 class="section-title">Dashboard Overview</h2>
                 <div class="overview-grid">
                     <div class="dashboard-card profile-overview-card">
-                        <img id="dashboard-profile-picture" src="https://via.placeholder.com/120" alt="Profile Picture" class="dashboard-profile-img">
+                        <img id="dashboard-profile-picture" src="meroon Transparent logo prefect.png" alt="Profile Picture" class="dashboard-profile-img">
                         <div class="profile-overview-info">
                             <h4 id="dashboard-welcome-name">Prefect Name</h4>
                             <p id="dashboard-profile-role">Prefect</p>
@@ -1870,12 +1981,29 @@
             <section id="profile" class="content-section">
                 <h2 class="section-title">My Profile</h2>
                 <div class="dashboard-card">
-                    <h3 class="card-title">Profile Details</h3>
-                    <div class="profile-details">
-                        <p><strong>Role:</strong> <span id="profile-role-detail">Prefect</span></p>
-                        <p><strong>Class:</strong> <span id="profile-class">13-B</span></p>
-                        <!-- Add more profile details here if needed -->
+                    <div class="profile-header">
+                        <img id="profile-page-picture" src="meroon Transparent logo prefect.png" alt="Profile Picture" class="profile-page-img">
+                        <div class="profile-header-info">
+                            <h3 id="profile-page-name">Prefect Name</h3>
+                            <input type="text" id="profile-page-role" value="Prefect" disabled>
+                        </div>
+
                     </div>
+                    <div class="profile-details-grid">
+                        <div class="profile-detail-item">
+                            <label for="profile-email">Email</label>
+                            <input type="email" id="profile-email" value="prefect@example.com" disabled>
+                        </div>
+                        <div class="profile-detail-item">
+                            <label for="profile-phone">Phone</label>
+                            <input type="tel" id="profile-phone" value="+94 123 456 789" disabled>
+                        </div>
+                        <div class="profile-detail-item">
+                            <label for="profile-class-static">Class</label>
+                            <input type="text" id="profile-class-static" value="13-B" disabled>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
@@ -2077,6 +2205,8 @@
         const loadingState = document.getElementById('loading-state');
         const eventsListDiv = document.getElementById('events-list');
         let currentPrefect = null;
+
+
 
         // --- MOBILE MENU LOGIC ---
         const menuToggle = document.getElementById('menu-toggle');
@@ -2408,15 +2538,17 @@
                     currentPrefect = { id: prefectId, ...prefectData };
 
                     // Populate new Dashboard Profile Card
-                    document.getElementById('dashboard-profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
+                    document.getElementById('dashboard-profile-picture').src = prefectData.picture || 'meroon Transparent logo prefect.png';
                     // Populate Header Profile Picture
-                    document.getElementById('header-profile-picture').src = prefectData.picture || 'https://via.placeholder.com/120';
+                    document.getElementById('header-profile-picture').src = prefectData.picture || 'meroon Transparent logo prefect.png';
                     document.getElementById('dashboard-welcome-name').textContent = prefectData.name || 'Please add your name';
                     document.getElementById('dashboard-profile-role').textContent = prefectData.destiny || 'N/A';
 
                     // Populate the separate Profile page details
-                    document.getElementById('profile-role-detail').textContent = prefectData.destiny || 'N/A';
-                    document.getElementById('profile-class').textContent = prefectData.class || 'N/A';
+                    document.getElementById('profile-page-picture').src = prefectData.picture || 'meroon Transparent logo prefect.png';
+                    document.getElementById('profile-page-name').textContent = prefectData.name || 'Please add your name';
+                    document.getElementById('profile-page-role').value = prefectData.destiny || 'N/A';
+                    document.getElementById('profile-class-static').value = prefectData.class || 'N/A';
 
                     // Add event listener for the new edit button
                     const dashboardEditBtn = document.getElementById('dashboard-edit-profile-btn');
@@ -2453,6 +2585,13 @@
                 });
 
                 updateChatNotificationBadge(user.uid); // Initialize chat notification badge
+
+                const editProfileBtn = document.getElementById('edit-profile-btn');
+                const saveProfileBtn = document.getElementById('save-profile-btn');
+                const profileInputs = document.querySelectorAll('#profile input');
+                const profilePagePicture = document.getElementById('profile-page-picture');
+
+                
             } else {
                 window.location.href = 'login.html';
             }
@@ -3193,6 +3332,8 @@
             }
         });
     </script>
+
+
 </body>
 </html>
 
