@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
     
     <style>
@@ -29,13 +28,13 @@
         }
         
         h1, h2, h4 {
-            font-family: 'Montserrat', sans-serif; /* Using Montserrat for punchy titles */
+            font-family: 'Montserrat', sans-serif;
         }
         
         .header-glass {
             backdrop-filter: blur(10px);
             background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 1px 15px rgba(0, 0, 0, 0.08); /* Minimalist shadow */
+            box-shadow: 0 1px 15px rgba(0, 0, 0, 0.08);
             border-bottom: 1px solid #E0E0E0;
         }
 
@@ -46,19 +45,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 85vh; /* Adjust to fit screen size */
-        }
-        .launch-bg::before, .launch-bg::after {
-            /* Removed distracting gradient circles */
-            display: none;
+            min-height: 85vh;
         }
 
         .text-primary { color: var(--color-primary); }
         .bg-primary { background-color: var(--color-primary); }
         .text-accent { color: var(--color-accent); }
-        .bg-accent-light { background-color: rgba(29, 155, 240, 0.1); } /* Light Blue */
+        .bg-accent-light { background-color: rgba(29, 155, 240, 0.1); }
         
-        /* Section Heading Style */
         .section-subtitle {
             font-family: 'Poppins', sans-serif;
             letter-spacing: 0.15em;
@@ -78,31 +72,29 @@
             transform: translateX(-50%);
             width: 70px;
             height: 5px;
-            background-color: var(--color-accent); /* Dark Gray Line */
+            background-color: var(--color-accent);
             border-radius: 2px;
-            opacity: 0.1; /* Subtle line */
+            opacity: 0.1;
         }
 
-        /* Feature Card Style */
         .feature-card {
             background-color: var(--color-background);
-            border: 1px solid #E5E7EB; /* Lighter border */
+            border: 1px solid #E5E7EB;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .feature-card:hover {
             transform: translateY(-8px); 
-            box-shadow: 0 12px 24px rgba(29, 155, 240, 0.2); /* Blue shadow on hover */
+            box-shadow: 0 12px 24px rgba(29, 155, 240, 0.2);
         }
 
         /* Phone Mockup */
         .phone-mockup {
-            max-width: 220px; /* Smaller phone size */
+            max-width: 220px;
             width: 60%;
             margin: 0 auto;
-            position: relative; /* Needed for the stage pseudo-element */
+            position: relative;
         }
-        /* The stage/shadow effect */
         .phone-mockup::after {
             content: '';
             position: absolute;
@@ -119,15 +111,15 @@
 
         .phone-mockup .phone-frame {
             background: #000;
-            border-radius: 30px; /* Rounded corners for the phone */
-            padding: 10px; /* Padding to contain the screen */
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2); /* Softer shadow */
-            transform: rotateY(-10deg) rotateX(3deg) scale(1); /* Softer rotation */
+            border-radius: 30px;
+            padding: 10px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: rotateY(-10deg) rotateX(3deg) scale(1);
             transition: transform 0.4s ease-out;
-            overflow: hidden; /* This will contain the image */
+            overflow: hidden;
         }
         .phone-mockup:hover .phone-frame {
-            transform: rotateY(0) rotateX(0) scale(1.05) translateY(-10px); /* Lift on hover */
+            transform: rotateY(0) rotateX(0) scale(1.05) translateY(-10px);
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
         }
         .phone-mockup:hover::after {
@@ -136,15 +128,14 @@
         }
         .phone-mockup .phone-screen {
             transition: transform 0.5s ease-out;
-            box-shadow: 0 0 0 2px #1D9BF0, 0 0 20px 5px rgba(29, 155, 240, 0.5); /* Blue Glow */
-            border-radius: 20px; /* Match the frame's rounding */
-            overflow: hidden; /* Ensure image inside is rounded */
+            box-shadow: 0 0 0 2px #1D9BF0, 0 0 20px 5px rgba(29, 155, 240, 0.5);
+            border-radius: 20px;
+            overflow: hidden;
         }
         .phone-mockup:hover .phone-screen {
              transform: scale(1.03);
         }
 
-        /* Button hover animation */
         .btn-hover-effect {
             position: relative;
             overflow: hidden;
@@ -165,7 +156,6 @@
             left: 0;
         }
         
-        /* Scroll Animation */
         .scroll-animate {
             opacity: 0;
             transform: translateY(20px);
@@ -176,7 +166,6 @@
             transform: translateY(0);
         }
 
-        /* Footer/Socials */
         .social-icon {
             transition: all 0.3s ease;
         }
@@ -215,7 +204,6 @@
             </button>
         </div>
         
-        <!-- Mobile Nav -->
         <div id="nav-mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden md:hidden">
             <div id="nav-mobile" class="absolute top-0 right-0 h-full bg-white w-64 shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out">
                 <div class="flex justify-end p-4">
@@ -233,11 +221,8 @@
         </div>
     </header>
 
-
     <section id="banner" class="launch-bg text-gray-800 relative flex items-center justify-center">
-        
         <div class="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
-            
             <div class="text-center md:text-left scroll-animate">
                 <div class="flex justify-center md:justify-start items-center space-x-4 mb-4">
                      <img src="images/prefects guild logo.png" alt="Prefects Guild Logo" class="rounded-full shadow-lg w-12 h-12 object-cover">
@@ -273,7 +258,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -322,7 +306,6 @@
                 <p class="section-subtitle text-primary mb-2 text-center scroll-animate">APP FEATURES</p>
                 <h2 class="section-title text-4xl font-extrabold text-gray-800 mb-16 text-center mx-auto scroll-animate">A Powerful Tool for School Leaders</h2>
 
-                <!-- Feature 1: Dashboard -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
                     <div class="scroll-animate">
                         <h3 class="text-3xl font-bold text-gray-800 mb-4">Comprehensive Dashboard</h3>
@@ -338,7 +321,6 @@
                     </div>
                 </div>
 
-                <!-- Feature 2: Event Management -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
                     <div class="scroll-animate lg:order-2">
                         <h3 class="text-3xl font-bold text-gray-800 mb-4">Effortless Event Management</h3>
@@ -354,7 +336,6 @@
                     </div>
                 </div>
 
-                <!-- Feature 3: Announcements -->
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="scroll-animate">
                         <h3 class="text-3xl font-bold text-gray-800 mb-4">Instant Announcements</h3>
@@ -372,20 +353,17 @@
             </div>
         </section>
 
-        <!-- How It Works Section -->
         <section id="how-it-works" class="py-24 bg-white">
             <div class="container mx-auto px-6 text-center">
                 <p class="section-subtitle text-primary mb-2 scroll-animate">EASY AS 1-2-3</p>
                 <h2 class="section-title text-4xl font-extrabold text-gray-800 mb-16 mx-auto scroll-animate">How It Works</h2>
 
                 <div class="relative">
-                    <!-- Dotted line -->
                     <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200">
                         <div class="h-0.5 bg-primary" style="width: 0%;"></div>
                     </div>
                     
                     <div class="grid md:grid-cols-3 gap-12 relative">
-                        <!-- Step 1 -->
                         <div class="text-center scroll-animate">
                             <div class="relative mb-6">
                                 <div class="w-20 h-20 bg-accent-light rounded-full flex items-center justify-center mb-4 shadow-lg mx-auto">
@@ -395,7 +373,6 @@
                             <h4 class="text-xl font-bold text-gray-900 mb-3">Register & Setup</h4>
                             <p class="text-base text-gray-600 leading-relaxed">Request access and set up your administrative profile in minutes.</p>
                         </div>
-                        <!-- Step 2 -->
                         <div class="text-center scroll-animate">
                             <div class="relative mb-6">
                                 <div class="w-20 h-20 bg-accent-light rounded-full flex items-center justify-center mb-4 shadow-lg mx-auto">
@@ -405,7 +382,6 @@
                             <h4 class="text-xl font-bold text-gray-900 mb-3">Manage & Monitor</h4>
                             <p class="text-base text-gray-600 leading-relaxed">Use the dashboard to manage duties, track attendance, and communicate.</p>
                         </div>
-                        <!-- Step 3 -->
                         <div class="text-center scroll-animate">
                             <div class="relative mb-6">
                                 <div class="w-20 h-20 bg-accent-light rounded-full flex items-center justify-center mb-4 shadow-lg mx-auto">
@@ -420,7 +396,6 @@
             </div>
         </section>
 
-        <!-- Admin Dashboard Preview Section -->
         <section id="dashboard-preview" class="py-24 bg-light-bg">
             <div class="container mx-auto px-6">
                 <p class="section-subtitle text-primary mb-2 text-center scroll-animate">SEE IT IN ACTION</p>
@@ -453,14 +428,12 @@
             </div>
         </section>
 
-        <!-- Testimonials Section -->
         <section id="testimonials" class="py-24 bg-white">
             <div class="container mx-auto px-6">
                 <p class="section-subtitle text-primary mb-2 text-center scroll-animate">WORDS OF PRAISE</p>
                 <h2 class="section-title text-4xl font-extrabold text-gray-800 mb-16 text-center mx-auto scroll-animate">What Our Users Say</h2>
                 
                 <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Testimonial 1 -->
                     <div class="p-8 rounded-xl feature-card bg-light-bg scroll-animate">
                         <div class="text-yellow-400 mb-4 text-2xl">
                             <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
@@ -474,7 +447,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Testimonial 2 -->
                     <div class="p-8 rounded-xl feature-card bg-light-bg scroll-animate">
                         <div class="text-yellow-400 mb-4 text-2xl">
                             <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-alt"></i>
@@ -492,7 +464,6 @@
             </div>
         </section>
 
-        <!-- Technology & Security Section -->
         <section id="tech-stack" class="py-24 bg-light-bg">
             <div class="container mx-auto px-6">
                 <div class="grid md:grid-cols-2 gap-16 items-center">
@@ -538,7 +509,7 @@
                 </p>
 
                 <div class="scroll-animate">
-                    <a href="https://drive.google.com/uc?export=download&id=1s49viOAjdlAZ0boe4tNV5YqixiNobrF0" 
+                    <a href="https://drive.usercontent.google.com/download?id=1-kkBEK-DAwJbOVu5yWdpY_HfT9oFoHUJ&export=download&authuser=0&confirm=t&uuid=fef64dd3-a939-43c5-abeb-3a75097bd7e7&at=ALWLOp5QJscEOecPzVKGAMCT-G_e%3A1764538564931" 
                        download="ECCPMS_Admin_App.apk"
                        class="inline-flex items-center bg-gray-900 text-white font-bold py-4 px-10 rounded-xl shadow-2xl text-lg mt-4 transition duration-300 transform hover:scale-105 btn-hover-effect">
                         <i class="fa-solid fa-download mr-3 text-xl"></i>
@@ -550,14 +521,12 @@
             </div>
         </section>
 
-        <!-- FAQ Section -->
         <section id="faq" class="py-24 bg-light-bg">
             <div class="container mx-auto px-6 max-w-4xl">
                 <p class="section-subtitle text-primary mb-2 text-center scroll-animate">GOT QUESTIONS?</p>
                 <h2 class="section-title text-4xl font-extrabold text-gray-800 mb-16 text-center mx-auto scroll-animate">Frequently Asked Questions</h2>
                 
                 <div class="space-y-4">
-                    <!-- FAQ Item 1 -->
                     <div class="bg-white rounded-lg shadow-md faq-item scroll-animate">
                         <button class="w-full text-left p-6 flex justify-between items-center faq-question">
                             <span class="text-lg font-semibold text-gray-800">Is this application free to use?</span>
@@ -567,79 +536,22 @@
                             <p class="text-gray-600">Yes, the ECCPMS application is completely free for all members of the Eheliyagoda Central College Prefects' Guild.</p>
                         </div>
                     </div>
-                    <!-- FAQ Item 2 -->
                     <div class="bg-white rounded-lg shadow-md faq-item scroll-animate">
                         <button class="w-full text-left p-6 flex justify-between items-center faq-question">
                             <span class="text-lg font-semibold text-gray-800">How do I get an admin account?</span>
                             <i class="fa-solid fa-chevron-down transition-transform"></i>
                         </button>
                         <div class="faq-answer hidden p-6 border-t border-gray-200">
-                            <p class="text-gray-600">You can request an admin account by filling out the registration form in the "Request Admin Access" section. The dev team will review your request and get back to you.</p>
+                            <p class="text-gray-600">You can request an admin account by filling out the registration form below. The dev team or Head Prefect will approve your request.</p>
                         </div>
                     </div>
-                    <!-- FAQ Item 3 -->
                     <div class="bg-white rounded-lg shadow-md faq-item scroll-animate">
                         <button class="w-full text-left p-6 flex justify-between items-center faq-question">
                             <span class="text-lg font-semibold text-gray-800">What devices are supported?</span>
                             <i class="fa-solid fa-chevron-down transition-transform"></i>
                         </button>
                         <div class="faq-answer hidden p-6 border-t border-gray-200">
-                            <p class="text-gray-600">Currently, the admin application is available for Android devices. A web-based dashboard is also available for access from any modern web browser.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Partnership Section -->
-        <section id="partnership" class="py-24 bg-white">
-            <div class="container mx-auto px-6 max-w-4xl text-center">
-                 <div class="bg-light-bg p-10 rounded-xl shadow-lg scroll-animate">
-                    <p class="section-subtitle text-primary mb-2">WORK WITH US</p>
-                    <h2 class="text-3xl font-extrabold text-gray-800 mb-4">Interested in Collaborating?</h2>
-                    <p class="text-gray-600 text-lg leading-relaxed mb-8">We are open to partnerships with other educational institutions to help them digitize their own prefect management systems. If you are interested in learning more, please get in touch with our development team.</p>
-                    <a href="mailto:emmvprefects@gmail.com" class="inline-flex items-center bg-primary text-white font-bold py-3 px-8 rounded-lg shadow-lg text-lg transition duration-300 hover:bg-blue-600 btn-hover-effect">
-                        Contact Us
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Latest Updates Section -->
-        <section id="latest-updates" class="py-24 bg-light-bg">
-            <div class="container mx-auto px-6">
-                <p class="section-subtitle text-primary mb-2 text-center scroll-animate">STAY INFORMED</p>
-                <h2 class="section-title text-4xl font-extrabold text-gray-800 mb-16 text-center mx-auto scroll-animate">Latest Updates</h2>
-                
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Blog Post 1 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden feature-card scroll-animate">
-                        <img src="https://placehold.co/600x400/E0E7FF/333333?text=v2.0+Launch" alt="Blog Post Image" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <p class="text-sm text-gray-500 mb-2">October 28, 2025</p>
-                            <h4 class="text-xl font-bold text-gray-900 mb-3">Version 2.0 Launched</h4>
-                            <p class="text-gray-600 mb-4">We are excited to announce the launch of version 2.0 with new features, a redesigned UI, and performance improvements.</p>
-                            <a href="#" class="font-bold text-primary hover:text-blue-600 transition">Read More <i class="fa-solid fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                    <!-- Blog Post 2 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden feature-card scroll-animate">
-                        <img src="https://placehold.co/600x400/D1E9FF/333333?text=Case+Study" alt="Blog Post Image" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <p class="text-sm text-gray-500 mb-2">October 15, 2025</p>
-                            <h4 class="text-xl font-bold text-gray-900 mb-3">A Prefect's Story</h4>
-                            <p class="text-gray-600 mb-4">Read about how one of our senior prefects is using the app to improve communication and efficiency within the team.</p>
-                            <a href="#" class="font-bold text-primary hover:text-blue-600 transition">Read More <i class="fa-solid fa-arrow-right ml-1"></i></a>
-                        </div>
-                    </div>
-                    <!-- Blog Post 3 -->
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden feature-card scroll-animate">
-                        <img src="https://placehold.co/600x400/C9F7E5/333333?text=Future" alt="Blog Post Image" class="w-full h-48 object-cover">
-                        <div class="p-6">
-                            <p class="text-sm text-gray-500 mb-2">October 1, 2025</p>
-                            <h4 class="text-xl font-bold text-gray-900 mb-3">What's Next for ECCPMS?</h4>
-                            <p class="text-gray-600 mb-4">An inside look at our roadmap, upcoming features, and our long-term vision for the platform.</p>
-                            <a href="#" class="font-bold text-primary hover:text-blue-600 transition">Read More <i class="fa-solid fa-arrow-right ml-1"></i></a>
+                            <p class="text-gray-600">Currently, the admin application is available for Android devices.</p>
                         </div>
                     </div>
                 </div>
@@ -654,52 +566,39 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/Hansaka.png" alt="Hansaka Fernando" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Hansaka Fernando</h4>
                         <p class="text-sm text-gray-600 mb-2">Lead Developer</p>
-
                     </div>
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/Adeesha.jpg" alt="Adeesha Ravimal" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Adeesha Ravimal</h4>
                         <p class="text-sm text-gray-600 mb-2">Backend Architect</p>
-
                     </div>
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/thevindu.JPG" alt="Thevindu Thisev" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Thevindu Thisev</h4>
                         <p class="text-sm text-gray-600 mb-2">Data Collector</p>
-
                     </div>
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/Avishka.jpg" alt="Avishka Kalhara" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Avishka Kalhara</h4>
                         <p class="text-sm text-gray-600 mb-2">Aerial Media</p>
-
                     </div>
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/Nethmi.jpg" alt="Nethmi Dhananjana" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Nethmi Dhananjana</h4>
                         <p class="text-sm text-gray-600 mb-2">Data Coordinator</p>
-
                     </div>
-                    <!-- Team Member -->
                     <div class="text-center scroll-animate">
                         <img src="images/Rashmi.jpg" alt="Rashmi Jananjana" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-primary shadow-lg">
                         <h4 class="text-lg font-bold text-gray-900">Rashmi Jananjana</h4>
                         <p class="text-sm text-gray-600 mb-2">Management Lead</p>
-
                     </div>
                 </div>
             </div>
         </section>
-
 
         <section id="register" class="py-24 bg-gray-900 text-white">
             <div class="container mx-auto px-6 flex flex-col items-center justify-center text-center">
@@ -707,12 +606,12 @@
                     <p class="section-subtitle text-primary mb-2">GET STARTED</p>
                     <h2 class="section-title text-4xl font-extrabold mb-6 mx-auto text-white">Request Admin Access</h2>
                     <p class="text-gray-400 text-lg leading-relaxed max-w-2xl mb-12">
-                        Fill the form to request a unique registration code. The Dev Team will verify your details and respond shortly.
+                        Create your account below. Your access will be pending until approved by the Main Administrator.
                     </p>
                 </div>
                  
                 <div class="w-full max-w-lg p-8 rounded-xl bg-gray-800 shadow-2xl text-gray-800 scroll-animate">
-                    <form id="registrationForm" onsubmit="handleFormSubmit(event)">
+                    <form id="registrationForm">
                         
                         <div class="mb-5">
                             <label for="fullName" class="block text-left text-sm font-semibold text-gray-300 mb-2">Full Name</label>
@@ -733,12 +632,19 @@
                                    class="w-full px-4 py-3 border-2 border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:border-primary transition shadow-sm">
                         </div>
                         
+                        <div class="mb-5">
+                            <label for="password" class="block text-left text-sm font-semibold text-gray-300 mb-2">Password</label>
+                            <input type="password" id="password" name="password" required minlength="6"
+                                   class="w-full px-4 py-3 border-2 border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:border-primary transition shadow-sm"
+                                   placeholder="Min 6 characters">
+                        </div>
+                        
                         <button type="submit" id="submitButton" class="text-white bg-primary font-bold py-3 px-6 rounded-xl w-full shadow-lg text-lg mt-6 flex items-center justify-center btn-hover-effect hover:bg-blue-600">
                             <svg id="spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span id="buttonText">Request Registration Code</span>
+                            <span id="buttonText">Register Admin Account</span>
                         </button>
                         
                         <p id="message" class="mt-4 text-center text-md font-medium"></p>
@@ -763,6 +669,7 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
     <script>
         // Preloader
         window.addEventListener('load', () => {
@@ -798,16 +705,12 @@
 
             question.addEventListener('click', () => {
                 const isVisible = !answer.classList.contains('hidden');
-                
-                // Close all other answers
                 document.querySelectorAll('.faq-answer').forEach(ans => {
                     if (ans !== answer) {
                         ans.classList.add('hidden');
                         ans.closest('.faq-item').querySelector('.faq-question i').classList.remove('rotate-180');
                     }
                 });
-
-                // Toggle current answer
                 answer.classList.toggle('hidden');
                 icon.classList.toggle('rotate-180');
             });
@@ -864,11 +767,34 @@
         navLinks.forEach(link => {
             link.addEventListener('click', closeNav);
         });
+    </script>
 
-        // --- Form Submission Handler (Simulated for this Frontend) ---
-        const API_KEY = ""; // Gemini API Key Placeholder
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        async function handleFormSubmit(event) {
+        // TODO: Replace with your actual Firebase Project Configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+  authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+  projectId: "prefect-management-syste-e1575",
+  storageBucket: "prefect-management-syste-e1575.firebasestorage.app",
+  messagingSenderId: "973932803095",
+  appId: "1:973932803095:web:a7f2db386cafb53330d852",
+  measurementId: "G-FLF7R3B8J3"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Handle Registration
+        const form = document.getElementById('registrationForm');
+        
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
             
             const button = document.getElementById('submitButton');
@@ -878,65 +804,54 @@
 
             button.disabled = true;
             spinner.classList.remove('hidden');
-            buttonText.textContent = 'Processing...';
+            buttonText.textContent = 'Creating Account...';
             messageElement.textContent = '';
-            messageElement.className = 'mt-4 text-center text-md font-medium';
 
-            const formData = new FormData(event.target);
-            const data = {
-                fullName: formData.get('fullName'),
-                prefectRole: formData.get('prefectRole'),
-                email: formData.get('email'),
-                timestamp: new Date().toISOString()
-            };
+            const fullName = document.getElementById('fullName').value;
+            const prefectRole = document.getElementById('prefectRole').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
             try {
-                const userPrompt = `New admin access request for ECCPMS. Summary: Name: ${data.fullName}, Role: ${data.prefectRole}, Email: ${data.email}. Suggest the next action for the administrator (e.g., Verify identity and generate code).`;
-                
-                const llmResult = await callGeminiAPI(userPrompt);
+                // 1. Create User in Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-                messageElement.innerHTML = `<span class="text-green-600 font-bold">✅ Request Received!</span><br>We will verify your details and email the registration code shortly.`;
-                
-                console.log("Admin Review Suggestion:", llmResult.text);
+                // 2. Update Display Name
+                await updateProfile(user, {
+                    displayName: fullName
+                });
 
-                event.target.reset();
+                // 3. Save details to Firestore with 'pending' status
+                await setDoc(doc(db, "admins", user.uid), {
+                    uid: user.uid,
+                    fullName: fullName,
+                    email: email,
+                    role: prefectRole,
+                    status: "pending", // Important: Set initial status to pending
+                    createdAt: new Date().toISOString()
+                });
+
+                messageElement.innerHTML = `<span class="text-green-500 font-bold">✅ Account Created!</span><br>Wait for Administrator approval.`;
+                form.reset();
 
             } catch (error) {
-                console.error('Submission Error:', error);
-                messageElement.innerHTML = `<span class="text-red-600 font-bold">❌ Submission Failed:</span> Error processing request.`;
+                console.error('Registration Error:', error);
+                let errorMessage = "Registration failed. Please try again.";
 
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "Password should be at least 6 characters.";
+                }
+
+                messageElement.innerHTML = `<span class="text-red-500 font-bold">❌ Error:</span> ${errorMessage}`;
             } finally {
                 button.disabled = false;
                 spinner.classList.add('hidden');
-                buttonText.textContent = 'Request Registration Code';
+                buttonText.textContent = 'Register Admin Account';
             }
-        }
-        
-        // --- Gemini API Call Function ---
-        async function callGeminiAPI(userQuery) {
-            const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=' + API_KEY;
-            
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: {
-                    parts: [{ text: "Act as a system administrator for the ECCPMS Dev Team. Provide a brief, actionable summary of the request for a human administrator." }]
-                }
-            };
-            
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                return { text: "API Unavailable: Request received but manual review required." };
-            }
-
-            const result = await response.json();
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No summary generated.';
-            return { text };
-        }
+        });
     </script>
 
 </body>
