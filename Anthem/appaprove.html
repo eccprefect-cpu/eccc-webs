@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECCPMS - Super Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Super Admin Access</h1>
+                <p class="text-gray-500 text-sm">Please login to manage approvals</p>
+            </div>
+            <form id="adminLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="adminEmail" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="adminPassword" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-bold">
+                    Login to Dashboard
+                </button>
+                <p id="loginError" class="text-red-500 text-sm text-center hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+        <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+            <h1 class="text-xl font-bold text-gray-800">ECCPMS <span class="text-blue-600">Admin Panel</span></h1>
+            <div class="flex items-center gap-4">
+                <span id="currentUserEmail" class="text-sm text-gray-500 hidden md:block"></span>
+                <button id="logoutBtn" class="text-red-500 font-semibold hover:text-red-700 text-sm border border-red-200 px-3 py-1 rounded-lg">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-6 py-8">
+            
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-10 border border-yellow-200">
+                <div class="bg-yellow-50 px-6 py-4 border-b border-yellow-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-yellow-800">
+                        <i class="fa-solid fa-clock mr-2"></i> Pending Approvals
+                    </h2>
+                    <span id="pendingCount" class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                <th class="px-6 py-3">Name</th>
+                                <th class="px-6 py-3">Role</th>
+                                <th class="px-6 py-3">Email</th>
+                                <th class="px-6 py-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody" class="divide-y divide-gray-200">
+                            <tr><td colspan="4" class="text-center py-4 text-gray-400">Loading requests...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-green-200">
+                <div class="bg-green-50 px-6 py-4 border-b border-green-100 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-green-800">
+                        <i class="fa-solid fa-user-check mr-2"></i> Active Admins
+                    </h2>
+                    <span id="activeCount" class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full font-bold">0</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-600 text-sm uppercase tracking-wider">
+                                <th class="px-6 py-3">Name</th>
+                                <th class="px-6 py-3">Role</th>
+                                <th class="px-6 py-3">Email</th>
+                                <th class="px-6 py-3 text-center">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeTableBody" class="divide-y divide-gray-200">
+                            <tr><td colspan="4" class="text-center py-4 text-gray-400">Loading active users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // TODO: ඔයාගේ Firebase Config එක මෙතනට දාන්න
+       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+  authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+  projectId: "prefect-management-syste-e1575",
+  storageBucket: "prefect-management-syste-e1575.firebasestorage.app",
+  messagingSenderId: "973932803095",
+  appId: "1:973932803095:web:a7f2db386cafb53330d852",
+  measurementId: "G-FLF7R3B8J3"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI Elements
+        const loginSection = document.getElementById('login-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('adminLoginForm');
+        const pendingTableBody = document.getElementById('pendingTableBody');
+        const pendingCount = document.getElementById('pendingCount');
+        const activeTableBody = document.getElementById('activeTableBody');
+        const activeCount = document.getElementById('activeCount');
+
+        // --- AUTH ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorMsg = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            btn.textContent = "Checking...";
+            btn.disabled = true;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => { errorMsg.classList.add('hidden'); })
+                .catch((error) => {
+                    errorMsg.textContent = "Access Denied.";
+                    errorMsg.classList.remove('hidden');
+                    btn.textContent = "Login to Dashboard";
+                    btn.disabled = false;
+                });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('currentUserEmail').textContent = user.email;
+                loginSection.classList.add('hidden');
+                dashboardSection.classList.remove('hidden');
+                loadData(); 
+            } else {
+                loginSection.classList.remove('hidden');
+                dashboardSection.classList.add('hidden');
+            }
+        });
+
+        // --- DATA LOADING (Updated to use 'admins') ---
+        function loadData() {
+            // 1. Pending Users (Collection: admins)
+            const qPending = query(collection(db, "admins"), where("status", "==", "pending"));
+            
+            onSnapshot(qPending, (snapshot) => {
+                pendingTableBody.innerHTML = "";
+                pendingCount.textContent = snapshot.size;
+                if (snapshot.empty) {
+                    pendingTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No pending requests found.</td></tr>`;
+                } else {
+                    snapshot.forEach((docSnap) => {
+                        const user = docSnap.data();
+                        pendingTableBody.innerHTML += `
+                            <tr class="hover:bg-yellow-50 transition border-b border-gray-100">
+                                <td class="px-6 py-4 font-medium text-gray-900">${user.fullName || 'No Name'}</td>
+                                <td class="px-6 py-4 text-gray-600">${user.role || '-'}</td>
+                                <td class="px-6 py-4 text-gray-500 text-sm">${user.email}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <button onclick="window.approveUser('${docSnap.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 mr-2 shadow"><i class="fa-solid fa-check"></i> Approve</button>
+                                    <button onclick="window.deleteUser('${docSnap.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 shadow"><i class="fa-solid fa-times"></i> Reject</button>
+                                </td>
+                            </tr>`;
+                    });
+                }
+            });
+
+            // 2. Active Admins (Collection: admins)
+            const qActive = query(collection(db, "admins"), where("status", "in", ["approved", "owner"]));
+
+            onSnapshot(qActive, (snapshot) => {
+                activeTableBody.innerHTML = "";
+                activeCount.textContent = snapshot.size;
+                if (snapshot.empty) {
+                    activeTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500 italic">No active admins found.</td></tr>`;
+                } else {
+                    snapshot.forEach((docSnap) => {
+                        const user = docSnap.data();
+                        let deleteBtn = `<button onclick="window.deleteUser('${docSnap.id}')" class="bg-red-100 text-red-600 px-3 py-1 rounded-lg text-sm hover:bg-red-200 border border-red-200 transition"><i class="fa-solid fa-trash-can mr-1"></i> Remove</button>`;
+                        if(user.email === auth.currentUser?.email) { deleteBtn = `<span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">You</span>`; }
+
+                        activeTableBody.innerHTML += `
+                            <tr class="hover:bg-green-50 transition border-b border-gray-100">
+                                <td class="px-6 py-4 font-bold text-gray-900">${user.fullName || 'No Name'}</td>
+                                <td class="px-6 py-4 text-gray-600">${user.role || '-'}</td>
+                                <td class="px-6 py-4 text-gray-500 text-sm">${user.email}</td>
+                                <td class="px-6 py-4 text-center">${deleteBtn}</td>
+                            </tr>`;
+                    });
+                }
+            });
+        }
+
+        // --- ACTIONS ---
+        window.approveUser = async (uid) => {
+            if(!confirm("Approve this user as Admin?")) return;
+            try {
+                // UPDATE: Using "admins" collection
+                await updateDoc(doc(db, "admins", uid), { status: "approved", isAdmin: true });
+            } catch (error) { alert("Error: " + error.message); }
+        };
+
+        window.deleteUser = async (uid) => {
+            if(!confirm("Remove this user? They will lose access.")) return;
+            try {
+                // UPDATE: Using "admins" collection
+                await deleteDoc(doc(db, "admins", uid));
+            } catch (error) { alert("Error: " + error.message); }
+        };
+    </script>
+</body>
+</html>
