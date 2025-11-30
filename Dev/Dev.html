@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECCPMS Admin Portal - Download</title>
+    <link rel="icon" href="meroon Transparent logo prefect.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* --- CORE VARIABLES FROM index.html --- */
+        :root {
+            --primary-color: #7A150F; /* Maroon */
+            --secondary-color: #D4AF37; /* Gold */
+            --text-color: #3b3b3b;
+            --text-light: #5f5f5f;
+            --card-bg-color: #FDFDFD;
+            --light-text-color: #ffffff;
+            --glass-bg: rgba(253, 253, 253, 0.75);
+        }
+
+        body.dark-mode {
+            --text-color: #e8e8e8;
+            --text-light: #b0b0b0;
+            --card-bg-color: #121212;
+            --glass-bg: rgba(30, 30, 30, 0.75);
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            background-attachment: fixed;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #F8F8F8 0%, #F0F0F0 100%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
+
+        /* HEADER STYLES (Exact Match) */
+        .portfolio-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 998; 
+            transition: all 0.5s ease-in-out; width: 95%; max-width: 1200px; 
+            margin: 0 auto; border-radius: 12px; 
+        }
+        .portfolio-header.header-scrolled { 
+            top: 1rem; background-color: rgba(255, 250, 240, 0.95); 
+            backdrop-filter: blur(10px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); 
+        }
+        .portfolio-header h1 { 
+            font-size: 1.5rem; color: var(--light-text-color); 
+            font-weight: 800; letter-spacing: 1px; transition: color 0.4s ease;
+        }
+        .portfolio-header.header-scrolled h1 { color: var(--primary-color); }
+
+        .desktop-nav-links ul { list-style: none; display: flex; gap: 1.5rem; padding: 0; margin: 0; }
+        .desktop-nav-links a { 
+            color: var(--light-text-color); text-decoration: none; font-weight: 600; 
+            transition: color 0.3s; 
+        }
+        .portfolio-header.header-scrolled .desktop-nav-links a { color: var(--text-color); }
+        .portfolio-header.header-scrolled .desktop-nav-links a:hover { color: var(--primary-color); }
+
+        /* --- HERO SECTION (THE FIX) --- */
+        .hero-section {
+            display: flex; justify-content: center; align-items: center; text-align: center;
+            min-height: 100vh; padding: 2rem; position: relative; color: var(--light-text-color);
+            /* Using darker overlay to pop the text, similar to index.html */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), url('astrd/school logo.png'); 
+            background-size: cover; background-position: center; 
+            margin-top: -130px; /* Pulls it behind the header */
+        }
+        
+        .hero-content { z-index: 2; max-width: 800px; }
+        
+        .hero-greeting { 
+            font-size: 1.2rem; font-weight: 600; color: rgba(255, 255, 255, 0.9); margin: 0; 
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        
+        .hero-title { 
+            font-size: 4rem; font-weight: 700; color: var(--light-text-color); 
+            margin: 0.5rem 0; line-height: 1.2; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3); 
+        }
+        
+        /* The Magic Gradient Animation from index.html */
+        .hero-title-gradient {
+            background: linear-gradient(90deg, var(--secondary-color), #fff, var(--secondary-color));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 5s linear infinite;
+        }
+        @keyframes gradient-flow {
+            0% { background-position: 200% center; }
+            100% { background-position: 0% center; }
+        }
+
+        .hero-divider { 
+            width: 80px; height: 4px; background-color: var(--light-text-color); 
+            margin: 1.5rem auto; 
+        }
+        
+        .hero-description { 
+            font-size: 1.1rem; line-height: 1.7; color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem;
+        }
+
+        .hero-login-btn {
+            background: transparent;
+            border: 2px solid var(--light-text-color);
+            color: var(--light-text-color);
+            padding: 0.8rem 2.5rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        .hero-login-btn:hover {
+            background: var(--light-text-color);
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* --- REST OF THE UI (GLASSMORPHISM) --- */
+        .portfolio-container { max-width: 1200px; margin: auto; padding: 2rem; }
+        
+        .portfolio-section {
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem; margin-bottom: 2rem; border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .portfolio-section h3 { 
+            font-size: 2rem; color: var(--primary-color); text-align: center; 
+            margin-bottom: 2rem; 
+        }
+        
+        /* Feature/Stat Cards */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s; text-align: center;
+        }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px 0 rgba(0,0,0,0.15); }
+        .feature-icon { font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem; }
+
+        /* Team Cards */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; }
+        .team-card {
+            background: #fff; border-radius: 12px; padding: 1rem; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s;
+        }
+        .team-card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        .team-card img {
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 3px solid var(--secondary-color); margin-bottom: 0.5rem;
+        }
+
+        /* Download Box (Custom) */
+        .download-btn-main {
+            background: var(--primary-color); color: white; padding: 1rem 3rem;
+            border-radius: 50px; font-weight: 700; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s;
+        }
+        .download-btn-main:hover { background: #5a0f0a; transform: scale(1.05); }
+
+        /* Footer */
+        .portfolio-footer {
+            padding: 2.5rem 1rem; text-align: center; background: var(--card-bg-color);
+            border-top: 1px solid #eee; border-top-left-radius: 25px; border-top-right-radius: 25px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .desktop-nav-links { display: none; }
+            .hero-title { font-size: 2.5rem; }
+            .portfolio-header h1 { display: none; } /* Hide text logo on mobile like index.html */
+        }
+    </style>
+</head>
+<body>
+
+    <header class="portfolio-header" id="portfolio-header">
+        <div style="display: flex; align-items: center;">
+            <img src="meroon Transparent logo prefect.png" alt="Logo" style="height: 50px; margin-right: 15px; filter: brightness(0) invert(1);" id="header-logo">
+            <h1>PREFECTS' GUILD</h1>
+        </div>
+        <nav class="desktop-nav-links">
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#team">Team</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero-section" id="hero">
+        <div class="hero-content">
+            <p class="hero-greeting">Welcome to the</p>
+            <h2 class="hero-title hero-title-gradient">ECCPMS ADMIN PORTAL</h2>
+            <p class="hero-greeting">OFFICIAL DOWNLOAD CENTER</p>
+            <div class="hero-divider"></div>
+            <p class="hero-description">
+                Manage attendance, track duties, and organize events with the official app. <br>
+                Exclusive for Top Board Members & Teachers.
+            </p>
+            <a href="#download" class="hero-login-btn">
+                <i class="fab fa-android mr-2"></i> Get The App
+            </a>
+            
+            <a href="#features" style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: white; font-size: 2rem; animation: bounceArrow 1.5s infinite;">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <div class="portfolio-container">
+        
+        <section class="portfolio-section" style="margin-top: 2rem;">
+            <h3>System Impact</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-users feature-icon"></i>
+                    <h2 style="font-size: 3rem; color: var(--text-color); margin: 0;">100+</h2>
+                    <p style="color: var(--primary-color); font-weight: 600;">Active Prefects</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-calendar-check feature-icon"></i>
+                    <h2 style="font-size: 3rem; color: var(--text-color); margin: 0;">25+</h2>
+                    <p style="color: var(--primary-color); font-weight: 600;">Events Managed</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h2 style="font-size: 3rem; color: var(--text-color); margin: 0;">100%</h2>
+                    <p style="color: var(--primary-color); font-weight: 600;">Secure Data</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="portfolio-section">
+            <h3>Admin Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-qrcode feature-icon"></i>
+                    <h4>Smart Attendance</h4>
+                    <p>Mark attendance instantly using QR code scanning technology. Eliminate manual errors.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-clipboard-list feature-icon"></i>
+                    <h4>Duty Management</h4>
+                    <p>Assign and track daily duties. Monitor performance and generate reports easily.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bullhorn feature-icon"></i>
+                    <h4>Live Announcements</h4>
+                    <p>Send instant notifications to all prefects regarding meetings and special duties.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="portfolio-section" style="text-align: center;">
+            <h3>Download App</h3>
+            <div style="background: var(--card-bg-color); padding: 2rem; border-radius: 15px; border: 1px solid #eee;">
+                <h2 style="font-size: 2rem; color: var(--text-color);">Ready to Upgrade?</h2>
+                <p style="color: var(--text-light); margin-bottom: 2rem;">Download the official .APK file directly to your device.</p>
+                
+                <a href="https://drive.google.com/uc?export=download&id=1s49viOAjdlAZ0boe4tNV5YqixiNobrF0" class="download-btn-main">
+                    <i class="fab fa-android" style="font-size: 1.5rem;"></i>
+                    <span>Download v2.0</span>
+                </a>
+
+                <div style="margin-top: 2rem;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://drive.google.com/uc?export=download&id=1s49viOAjdlAZ0boe4tNV5YqixiNobrF0" alt="QR Code" style="border: 4px solid var(--secondary-color); border-radius: 10px;">
+                    <p style="margin-top: 10px; font-weight: 600; color: var(--primary-color);">Scan to Download</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="portfolio-section">
+            <h3>Development Team</h3>
+            <div class="team-grid">
+                <div class="team-card">
+                    <img src="astrd/Hansaka.png" alt="Hansaka">
+                    <h4>Hansaka Fernando</h4>
+                    <p>Lead Developer</p>
+                </div>
+                <div class="team-card">
+                    <img src="astrd/Adeesha.jpg" alt="Adeesha">
+                    <h4>Adeesha Ravimal</h4>
+                    <p>System Architect</p>
+                </div>
+                <div class="team-card">
+                    <img src="astrd/thevindu.JPG" alt="Thevindu">
+                    <h4>Thevindu Thisev</h4>
+                    <p>Data Collector</p>
+                </div>
+                <div class="team-card">
+                    <img src="astrd/Avishka.jpg" alt="Avishka">
+                    <h4>Avishka Kalhara</h4>
+                    <p>Media Coverage</p>
+                </div>
+                <div class="team-card">
+                    <img src="astrd/Nethmi.jpg" alt="Nethmi">
+                    <h4>Nethmi Dhananjana</h4>
+                    <p>Coordinator</p>
+                </div>
+                <div class="team-card">
+                    <img src="astrd/Rashmi.jpg" alt="Rashmi">
+                    <h4>Rashmi Jananjana</h4>
+                    <p>Management Lead</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="register" class="portfolio-section">
+            <h3>Request Admin Access</h3>
+            <div style="max-width: 600px; margin: 0 auto;">
+                <form id="requestForm">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Full Name</label>
+                        <input type="text" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd;" required>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Role / Position</label>
+                        <input type="text" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd;" required>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd;" required>
+                    </div>
+                    <button type="submit" style="width: 100%; background: var(--primary-color); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">SEND REQUEST</button>
+                </form>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="portfolio-footer">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <img src="meroon Transparent logo prefect.png" alt="Logo" style="height: 50px;">
+        </div>
+        <p style="margin: 0; font-weight: 600; color: var(--text-color);">Eheliyagoda Central College</p>
+        <p style="margin: 0; font-weight: 600; color: var(--text-color);">2025 Prefects' Guild</p>
+        <p>-----</p>
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <a href="#" style="color: var(--primary-color); width: 40px; height: 40px; background: rgba(140,28,19,0.1); display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" style="color: var(--primary-color); width: 40px; height: 40px; background: rgba(140,28,19,0.1); display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i class="fas fa-envelope"></i></a>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-light);">&copy; 2025 All Rights Reserved.</p>
+    </footer>
+
+    <style>
+        @keyframes bounceArrow { 0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); } 40% { transform: translate(-50%, -10px); } 60% { transform: translate(-50%, -5px); } }
+    </style>
+
+    <script>
+        // Header Scroll Effect (Matching index.html logic)
+        const header = document.getElementById('portfolio-header');
+        const logo = document.getElementById('header-logo');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+                logo.style.filter = "none"; // Restore colors on white background
+            } else {
+                header.classList.remove('header-scrolled');
+                logo.style.filter = "brightness(0) invert(1)"; // White logo on hero
+            }
+        });
+    </script>
+</body>
+</html>
