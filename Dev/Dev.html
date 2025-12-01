@@ -823,7 +823,7 @@ const firebaseConfig = {
                 });
 
                 // 3. Save details to Firestore with 'pending' status
-                await setDoc(doc(db, "admins", user.uid), {
+                await setDoc(doc(db, "app_admins", user.uid), {
                     uid: user.uid,
                     fullName: fullName,
                     email: email,
