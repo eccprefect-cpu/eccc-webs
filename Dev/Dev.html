@@ -9,7 +9,15 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){
+          // ⚠️ අවධානයයි: මෙතැනට ඔබේ EmailJS Public Key එක දමන්න
+          // උදාහරණ: emailjs.init("user_xxxxxxxxxxxx");
+          emailjs.init("8u6HxjnObnXlrvHmx"); 
+       })();
+    </script>
     <style>
         :root {
             --color-primary: #800000;       /* Maroon */
@@ -260,14 +268,14 @@
                 </h2>
                 
                 <p class="text-lg mb-8 max-w-lg mx-auto md:mx-0 font-normal text-text-secondary">
-                    රෙජිස්ටර් වීම සඳහා පහළම කෙළවරේ ඇති ෆෝම් එක පුරවා රෙජිස්ටර් විය හැකි අතර එහිදී රෙජිස්ටර් වූ පරිශීලක නාමය හා මුරපදය භාවිතයෙන් ඇප් එකට ලොග් විය හැක
+                    
                 </p>
 
                 <div>
-                    <a href="#download" class="inline-flex items-center bg-primary text-white font-bold py-4 px-10 rounded-lg shadow-lg text-lg mt-4 transition duration-300 hover:bg-primary-dark btn-hover-effect">
+                    <button onclick="openDownloadModal()" class="inline-flex items-center bg-primary text-white font-bold py-4 px-10 rounded-lg shadow-lg text-lg mt-4 transition duration-300 hover:bg-primary-dark btn-hover-effect cursor-pointer">
                         <i class="fa-solid fa-download mr-3"></i>
                         Get The App
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -531,12 +539,10 @@
                 </p>
 
                 <div class="scroll-animate">
-                    <a href="https://github.com/Hansaka-Franando-589/ECCPMS/releases/download/v1/ECCPMS_ADMIN_v2.apk" 
-                       download="ECCPMS_Admin_App.apk"
-                       class="inline-flex items-center bg-primary text-white font-bold py-4 px-10 rounded-xl shadow-2xl text-lg mt-4 transition duration-300 transform hover:scale-105 btn-hover-effect hover:bg-primary-dark">
+                    <button onclick="openDownloadModal()" class="inline-flex items-center bg-primary text-white font-bold py-4 px-10 rounded-xl shadow-2xl text-lg mt-4 transition duration-300 transform hover:scale-105 btn-hover-effect hover:bg-primary-dark cursor-pointer">
                         <i class="fa-brands fa-android mr-3 text-xl"></i>
                         Download for Android
-                    </a>
+                    </button>
                 </div>
                 
                 <p class="text-sm text-text-secondary mt-6">For Prefects' Guild Administration Use Only.</p>
@@ -787,6 +793,59 @@
         </div>
     </footer>
 
+    <div id="otpModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity blur-sm"></div>
+
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border-2 border-[#800000]">
+                
+                <div class="absolute top-0 right-0 pt-4 pr-4">
+                    <button type="button" onclick="closeDownloadModal()" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">Close</span>
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fa-solid fa-lock text-[#800000]"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-xl font-bold leading-6 text-gray-900" id="modal-title">Security Verification</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Please enter your email address to receive a One-Time Password (OTP) to download the app.</p>
+                                
+                                <div id="emailStep" class="mt-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <input type="email" id="downloadEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#800000] focus:border-[#800000]" placeholder="Enter your email">
+                                    <p id="emailError" class="text-red-500 text-xs mt-1 hidden"></p>
+                                </div>
+
+                                <div id="otpStep" class="mt-4 hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Enter OTP Code</label>
+                                    <input type="text" id="otpInput" maxlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#800000] focus:border-[#800000] tracking-widest text-center text-xl" placeholder="XXXXXX">
+                                    <p class="text-xs text-gray-500 mt-2">OTP sent to <span id="displayEmail" class="font-bold"></span></p>
+                                    <p id="otpError" class="text-red-500 text-xs mt-1 hidden">Incorrect OTP</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id="sendOtpBtn" onclick="sendOTP()" class="inline-flex w-full justify-center rounded-md bg-[#800000] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#660000] sm:ml-3 sm:w-auto transition-colors">
+                        Send OTP
+                    </button>
+                    <button type="button" id="verifyOtpBtn" onclick="verifyOTP()" class="hidden inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto transition-colors">
+                        Verify & Download
+                    </button>
+                    <button type="button" onclick="closeDownloadModal()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     
     <script>
@@ -884,6 +943,107 @@
         navLinks.forEach(link => {
             link.addEventListener('click', closeNav);
         });
+
+        // --- NEW CODE: OTP & DOWNLOAD LOGIC ---
+        
+        const apkUrl = "https://github.com/Hansaka-Franando-589/ECCPMS/releases/download/v1/ECCPMS_ADMIN_v2.apk";
+        let generatedOTP = null;
+
+        // Modal Functions
+        function openDownloadModal() {
+            document.getElementById('otpModal').classList.remove('hidden');
+            resetModal();
+        }
+
+        function closeDownloadModal() {
+            document.getElementById('otpModal').classList.add('hidden');
+        }
+
+        function resetModal() {
+            document.getElementById('emailStep').classList.remove('hidden');
+            document.getElementById('otpStep').classList.add('hidden');
+            document.getElementById('sendOtpBtn').classList.remove('hidden');
+            document.getElementById('verifyOtpBtn').classList.add('hidden');
+            document.getElementById('downloadEmail').value = '';
+            document.getElementById('otpInput').value = '';
+            document.getElementById('emailError').classList.add('hidden');
+            document.getElementById('otpError').classList.add('hidden');
+            document.getElementById('sendOtpBtn').innerHTML = 'Send OTP';
+            document.getElementById('sendOtpBtn').disabled = false;
+        }
+
+        // Generate Random 6 Digit Number
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // Send OTP via EmailJS
+        function sendOTP() {
+            const email = document.getElementById('downloadEmail').value;
+            const btn = document.getElementById('sendOtpBtn');
+            const errorMsg = document.getElementById('emailError');
+
+            // Simple validation
+            if (!email || !email.includes('@')) {
+                errorMsg.textContent = "Please enter a valid email address";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sending...';
+            
+            generatedOTP = generateOTP();
+
+            // EmailJS Parameters
+            const templateParams = {
+                to_email: email,
+                otp_code: generatedOTP
+            };
+
+            // ⚠️ අවධානයයි: මෙතැන ඔබේ Service ID සහ Template ID දමන්න
+            // උදා: emailjs.send('service_xyz', 'template_abc', templateParams)
+            emailjs.send('service_cwl7hxc', 'template_caw4ksi', templateParams)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    // Switch to OTP Input View
+                    document.getElementById('emailStep').classList.add('hidden');
+                    document.getElementById('otpStep').classList.remove('hidden');
+                    document.getElementById('displayEmail').innerText = email;
+                    
+                    // Switch Buttons
+                    document.getElementById('sendOtpBtn').classList.add('hidden');
+                    document.getElementById('verifyOtpBtn').classList.remove('hidden');
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    errorMsg.textContent = "Failed to send email. Check console/keys.";
+                    errorMsg.classList.remove('hidden');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Send OTP';
+                });
+        }
+
+        // Verify OTP
+        function verifyOTP() {
+            const userOTP = document.getElementById('otpInput').value;
+            const errorMsg = document.getElementById('otpError');
+
+            if (userOTP === generatedOTP) {
+                // Success! Start Download
+                const link = document.createElement('a');
+                link.href = apkUrl;
+                link.setAttribute('download', 'ECCPMS_Admin_App.apk'); 
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                closeDownloadModal();
+                // Optional success message
+                // alert("Verification Successful! Download starting...");
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
     </script>
 
     <script type="module">
@@ -1033,7 +1193,7 @@
                     stream: data.studyStream,
                     whatsapp: data.whatsappNo,
                     email: data.email,
-                    password: data.password, // Note: Storing plaintext passwords is a major security risk.
+                    password: data.password, 
                     status: "pending",
                     createdAt: new Date().toISOString()
                 });
