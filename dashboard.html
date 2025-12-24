@@ -2874,35 +2874,54 @@
 
             <!-- Profile Section -->
             <section id="profile" class="content-section">
-                <h2 class="section-title">My Profile</h2>
-                <div class="dashboard-card">
-                    <div class="profile-header">
-                        <img id="profile-page-picture" src="meroon Transparent logo prefect.png" alt="Profile Picture"
-                            class="profile-page-img">
-                        <div class="profile-header-info">
-                            <h3 id="profile-page-name">Prefect Name</h3>
-                            <input type="text" id="profile-page-role" value="Prefect" disabled>
-                        </div>
+    <h2 class="section-title">My Profile</h2>
+    <div class="dashboard-card">
+        <div class="profile-header">
+            <img id="profile-page-picture" src="meroon Transparent logo prefect.png" alt="Profile Picture" class="profile-page-img">
+            <div class="profile-header-info">
+                <h3 id="profile-page-name">Prefect Name</h3>
+                <input type="text" id="profile-page-role" value="Prefect" disabled>
+                <small id="profile-prefect-id" style="color: var(--text-light);">ID: -</small>
+            </div>
+        </div>
+        
+        <div class="profile-details-grid">
+            <div class="profile-detail-item">
+                <label for="profile-email">Email</label>
+                <input type="email" id="profile-email" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-phone">Phone</label>
+                <input type="tel" id="profile-phone" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-class-static">Class</label>
+                <input type="text" id="profile-class-static" value="-" disabled>
+            </div>
 
-                    </div>
-                    <div class="profile-details-grid">
-                        <div class="profile-detail-item">
-                            <label for="profile-email">Email</label>
-                            <input type="email" id="profile-email" value="prefect@example.com" disabled>
-                        </div>
-                        <div class="profile-detail-item">
-                            <label for="profile-phone">Phone</label>
-                            <input type="tel" id="profile-phone" value="+94 123 456 789" disabled>
-                        </div>
-                        <div class="profile-detail-item">
-                            <label for="profile-class-static">Class</label>
-                            <input type="text" id="profile-class-static" value="13-B" disabled>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
+            <div class="profile-detail-item">
+                <label for="profile-section">Section</label>
+                <input type="text" id="profile-section" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-index">Index Number</label>
+                <input type="text" id="profile-index" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-parents-phone">Parents' Phone</label>
+                <input type="tel" id="profile-parents-phone" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-current-duty">Current Duty</label>
+                <input type="text" id="profile-current-duty" value="-" disabled>
+            </div>
+            <div class="profile-detail-item">
+                <label for="profile-total-points">Total Points</label>
+                <input type="text" id="profile-total-points" value="0" disabled>
+            </div>
+        </div>
+    </div>
+</section>
             <!-- Events Section -->
             <section id="events" class="content-section">
                 <h2 class="section-title">Events</h2>
@@ -3466,6 +3485,16 @@
                     document.getElementById('profile-page-name').textContent = prefectData.name || 'Please add your name';
                     document.getElementById('profile-page-role').value = prefectData.destiny || 'N/A';
                     document.getElementById('profile-class-static').value = prefectData.class || 'N/A';
+                    // අලුතින් එකතු කරන දත්ත ෆීල්ඩ්ස්
+                    document.getElementById('profile-section').value = prefectData.section || '-'; 
+                    document.getElementById('profile-index').value = prefectData.school_index_number || '-';
+                    document.getElementById('profile-parents-phone').value = prefectData.parents_phone || '-';
+                    document.getElementById('profile-current-duty').value = prefectData.current_duty || '-';
+                    document.getElementById('profile-total-points').value = prefectData.total_points || '0';
+                    
+                    // Email සහ Phone අංක දැනටමත් කේතයේ තිබුණාට හරියට Update වෙන්නේ නැත්නම් මේවත් එක් කරන්න:
+                    document.getElementById('profile-email').value = prefectData.email || '-';
+                    document.getElementById('profile-phone').value = prefectData.phone || '-';
 
                     // Add event listener for the new edit button
                     const dashboardEditBtn = document.getElementById('dashboard-edit-profile-btn');
@@ -4402,3 +4431,4 @@
 </body>
 
 </html>
+
