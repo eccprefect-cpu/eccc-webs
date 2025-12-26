@@ -17,6 +17,11 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
+    <!-- jsPDF & AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* --- DESIGN SYSTEM : MAROON & GOLD PREMIUM --- */
         :root {
@@ -1283,6 +1288,149 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- ATTENDANCE LIST STYLES (NEW) --- */
+        .attendance-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .attendance-card-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .attendance-card-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .attendance-card-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gray-300);
+        }
+
+        .attendance-card-item.present::before {
+            background: #4caf50;
+        }
+
+        .attendance-card-item.late::before {
+            background: #ffc107;
+        }
+
+        .attendance-card-item.absent::before {
+            background: #f44336;
+        }
+
+        .attendance-info-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .attendance-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            font-size: 1.1rem;
+        }
+
+        .attendance-card-item.present .attendance-icon-wrapper {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .attendance-card-item.late .attendance-icon-wrapper {
+            background: #fff8e1;
+            color: #fbc02d;
+        }
+
+        .attendance-card-item.absent .attendance-icon-wrapper {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .attendance-date-text {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        .attendance-time-text {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+
+        .attendance-status-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .attendance-card-item.present .attendance-status-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .attendance-card-item.late .attendance-status-badge {
+            background: #fff8e1;
+            color: #fbc02d;
+        }
+
+        .attendance-card-item.absent .attendance-status-badge {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Download Report Card Style */
+        .card-download-report {
+            grid-column: 1 / -1;
+            /* Full width always */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--white), #f8f9fa);
+            padding: 1.5rem;
+        }
+
+        /* Disabled Countdown State */
+        .supiri-btn:disabled,
+        .supiri-btn.disabled-countdown {
+            background: var(--gray-200);
+            color: var(--gray-600);
+            cursor: not-allowed;
+            border: 1px solid var(--gray-300);
+            box-shadow: none;
         }
     </style>
 </head>
@@ -1303,7 +1451,7 @@
 
         <nav class="nav-menu">
             <a href="#overview" class="nav-item active">
-                <i class="fas fa-grid-2"></i>
+                <i class="fas fa-th-large"></i>
                 <span>Overview</span>
             </a>
             <a href="#events" class="nav-item">
@@ -1432,40 +1580,44 @@
                     <div class="card card-actions">
                         <h4>Quick Actions</h4>
                         <div class="action-list">
-                            <button class="btn-action"><i class="fas fa-calendar-plus"></i> New Event</button>
-                            <button class="btn-action"><i class="fas fa-lightbulb"></i> Submit Idea</button>
-                            <button class="btn-action"><i class="fas fa-file-medical"></i> Report Absence</button>
+                            <button class="btn-action" id="btn-quick-event"><i class="fas fa-calendar-plus"></i> New
+                                Event</button>
+                            <button class="btn-action" id="btn-quick-idea"><i class="fas fa-lightbulb"></i> Submit
+                                Idea</button>
+                            <button class="btn-action" id="btn-quick-absence"><i class="fas fa-file-medical"></i> Report
+                                Absence</button>
+                            <button class="btn-action" id="btn-quick-edit-profile"><i class="fas fa-user-edit"></i> Edit
+                                Profile</button>
                         </div>
                     </div>
 
-                    <!-- Chart Placeholder -->
-                    <div class="card" style="grid-column: span 2; min-height: 300px;">
+                    <!-- Chart: Weekly Attendance (Span 2) -->
+                    <div class="card" style="grid-column: span 2; min-height: 350px;">
                         <div style="padding: 1rem; height: 100%; display: flex; flex-direction: column;">
                             <h4 style="margin-bottom: 1rem; color: var(--gray-700);">Weekly Attendance</h4>
-                            <div class="bar-chart-container" style="flex: 1; min-height: 200px;">
-                                <div class="bar-chart" id="weekly-attendance-chart">
-                                    <!-- Bars will be injected here -->
-                                </div>
+                            <div style="flex: 1; position: relative;">
+                                <canvas id="attendanceBarChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Late Arrivals -->
-                    <div class="card card-stat">
-                        <div class="stat-icon" style="background: #fff8e1; color: #fbc02d;"><i class="fas fa-clock"></i>
+                    <!-- Chart: Attendance Breakdown (Span 2) -->
+                    <div class="card" style="grid-column: span 2; min-height: 350px;">
+                        <div style="padding: 1rem; height: 100%; display: flex; flex-direction: column;">
+                            <h4 style="margin-bottom: 1rem; color: var(--gray-700);">Attendance Overview</h4>
+                            <div style="flex: 1; position: relative; display: flex; justify-content: center;">
+                                <canvas id="attendanceDoughnutChart"></canvas>
+                            </div>
                         </div>
-                        <div class="stat-value" style="color: #fbc02d;" id="total-late">0</div>
-                        <div class="stat-label">Late Arrivals</div>
                     </div>
 
-                    <!-- Profile Edit -->
-                    <div class="card card-stat">
-                        <div class="stat-icon" style="background: #e3f2fd; color: #1e88e5;"><i
-                                class="fas fa-user-edit"></i>
-                        </div>
-                        <button style="border: none; background: transparent; font-weight: 600; color: #1e88e5;"
-                            id="dashboard-edit-profile-btn">Edit
-                            Profile</button>
+                    <!-- Download Report Button -->
+                    <div class="card card-download-report">
+                        <button id="btn-download-report" class="supiri-btn"
+                            style="width: auto; padding: 0.8rem 2rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-file-download"></i>
+                            Download Monthly Report
+                        </button>
                     </div>
 
                 </div>
@@ -1810,6 +1962,284 @@
             });
         });
 
+
+        // Quick Actions Logic
+        const btnQuickEvent = document.getElementById('btn-quick-event');
+        const btnQuickIdea = document.getElementById('btn-quick-idea');
+        const btnQuickAbsence = document.getElementById('btn-quick-absence');
+
+        if (btnQuickEvent) {
+            btnQuickEvent.addEventListener('click', () => {
+                document.querySelector('.nav-item[href="#events"]').click();
+            });
+        }
+
+        if (btnQuickIdea) {
+            btnQuickIdea.addEventListener('click', () => {
+                document.querySelector('.nav-item[href="#ideas"]').click();
+                setTimeout(() => {
+                    const titleInput = document.getElementById('idea-title');
+                    if (titleInput) titleInput.focus();
+                }, 100);
+            });
+        }
+
+        if (btnQuickAbsence) {
+            btnQuickAbsence.addEventListener('click', () => {
+                document.querySelector('.nav-item[href="#attendance"]').click();
+            });
+        }
+
+        const btnQuickEditProfile = document.getElementById('btn-quick-edit-profile');
+        if (btnQuickEditProfile) {
+            btnQuickEditProfile.addEventListener('click', () => {
+                document.querySelector('.nav-item[href="#profile"]').click();
+            });
+        }
+
+        // Download Report Logic
+        const btnDownloadReport = document.getElementById('btn-download-report');
+
+        function updateDownloadButtonState() {
+            if (!btnDownloadReport) return;
+
+            const today = new Date();
+            const currentDay = today.getDate();
+            const allowedDays = [27, 28, 29, 30];
+
+            if (allowedDays.includes(currentDay)) {
+                // Enabled State
+                if (btnDownloadReport.innerHTML.includes('Generating')) return; // Don't override loading state
+                btnDownloadReport.disabled = false;
+                btnDownloadReport.classList.remove('disabled-countdown');
+                btnDownloadReport.innerHTML = '<i class="fas fa-file-download"></i> Download Monthly Report';
+            } else {
+                // Disabled State with Countdown
+                btnDownloadReport.disabled = true;
+                btnDownloadReport.classList.add('disabled-countdown');
+
+                let targetDate = new Date();
+                if (currentDay > 30) {
+                    targetDate.setMonth(targetDate.getMonth() + 1);
+                }
+                targetDate.setDate(27);
+                targetDate.setHours(0, 0, 0, 0);
+
+                if (targetDate < today) {
+                    // This handles edge cases where today is < 27, target is set to today's month 27th
+                    // Logic checks out.
+                }
+
+                const timeDiff = targetDate.getTime() - today.getTime();
+                if (timeDiff > 0) {
+                    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                    // Optional: Seconds
+                    // const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                    let timeString = "";
+                    if (days > 0) timeString += `${days}d `;
+                    timeString += `${hours}h ${minutes}m`;
+
+                    btnDownloadReport.innerHTML = `<i class="fas fa-clock"></i> Next Report: ${timeString}`;
+                }
+            }
+        }
+
+        // Initialize and Update Every Minute
+        if (btnDownloadReport) {
+            updateDownloadButtonState();
+            setInterval(updateDownloadButtonState, 60000); // Update every minute
+
+            btnDownloadReport.addEventListener('click', async () => {
+                if (!currentPrefectGlobal) return alert("Please wait for profile to load.");
+
+                // Double check date just in case (though button is disabled)
+                const d = new Date().getDate();
+                if (![27, 28, 29, 30].includes(d)) return;
+
+                const originalText = btnDownloadReport.innerHTML;
+                btnDownloadReport.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+                btnDownloadReport.disabled = true;
+
+                try {
+                    await generateMonthlyReportPDF(currentPrefectGlobal);
+                } catch (error) {
+                    console.error("PDF Error:", error);
+                    alert("Failed to generate PDF: " + error.message);
+                } finally {
+                    btnDownloadReport.innerHTML = originalText;
+                    btnDownloadReport.disabled = false;
+                }
+            });
+        }
+
+        async function generateMonthlyReportPDF(prefect) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // --- DATA FETCHING ---
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const monthName = now.toLocaleString('default', { month: 'long' });
+
+            // 1. Fetch Month's Attendance
+            // Note: In a real app, you'd query by date range. Client-side filter for simplicity here.
+            const attendanceRef = collection(db, "attendance");
+            const attQ = query(attendanceRef, where("prefect_id", "==", prefect.id));
+            const attSnap = await getDocs(attQ);
+            let attendanceRecords = [];
+            let totalAbsencesMonth = 0;
+            let totalLateMonth = 0;
+
+            attSnap.forEach(d => {
+                const data = d.data();
+                // Parse date string "YYYY-MM-DD" or timestamp
+                let dateObj = null;
+                if (data.date && data.date.seconds) dateObj = new Date(data.date.seconds * 1000);
+                else if (typeof data.date === 'string') dateObj = new Date(data.date);
+
+                if (dateObj && dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
+                    attendanceRecords.push(data);
+                    const status = (data.status || '').toLowerCase();
+                    if (status === 'absent') totalAbsencesMonth++;
+                    if (status === 'late') totalLateMonth++;
+                }
+            });
+            // Sort by Date
+            attendanceRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // 2. Fetch Month's Points
+            const pointsRef = collection(db, "points");
+            const pointsQ = query(pointsRef, where("prefect_id", "==", prefect.id));
+            const pointsSnap = await getDocs(pointsQ);
+            let pointsRecords = [];
+            let totalPointsMonth = 0;
+
+            pointsSnap.forEach(d => {
+                const data = d.data();
+                let dateObj = null;
+                if (data.date && data.date.seconds) dateObj = new Date(data.date.seconds * 1000);
+                else if (typeof data.date === 'string') dateObj = new Date(data.date);
+
+                if (dateObj && dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
+                    pointsRecords.push(data);
+                    totalPointsMonth += (data.points || 0);
+                }
+            });
+            pointsRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+
+            // --- PDF GENERATION ---
+            // Colors
+            const colorPrimary = [114, 14, 14]; // Maroon
+            const colorGold = [212, 175, 55]; // Gold
+            const colorGray = [100, 100, 100];
+
+            // Header
+            doc.setFillColor(...colorPrimary);
+            doc.rect(0, 0, 210, 40, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Eheliyagoda Central College", 105, 20, { align: "center" });
+
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "normal");
+            doc.text("Prefects' Guild - Monthly Performance Report", 105, 30, { align: "center" });
+
+            // Prefect Info
+            let yPos = 55;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.text(`Prefect Name: ${prefect.name}`, 14, yPos);
+            doc.text(`Month: ${monthName} ${currentYear}`, 150, yPos);
+
+            yPos += 7;
+            doc.text(`Prefect ID: ${prefect.school_index_number || '-'}`, 14, yPos);
+            doc.text(`Generated On: ${now.toLocaleDateString()}`, 150, yPos);
+
+            yPos += 15;
+
+            // Summary Box
+            doc.setFillColor(245, 245, 245);
+            doc.roundedRect(14, yPos, 182, 25, 3, 3, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.roundedRect(14, yPos, 182, 25, 3, 3, 'S');
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Monthly Summary", 20, yPos + 8);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text(`Total Points Earned: ${totalPointsMonth}`, 20, yPos + 18);
+            doc.text(`Days Absent: ${totalAbsencesMonth}`, 80, yPos + 18);
+            doc.text(`Late Arrivals: ${totalLateMonth}`, 140, yPos + 18);
+
+            yPos += 40;
+
+            // Table 1: Attendance
+            doc.setFontSize(14);
+            doc.setTextColor(...colorPrimary);
+            doc.text("Attendance Log", 14, yPos);
+            yPos += 5;
+
+            const attendanceRows = attendanceRecords.map(r => [
+                r.date || '-',
+                (r.status || 'N/A').toUpperCase(),
+                r.time_in || '-',
+                r.reason || '-'
+            ]);
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Date', 'Status', 'Time In', 'Reason / Note']],
+                body: attendanceRows,
+                theme: 'grid',
+                headStyles: { fillColor: colorPrimary, textColor: 255 },
+                styles: { fontSize: 9 },
+                alternateRowStyles: { fillColor: [250, 240, 240] }
+            });
+
+            yPos = doc.lastAutoTable.finalY + 20;
+
+            // Table 2: Points
+            doc.setFontSize(14);
+            doc.setTextColor(...colorPrimary);
+            doc.text("Points History", 14, yPos);
+            yPos += 5;
+
+            const pointsRows = pointsRecords.map(r => [
+                r.date && r.date.seconds ? new Date(r.date.seconds * 1000).toLocaleDateString() : r.date,
+                r.reason || 'Points Awarded',
+                (r.points > 0 ? '+' : '') + r.points
+            ]);
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Date', 'Description', 'Points']],
+                body: pointsRows,
+                theme: 'grid',
+                headStyles: { fillColor: colorGold, textColor: 0 }, // Gold header for points
+                styles: { fontSize: 9 },
+            });
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text('ECCPMS - System Generated Report', 105, 290, { align: 'center' });
+            }
+
+            // Save
+            doc.save(`Monthly_Report_${monthName}_${prefect.name.replace(/\s+/g, '_')}.pdf`);
+        }
+
         // Logout Logic
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
@@ -1837,6 +2267,9 @@
                         const prefectDoc = querySnapshot.docs[0];
                         const prefectData = prefectDoc.data();
                         const prefectId = prefectDoc.id;
+
+                        // Set Global Var for PDF & other functions
+                        currentPrefectGlobal = { id: prefectId, ...prefectData };
 
                         // Update UI with Profile Data
                         updateProfileUI(prefectData);
@@ -1956,72 +2389,175 @@
             });
         }
 
+        let weeklyChartInstance = null;
+        let breakdownChartInstance = null;
+
         async function fetchWeeklyAttendanceChart(prefectId) {
-            const chartContainer = document.getElementById('weekly-attendance-chart');
-            if (!chartContainer) return;
+            // --- 1. Bar Chart: Weekly Attendance ---
+            const ctxBar = document.getElementById('attendanceBarChart');
+            if (!ctxBar) return;
 
             try {
-                // Use real-time listener for attendance data
+                // Fetch last 10 records for better trend
                 const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), limit(20));
 
                 onSnapshot(attendanceQuery, (querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        chartContainer.innerHTML = '<p style="color:var(--gray-500); font-size:0.9rem; text-align:center;">No attendance data available</p>';
-                        return;
-                    }
+                    if (querySnapshot.empty) return; // Handle empty state visually if needed
 
                     let attendanceData = [];
-                    querySnapshot.forEach(doc => {
-                        attendanceData.push(doc.data());
-                    });
+                    querySnapshot.forEach(doc => attendanceData.push(doc.data()));
 
-                    // Client-side sort by date (most recent first)
+                    // Sort: Oldest to Newest for Chart
                     attendanceData.sort((a, b) => {
                         const dateA = a.date?.seconds ? a.date.seconds : new Date(a.date).getTime() / 1000;
                         const dateB = b.date?.seconds ? b.date.seconds : new Date(b.date).getTime() / 1000;
-                        return dateB - dateA;
+                        return dateA - dateB;
                     });
 
-                    // Take last 7 records
-                    attendanceData = attendanceData.slice(0, 7);
+                    // Take last 7 for the week view
+                    const recentData = attendanceData.slice(-7);
 
-                    // Create bars based on attendance status
-                    let chartHtml = '';
-                    attendanceData.reverse().forEach((record) => {
-                        // Assign height and color based on status (case-insensitive)
-                        let barHeight = 0;
-                        let barColor = 'var(--gray-400)';
-                        let statusLabel = 'N/A';
-                        const status = (record.status || '').toLowerCase();
+                    const labels = recentData.map(d => formatDate(d.date).split('/')[0] + '/' + formatDate(d.date).split('/')[1]); // DD/MM
+                    const statusValues = recentData.map(d => {
+                        const s = (d.status || '').toLowerCase();
+                        if (s === 'present') return 10; // Visualization height
+                        if (s === 'late') return 6;
+                        if (s === 'absent') return 2;
+                        return 0;
+                    });
+                    const statusColors = recentData.map(d => {
+                        const s = (d.status || '').toLowerCase();
+                        if (s === 'present') return '#4caf50';
+                        if (s === 'late') return '#fbc02d';
+                        if (s === 'absent') return '#d63031';
+                        return '#ccc';
+                    });
 
-                        if (status === 'present') {
-                            barHeight = 100;
-                            barColor = '#4caf50'; // Green
-                            statusLabel = 'Present';
-                        } else if (status === 'late') {
-                            barHeight = 60;
-                            barColor = '#fbc02d'; // Yellow/Orange
-                            statusLabel = 'Late';
-                        } else if (status === 'absent') {
-                            barHeight = 30;
-                            barColor = '#d63031'; // Red
-                            statusLabel = 'Absent';
+                    // Render Chart.js
+                    if (weeklyChartInstance) weeklyChartInstance.destroy();
+
+                    const config = {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Attendance Status',
+                                data: statusValues,
+                                backgroundColor: statusColors,
+                                borderRadius: 8,
+                                barThickness: 25,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            const val = context.raw;
+                                            if (val === 10) return 'Present';
+                                            if (val === 6) return 'Late';
+                                            if (val === 2) return 'Absent';
+                                            return 'Unknown';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    display: false,
+                                    max: 12
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { font: { family: "'Plus Jakarta Sans', sans-serif" } }
+                                }
+                            },
+                            animation: {
+                                duration: 1500,
+                                easing: 'easeOutQuart'
+                            }
                         }
+                    };
 
-                        const dateLabel = formatDate(record.date);
-                        chartHtml += `<div class="bar" style="height: ${barHeight}%; background-image: linear-gradient(to top, ${barColor}, ${barColor}dd);" data-label="${dateLabel}" data-value="${statusLabel}"></div>`;
+                    weeklyChartInstance = new Chart(ctxBar, config);
+
+                    // --- 2. Doughnut Chart: Overall Breakdown ---
+                    // Calculate totals from ALL fetched data (up to 20 or more if we queried more)
+                    // For better stats, we might want to query more or use the existing aggregates from fetchKeyStats
+
+                    // Let's use the local `attendanceData` (last 20) as a sample
+                    let p = 0, l = 0, a = 0;
+                    attendanceData.forEach(d => {
+                        const s = (d.status || '').toLowerCase();
+                        if (s === 'present') p++;
+                        else if (s === 'late') l++;
+                        else if (s === 'absent') a++;
                     });
 
-                    chartContainer.innerHTML = chartHtml;
+                    renderBreakdownChart(p, l, a);
+
                 }, (error) => {
-                    console.error("Error listening to attendance chart data:", error);
-                    chartContainer.innerHTML = '<p style="color:red; font-size:0.8rem; text-align:center;">Error loading attendance chart.</p>';
+                    console.error("Chart Error:", error);
                 });
 
             } catch (error) {
-                console.error("Error fetching attendance chart:", error);
-                if (chartContainer) chartContainer.innerHTML = '<p style="color:red; font-size:0.8rem; text-align:center;">Error loading chart.</p>';
+                console.error("Chart Init Error:", error);
             }
+        }
+
+        function renderBreakdownChart(present, late, absent) {
+            const ctxDoughnut = document.getElementById('attendanceDoughnutChart');
+            if (!ctxDoughnut) return;
+
+            if (breakdownChartInstance) breakdownChartInstance.destroy();
+
+            // Handle empty data case
+            if (present === 0 && late === 0 && absent === 0) {
+                // Maybe show a grey placeholder?
+                present = 1; // Dummy
+            }
+
+            breakdownChartInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Present', 'Late', 'Absent'],
+                    datasets: [{
+                        data: [present, late, absent],
+                        backgroundColor: [
+                            '#4caf50', // Present
+                            '#fbc02d', // Late
+                            '#d63031'  // Absent
+                        ],
+                        hoverOffset: 10,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    family: "'Plus Jakarta Sans', sans-serif",
+                                    size: 12
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
         }
 
         async function fetchRecentPoints(prefectId) {
@@ -2134,19 +2670,44 @@
                     return dateB - dateA;
                 });
 
-                let html = '<ul class="stats-list" style="list-style:none; padding:0;">';
+                let html = '<div class="attendance-list-container">';
                 records.forEach(record => {
-                    let statusColor = 'gray';
-                    if (record.status === 'present') statusColor = 'green';
-                    if (record.status === 'absent') statusColor = 'red';
-                    if (record.status === 'late') statusColor = 'orange';
+                    let statusClass = 'neutral';
+                    let iconClass = 'fa-circle';
+                    let statusText = record.status || 'N/A';
+                    const statusLower = (record.status || '').toLowerCase();
 
-                    html += `<li style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
-                        <span>${formatDate(record.date)}</span> 
-                        <span style="color:${statusColor}; font-weight:500; text-transform:capitalize;">${record.status || 'N/A'}</span>
-                    </li>`;
+                    if (statusLower === 'present') {
+                        statusClass = 'present';
+                        iconClass = 'fa-check-circle';
+                    } else if (statusLower === 'late') {
+                        statusClass = 'late';
+                        iconClass = 'fa-clock'; // or fa-business-time
+                    } else if (statusLower === 'absent') {
+                        statusClass = 'absent';
+                        iconClass = 'fa-times-circle';
+                    }
+
+                    // Format Time (if available) - Assuming time_in is a string like "07:30 AM" or timestamp
+                    let timeDisplay = record.time_in || '';
+                    if (!timeDisplay && statusLower === 'absent') timeDisplay = record.reason || 'No reason';
+
+                    html += `
+                    <div class="attendance-card-item ${statusClass}">
+                        <div class="attendance-info-group">
+                            <div class="attendance-icon-wrapper">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div>
+                                <span class="attendance-date-text">${formatDate(record.date)}</span>
+                                <span class="attendance-time-text">${timeDisplay}</span>
+                            </div>
+                        </div>
+                        <div class="attendance-status-badge">${statusText}</div>
+                    </div>
+                    `;
                 });
-                html += '</ul>';
+                html += '</div>';
                 attendanceList.innerHTML = html;
             } catch (e) {
                 console.error("Error fetching attendance:", e);
@@ -2158,55 +2719,158 @@
             const absentReasonContainer = document.getElementById('absent-reason-container');
             if (!absentReasonContainer) return;
 
-            const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), where("status", "==", "Absent"), where("reason", "==", null), orderBy("date", "desc"), limit(1));
-            const querySnapshot = await getDocs(q);
+            // Get Today's Date
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayString = `${year}-${month}-${day}`;
 
-            if (!querySnapshot.empty) {
-                const latestAttendance = querySnapshot.docs[0];
-                const data = latestAttendance.data();
+            const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), where("date", "==", todayString), limit(1));
 
+            try {
+                const querySnapshot = await getDocs(q);
+                let status = 'none'; // 'none', 'present', 'absent'
+                let recordData = {};
+
+                if (!querySnapshot.empty) {
+                    recordData = querySnapshot.docs[0].data();
+                    status = (recordData.status || '').toLowerCase();
+                }
+
+                // Determine UI State
+                let isDisabled = false;
+                let cardColor = '#fff';
+                let borderColor = '#ccc';
+                let titleColor = '#333';
+                let titleText = 'Absence Reporting';
+                let messageText = `If you are absent today (<strong>${todayString}</strong>), please report it here.`;
+                let icon = 'fas fa-info-circle';
+                let showSpinner = false;
+
+                if (status === 'present') {
+                    isDisabled = true;
+                    cardColor = '#f1f8e9'; // Greenish
+                    borderColor = '#66bb6a';
+                    titleColor = '#2e7d32';
+                    titleText = 'Present Today';
+                    messageText = `You have been marked <strong>Present</strong> at ${recordData.time_in || 'Unknown Time'}.`;
+                    icon = 'fas fa-check-circle';
+                } else if (status === 'absent') {
+                    // Marked Absent (either self or admin)
+                    isDisabled = false; // Allow editing
+                    cardColor = '#fff0f0'; // Reddish
+                    borderColor = '#d63031';
+                    titleColor = '#d63031';
+                    titleText = 'Marked Absent';
+                    const existingReason = recordData.reason || 'No reason provided';
+                    messageText = `You are marked <strong>Absent</strong>. Reason: <strong>${existingReason}</strong>. You can update this below.`;
+                    icon = 'fas fa-user-times';
+                } else {
+                    // No Record (None) -> Treat as potential absence
+                    isDisabled = false;
+                    cardColor = '#ffffff'; // White/Neutral
+                    borderColor = '#ffa726'; // Orange warning
+                    titleColor = '#ef6c00';
+                    titleText = 'Not Checked In';
+                    messageText = `You have not scanned in for today (<strong>${todayString}</strong>). If you are absent, please submit a reason.`;
+                    icon = 'fas fa-exclamation-triangle';
+                }
+
+                // Render ALWAYS
                 absentReasonContainer.innerHTML = `
-                    <div class="dashboard-card" style="border-left: 4px solid #d63031; padding: 1.5rem; background: #fff0f0;">
-                        <h3 style="color: #d63031; margin-top:0;">Action Required: Absence Reason</h3>
-                        <p>You were marked ABSENT on <strong>${formatDate(data.date)}</strong>. Please provide a reason.</p>
-                        <form id="absence-reason-form" style="margin-top:1rem;">
-                            <select id="absence-reason-select" style="padding:0.5rem; border-radius:4px; border:1px solid #ccc; width:100%; margin-bottom:0.5rem;">
-                                <option value="" disabled selected>Select Reason</option>
-                                <option value="Sick">Sick / Medical</option>
-                                <option value="Family Emergency">Family Emergency</option>
-                                <option value="Exam / Tuition">Exam / Tuition</option>
-                                <option value="Transport Issue">Transport Issue</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <input type="text" id="absence-reason-other" placeholder="Specify reason..." style="display:none; padding:0.5rem; border-radius:4px; border:1px solid #ccc; width:100%; margin-bottom:0.5rem;">
-                            <button type="submit" id="absence-submit-btn" style="background:#d63031; color:white; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer;">Submit Reason</button>
+                    <div class="dashboard-card" style="border-left: 4px solid ${borderColor}; padding: 1.5rem; background: ${cardColor}; margin-bottom: 2rem; transition: all 0.3s ease;">
+                        <h3 style="color: ${titleColor}; margin-top:0; font-size: 1.1rem;"><i class="${icon}"></i> ${titleText}</h3>
+                        <p style="margin-bottom: 1rem; color: #444; font-size: 0.95rem;">${messageText}</p>
+                        
+                        <form id="today-absence-form" style="opacity: ${isDisabled ? '0.6' : '1'}; pointer-events: ${isDisabled ? 'none' : 'all'};">
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <select id="today-absence-reason-select" style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; background: white;" ${isDisabled ? 'disabled' : 'required'}>
+                                    <option value="" disabled selected>Select Reason for Absence</option>
+                                    <option value="Sick">Sick / Medical</option>
+                                    <option value="Family Emergency">Family Emergency</option>
+                                    <option value="Exam / Tuition">Exam / Tuition</option>
+                                    <option value="Transport Issue">Transport Issue</option>
+                                    <option value="Official Duty">Official Duty</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <button type="submit" id="today-absence-submit-btn" style="background: ${isDisabled ? '#999' : '#d63031'}; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;" ${isDisabled ? 'disabled' : ''}>
+                                    <i class="fas fa-save"></i> ${status === 'absent' ? 'Update' : 'Mark Absent'}
+                                </button>
+                            </div>
+                            <input type="text" id="today-absence-reason-other" placeholder="Please specify reason..." style="display:none; width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px;" ${isDisabled ? 'disabled' : ''}>
                         </form>
                     </div>
                 `;
 
-                const absenceReasonSelect = document.getElementById('absence-reason-select');
-                const absenceReasonOther = document.getElementById('absence-reason-other');
-                const form = document.getElementById('absence-reason-form');
+                // Event Listeners
+                const reasonSelect = document.getElementById('today-absence-reason-select');
+                const reasonOther = document.getElementById('today-absence-reason-other');
+                const form = document.getElementById('today-absence-form');
 
-                absenceReasonSelect.addEventListener('change', () => {
-                    absenceReasonOther.style.display = absenceReasonSelect.value === 'Other' ? 'block' : 'none';
-                });
+                if (reasonSelect && reasonOther) {
+                    reasonSelect.addEventListener('change', () => {
+                        reasonOther.style.display = reasonSelect.value === 'Other' ? 'block' : 'none';
+                        if (reasonSelect.value === 'Other') reasonOther.required = true;
+                        else reasonOther.required = false;
+                    });
+                }
 
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    let reason = absenceReasonSelect.value;
-                    if (reason === 'Other') reason = absenceReasonOther.value.trim();
-                    if (!reason) return alert('Please provide a reason.');
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        if (isDisabled) return;
 
-                    try {
-                        await updateDoc(doc(db, "attendance", latestAttendance.id), { reason: reason });
-                        absentReasonContainer.innerHTML = '<div class="dashboard-card" style="padding:1.5rem; background:#e8f5e9; color:#2e7d32;"><i class="fas fa-check-circle"></i> Reason submitted successfully.</div>';
-                    } catch (err) {
-                        alert("Error: " + err.message);
-                    }
-                });
-            } else {
-                absentReasonContainer.innerHTML = ''; // Clear if no pending absences
+                        if (!confirm("Confirm absence reporting?")) return;
+
+                        const btn = document.getElementById('today-absence-submit-btn');
+                        const originalText = btn.innerHTML;
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                        let reason = reasonSelect.value;
+                        if (reason === 'Other') reason = reasonOther.value.trim();
+
+                        try {
+                            if (status === 'none') {
+                                // Create new record
+                                const userDoc = await getDoc(doc(db, "prefects", prefectId));
+                                const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
+
+                                await addDoc(collection(db, "attendance"), {
+                                    prefect_id: prefectId,
+                                    name: prefectName,
+                                    date: todayString,
+                                    time_in: null,
+                                    time_out: null,
+                                    status: "Absent",
+                                    reason: reason,
+                                    created_at: serverTimestamp()
+                                });
+                            } else if (status === 'absent') {
+                                // Update existing record
+                                const docId = querySnapshot.docs[0].id;
+                                await updateDoc(doc(db, "attendance", docId), {
+                                    reason: reason
+                                });
+                            }
+
+                            // Refresh UI
+                            await checkForAbsenceReason(prefectId);
+                            fetchKeyStats(prefectId);
+
+                        } catch (err) {
+                            console.error("Error saving absence:", err);
+                            alert("Error: " + err.message);
+                            btn.disabled = false;
+                            btn.innerHTML = originalText;
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error("Error checking absence status:", error);
+                absentReasonContainer.innerHTML = '<p style="color:red">Error loading status.</p>';
             }
         }
 
