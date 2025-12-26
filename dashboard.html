@@ -1941,8 +1941,9 @@
 
                 attendanceSnapshot.forEach(doc => {
                     const record = doc.data();
-                    if (record.status === 'absent') totalAbsences++;
-                    else if (record.status === 'late') totalLate++;
+                    const status = (record.status || '').toLowerCase(); // Case-insensitive comparison
+                    if (status === 'absent') totalAbsences++;
+                    else if (status === 'late') totalLate++;
                 });
 
                 const absencesEl = document.getElementById('total-absences');
@@ -1987,20 +1988,21 @@
                     // Create bars based on attendance status
                     let chartHtml = '';
                     attendanceData.reverse().forEach((record) => {
-                        // Assign height and color based on status
+                        // Assign height and color based on status (case-insensitive)
                         let barHeight = 0;
                         let barColor = 'var(--gray-400)';
                         let statusLabel = 'N/A';
+                        const status = (record.status || '').toLowerCase();
 
-                        if (record.status === 'present') {
+                        if (status === 'present') {
                             barHeight = 100;
                             barColor = '#4caf50'; // Green
                             statusLabel = 'Present';
-                        } else if (record.status === 'late') {
+                        } else if (status === 'late') {
                             barHeight = 60;
                             barColor = '#fbc02d'; // Yellow/Orange
                             statusLabel = 'Late';
-                        } else if (record.status === 'absent') {
+                        } else if (status === 'absent') {
                             barHeight = 30;
                             barColor = '#d63031'; // Red
                             statusLabel = 'Absent';
