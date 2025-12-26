@@ -1920,32 +1920,38 @@
         }
 
         async function fetchKeyStats(prefectId) {
-            // Points
+            // Points - Using real-time listener
             const pointsQuery = query(collection(db, "points"), where("prefect_id", "==", prefectId));
-            const pointsSnapshot = await getDocs(pointsQuery);
-            let totalPoints = 0;
-            pointsSnapshot.forEach(doc => { totalPoints += doc.data().points || 0; });
+            onSnapshot(pointsQuery, (pointsSnapshot) => {
+                let totalPoints = 0;
+                pointsSnapshot.forEach(doc => { totalPoints += doc.data().points || 0; });
 
-            const pointsEl = document.getElementById('total-points');
-            if (pointsEl) pointsEl.textContent = totalPoints;
-
-            // Attendance (Absences & Late)
-            const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
-            const attendanceSnapshot = await getDocs(attendanceQuery);
-            let totalAbsences = 0;
-            let totalLate = 0;
-
-            attendanceSnapshot.forEach(doc => {
-                const record = doc.data();
-                if (record.status === 'absent') totalAbsences++;
-                else if (record.status === 'late') totalLate++;
+                const pointsEl = document.getElementById('total-points');
+                if (pointsEl) pointsEl.textContent = totalPoints;
+            }, (error) => {
+                console.error("Error listening to points:", error);
             });
 
-            const absencesEl = document.getElementById('total-absences');
-            const lateEl = document.getElementById('total-late');
+            // Attendance (Absences & Late) - Using real-time listener
+            const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
+            onSnapshot(attendanceQuery, (attendanceSnapshot) => {
+                let totalAbsences = 0;
+                let totalLate = 0;
 
-            if (absencesEl) absencesEl.textContent = totalAbsences;
-            if (lateEl) lateEl.textContent = totalLate;
+                attendanceSnapshot.forEach(doc => {
+                    const record = doc.data();
+                    if (record.status === 'absent') totalAbsences++;
+                    else if (record.status === 'late') totalLate++;
+                });
+
+                const absencesEl = document.getElementById('total-absences');
+                const lateEl = document.getElementById('total-late');
+
+                if (absencesEl) absencesEl.textContent = totalAbsences;
+                if (lateEl) lateEl.textContent = totalLate;
+            }, (error) => {
+                console.error("Error listening to attendance:", error);
+            });
         }
 
         async function fetchRecentPoints(prefectId) {
