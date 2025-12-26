@@ -1443,7 +1443,7 @@
                         <div style="padding: 1rem; height: 100%; display: flex; flex-direction: column;">
                             <h4 style="margin-bottom: 1rem; color: var(--gray-700);">Weekly Attendance</h4>
                             <div class="bar-chart-container" style="flex: 1; min-height: 200px;">
-                                <div class="bar-chart" id="recent-points-chart">
+                                <div class="bar-chart" id="weekly-attendance-chart">
                                     <!-- Bars will be injected here -->
                                 </div>
                             </div>
@@ -1844,6 +1844,7 @@
                         // Fetch Stats
                         await fetchKeyStats(prefectId);
                         await fetchRecentPoints(prefectId);
+                        await fetchWeeklyAttendanceChart(prefectId);
                         await fetchRecentAttendance(prefectId);
                         await checkForAbsenceReason(prefectId);
                         await fetchBadWork(prefectId);
@@ -1952,6 +1953,73 @@
             }, (error) => {
                 console.error("Error listening to attendance:", error);
             });
+        }
+
+        async function fetchWeeklyAttendanceChart(prefectId) {
+            const chartContainer = document.getElementById('weekly-attendance-chart');
+            if (!chartContainer) return;
+
+            try {
+                // Use real-time listener for attendance data
+                const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), limit(20));
+
+                onSnapshot(attendanceQuery, (querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        chartContainer.innerHTML = '<p style="color:var(--gray-500); font-size:0.9rem; text-align:center;">No attendance data available</p>';
+                        return;
+                    }
+
+                    let attendanceData = [];
+                    querySnapshot.forEach(doc => {
+                        attendanceData.push(doc.data());
+                    });
+
+                    // Client-side sort by date (most recent first)
+                    attendanceData.sort((a, b) => {
+                        const dateA = a.date?.seconds ? a.date.seconds : new Date(a.date).getTime() / 1000;
+                        const dateB = b.date?.seconds ? b.date.seconds : new Date(b.date).getTime() / 1000;
+                        return dateB - dateA;
+                    });
+
+                    // Take last 7 records
+                    attendanceData = attendanceData.slice(0, 7);
+
+                    // Create bars based on attendance status
+                    let chartHtml = '';
+                    attendanceData.reverse().forEach((record) => {
+                        // Assign height and color based on status
+                        let barHeight = 0;
+                        let barColor = 'var(--gray-400)';
+                        let statusLabel = 'N/A';
+
+                        if (record.status === 'present') {
+                            barHeight = 100;
+                            barColor = '#4caf50'; // Green
+                            statusLabel = 'Present';
+                        } else if (record.status === 'late') {
+                            barHeight = 60;
+                            barColor = '#fbc02d'; // Yellow/Orange
+                            statusLabel = 'Late';
+                        } else if (record.status === 'absent') {
+                            barHeight = 30;
+                            barColor = '#d63031'; // Red
+                            statusLabel = 'Absent';
+                        }
+
+                        const dateLabel = formatDate(record.date);
+                        chartHtml += `<div class="bar" style="height: ${barHeight}%; background-image: linear-gradient(to top, ${barColor}, ${barColor}dd);" data-label="${dateLabel}" data-value="${statusLabel}"></div>`;
+                    });
+
+                    chartContainer.innerHTML = chartHtml;
+                }, (error) => {
+                    console.error("Error listening to attendance chart data:", error);
+                    chartContainer.innerHTML = '<p style="color:red; font-size:0.8rem; text-align:center;">Error loading attendance chart.</p>';
+                });
+
+            } catch (error) {
+                console.error("Error fetching attendance chart:", error);
+                if (chartContainer) chartContainer.innerHTML = '<p style="color:red; font-size:0.8rem; text-align:center;">Error loading chart.</p>';
+            }
         }
 
         async function fetchRecentPoints(prefectId) {
