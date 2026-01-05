@@ -2906,7 +2906,7 @@
                         const s = (d.status || '').toLowerCase();
                         if (s === 'present') return 10; // Visualization height
                         if (s === 'late') return 6;
-                        if (s === 'absent') return 2;
+                        if (s === 'absent') return 10;
                         return 0;
                     });
                     const statusColors = recentData.map(d => {
@@ -3241,14 +3241,14 @@
                     messageText = `You have been marked <strong>Present</strong> at ${recordData.time_in || 'Unknown Time'}.`;
                     icon = 'fas fa-check-circle';
                 } else if (status === 'absent') {
-                    // Marked Absent (either self or admin)
-                    isDisabled = false; // Allow editing
+                    // Marked Absent -> DISABLE FORM
+                    isDisabled = true;
                     cardColor = '#fff0f0'; // Reddish
                     borderColor = '#d63031';
                     titleColor = '#d63031';
                     titleText = 'Marked Absent';
                     const existingReason = recordData.reason || 'No reason provided';
-                    messageText = `You are marked <strong>Absent</strong>. Reason: <strong>${existingReason}</strong>. You can update this below.`;
+                    messageText = `You have reported absence. Reason: <strong>${existingReason}</strong>.`;
                     icon = 'fas fa-user-times';
                 } else {
                     // No Record (None) -> Treat as potential absence
@@ -3279,7 +3279,7 @@
                                     <option value="Other">Other</option>
                                 </select>
                                 <button type="submit" id="today-absence-submit-btn" style="background: ${isDisabled ? '#999' : '#d63031'}; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;" ${isDisabled ? 'disabled' : ''}>
-                                    <i class="fas fa-save"></i> ${status === 'absent' ? 'Update' : 'Mark Absent'}
+                                    <i class="fas fa-save"></i> ${status === 'absent' ? 'Submitted' : 'Mark Absent'}
                                 </button>
                             </div>
                             <input type="text" id="today-absence-reason-other" placeholder="Please specify reason..." style="display:none; width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px;" ${isDisabled ? 'disabled' : ''}>
@@ -3323,6 +3323,7 @@
 
                                 await addDoc(collection(db, "attendance"), {
                                     prefect_id: prefectId,
+                                    uid: auth.currentUser.uid,
                                     name: prefectName,
                                     date: todayString,
                                     time_in: null,
@@ -3341,6 +3342,7 @@
 
                             // Refresh UI
                             await checkForAbsenceReason(prefectId);
+                            await fetchRecentAttendance(prefectId); // Refresh List!
                             fetchKeyStats(prefectId);
 
                         } catch (err) {
