@@ -113,6 +113,118 @@
             cursor: pointer;
         }
 
+        /* --- BADGE SYSTEM CSS --- */
+        .badge-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: help;
+        }
+
+        .role-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .role-badge i {
+            font-size: 0.85rem;
+        }
+
+        /* --- TIER STYLES --- */
+        .badge-rookie {
+            background: #f0f0f0;
+            color: #777;
+            border: 1px solid #ddd;
+        }
+
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #b87333);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-silver {
+            background: linear-gradient(135deg, #C0C0C0, #E0E0E0);
+            color: #444;
+            box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #FFD700, #FDB931);
+            color: #856404;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            animation: shine 3s infinite linear;
+        }
+
+        .badge-platinum {
+            background: linear-gradient(135deg, #e5e4e2, #b0c4de, #ffffff);
+            color: #2c3e50;
+            box-shadow: 0 2px 15px rgba(176, 196, 222, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Shimmer effect for Platinum */
+        .badge-platinum::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 200%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                filter: brightness(100%);
+            }
+
+            50% {
+                filter: brightness(110%);
+            }
+
+            100% {
+                filter: brightness(100%);
+            }
+        }
+
         /* --- LAYOUT GRID --- */
         .app-container {
             display: flex;
@@ -288,6 +400,26 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
+        }
+
+        /* FIX DATA BUTTON STYLE */
+        #reset-data-btn {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        #reset-data-btn:hover {
+            background: #d0d0d0;
         }
 
         .btn-icon {
@@ -1028,6 +1160,16 @@
             .card[style*="grid-column: span 2"] {
                 grid-column: span 2 !important;
                 min-height: 250px !important;
+            }
+
+            /* Hide profile name on mobile */
+            .profile-info {
+                display: none;
+            }
+
+            .profile-btn {
+                padding: 0.35rem;
+                gap: 0;
             }
         }
 
@@ -1842,6 +1984,272 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* ===== EVENTS SECTION BEAUTIFICATION ===== */
+        #events .page-header {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        #events .page-header h2 {
+            background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* Event Cards Styling */
+        #all-events-list>div {
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #all-events-list>div::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold-500) 0%, var(--primary-600) 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        #all-events-list>div:hover::before {
+            transform: scaleY(1);
+        }
+
+        #all-events-list>div:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(114, 14, 14, 0.15);
+            border-color: var(--primary-200);
+        }
+
+        /* Event Title Styling */
+        #all-events-list h4,
+        #all-events-list .event-title {
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #all-events-list h4 i,
+        #all-events-list .event-title i {
+            color: var(--primary-600);
+            font-size: 1rem;
+        }
+
+        /* Event Date Badge */
+        #all-events-list [style*="color:#64748b"] {
+            background: #f1f5f9;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Status Tags Enhancement */
+        #all-events-list span[style*="background:#fef3c7"],
+        #all-events-list span[style*="UPCOMING"] {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+            color: #92400e !important;
+            padding: 0.35rem 0.85rem !important;
+            border-radius: 20px !important;
+            font-weight: 700 !important;
+            font-size: 0.75rem !important;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(146, 64, 14, 0.2);
+        }
+
+        #all-events-list span[style*="background:#f1f5f9"],
+        #all-events-list span[style*="PAST"] {
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            padding: 0.35rem 0.85rem !important;
+            border-radius: 20px !important;
+            font-weight: 600 !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Duty Slots Section */
+        #all-events-list [style*="Available Duty Slots"] {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 1rem !important;
+        }
+
+        #all-events-list [style*="Available Duty Slots"]>div:first-child {
+            color: var(--primary-700) !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75rem !important;
+        }
+
+        /* Duty Slot Item */
+        #all-events-list button[onclick*="takeDuty"] {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(114, 14, 14, 0.25);
+        }
+
+        #all-events-list button[onclick*="takeDuty"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(114, 14, 14, 0.35);
+        }
+
+        /* My Duty Badge */
+        #all-events-list span[style*="YOUR DUTY"] {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+            color: #166534 !important;
+            border: 2px solid #86efac !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 12px rgba(22, 101, 52, 0.15);
+        }
+
+        /* History Table Enhancements */
+        #my-event-history-body tr {
+            transition: all 0.2s ease;
+        }
+
+        #my-event-history-body tr:hover {
+            background: #f8fafc !important;
+            transform: scale(1.01);
+        }
+
+        #my-event-history-body td {
+            border-bottom: 1px solid #f1f5f9 !important;
+        }
+
+        /* Status Badges inTable */
+        #my-event-history-body span[style*="VERIFIED"],
+        #my-event-history-body span[style*="PRESENT"] {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+            box-shadow: 0 2px 6px rgba(22, 101, 52, 0.15);
+        }
+
+        #my-event-history-body span[style*="LATE"] {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+            box-shadow: 0 2px 6px rgba(146, 64, 14, 0.15);
+        }
+
+        #my-event-history-body span[style*="ABSENT"] {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+            box-shadow: 0 2px 6px rgba(153, 27, 27, 0.15);
+        }
+
+        /* Refresh Button Enhancement */
+        #events .supiri-btn {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+            box-shadow: 0 4px 12px rgba(114, 14, 14, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #events .supiri-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(114, 14, 14, 0.35);
+        }
+
+        #events .supiri-btn i {
+            transition: transform 0.4s ease;
+        }
+
+        #events .supiri-btn:hover i {
+            transform: rotate(180deg);
+        }
+
+        /* Card Container for Events */
+        #events .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        #events .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Card Title with Icon */
+        #events .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        #events .card-title i {
+            font-size: 1.5rem;
+            color: var(--primary-600);
+        }
+
+        /* Smooth Fade-in Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #events .card,
+        #all-events-list>div {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        #all-events-list>div:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        #all-events-list>div:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        #all-events-list>div:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        #all-events-list>div:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        #all-events-list>div:nth-child(5) {
+            animation-delay: 0.25s;
+        }
     </style>
 </head>
 
@@ -1944,8 +2352,11 @@
 
                 <button class="profile-btn">
                     <div class="profile-info">
-                        <span class="profile-name" id="header-profile-name">Prefect Name</span>
-                        <span class="profile-role" id="header-profile-role">Senior Prefect</span>
+                        <div style="display: flex; align-items: center;">
+                            <span class="profile-name" id="user-name">Loading...</span>
+                            <div id="badge-container" class="badge-container"></div>
+                        </div>
+                        <span class="profile-role" id="user-role">Prefect</span>
                     </div>
                     <img src="meroon Transparent logo prefect.png" alt="Profile" class="profile-img"
                         id="header-profile-img">
@@ -2079,13 +2490,59 @@
             </section>
 
             <!-- Placeholders for other sections -->
+            <!-- EVENTS SECTION (REDESIGNED V2) -->
             <section id="events" class="content-section" style="display:none;">
-                <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">Upcoming Events</h2>
-                <div class="card">
-                    <div id="events-list">
-                        <!-- Events will be populated here -->
-                        <div style="text-align: center; padding: 2rem; color: var(--gray-500);">
-                            <i class="fas fa-spinner fa-spin"></i> Loading events...
+                <div class="page-header" style="margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="margin: 0; font-family: var(--font-display);">Event Portal</h2>
+                        <p style="color: var(--gray-500);">Manage your event participation</p>
+                    </div>
+                    <button class="supiri-btn" style="width: auto; padding: 0.5rem 1rem;" onclick="loadMyEvents()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="smart-dashboard-layout">
+                    <!-- LEFT: My History -->
+                    <div class="main-feed">
+                        <div class="card">
+                            <h3 class="card-title"
+                                style="color: var(--primary-700); border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                                <i class="fas fa-history"></i> My Participation History
+                            </h3>
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="text-align: left; background: #f8fafc;">
+                                            <th style="padding: 1rem; border-radius: 8px 0 0 8px;">Event</th>
+                                            <th style="padding: 1rem;">Date</th>
+                                            <th style="padding: 1rem;">Time In</th>
+                                            <th style="padding: 1rem; border-radius: 0 8px 8px 0;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="my-event-history-body">
+                                        <!-- Populated by JS -->
+                                        <tr>
+                                            <td colspan="4" style="padding:1.5rem; text-align:center; color:#999;">
+                                                Loading history...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Upcoming / All Events -->
+                    <div class="side-panel">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #fff, #fffdf5); border: 1px solid #ffeeba;">
+                            <h3 class="card-title" style="color: #b7791f; margin-bottom: 1rem;">
+                                <i class="fas fa-calendar-star"></i> All School Events
+                            </h3>
+                            <div id="all-events-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Populated by JS -->
+                                <p style="color:#999;font-size:0.9rem;">Loading events...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2187,6 +2644,67 @@
                 </div>
             </section>
 
+            <!-- EVENTS SECTION (REDESIGNED) -->
+            <section id="events" class="content-section" style="display:none;">
+                <div class="page-header" style="margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="margin: 0; font-family: var(--font-display);">Event Portal</h2>
+                        <p style="color: var(--gray-500);">Manage your event participation</p>
+                    </div>
+                    <button class="supiri-btn" style="width: auto; padding: 0.5rem 1rem;" onclick="loadMyEvents()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="smart-dashboard-layout"
+                    style="display: flex !important; flex-direction: column !important; width: 100% !important;">
+
+                    <!-- TOP: Upcoming / All Events -->
+                    <div class="main-feed" style="width: 100%;">
+                        <div class="card"
+                            style="background: linear-gradient(135deg, #fff, #fffdf5); border: 1px solid #ffeeba;">
+                            <h3 class="card-title" style="color: #b7791f; margin-bottom: 1rem;">
+                                <i class="fas fa-calendar-star"></i> Upcoming School Events
+                            </h3>
+                            <div id="all-events-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Populated by JS -->
+                                <p style="color:#999;font-size:0.9rem;">Loading events...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTTOM: My History -->
+                    <div class="main-feed" style="width: 100%;">
+                        <div class="card">
+                            <h3 class="card-title"
+                                style="color: var(--primary-700); border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                                <i class="fas fa-history"></i> My Participation History
+                            </h3>
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="text-align: left; background: #f8fafc;">
+                                            <th style="padding: 1rem; border-radius: 8px 0 0 8px;">Event</th>
+                                            <th style="padding: 1rem;">Date</th>
+                                            <th style="padding: 1rem;">Time In</th>
+                                            <th style="padding: 1rem; border-radius: 0 8px 8px 0;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="my-event-history-body">
+                                        <!-- Populated by JS -->
+                                        <tr>
+                                            <td colspan="4" style="padding:1.5rem; text-align:center; color:#999;">
+                                                Loading history...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
             <section id="points" class="content-section" style="display:none;">
                 <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">Points History</h2>
                 <div class="card">
@@ -2275,11 +2793,64 @@
                         </div>
                         <div class="form-group">
                             <label for="profile-total-points">Total Points</label>
-                            <input type="text" id="profile-total-points" value="0" disabled>
+                            <input type="text" id="profile-total-points" value="Loading..." disabled
+                                style="font-weight:bold; color:var(--primary-color);">
                         </div>
                     </div>
                 </div>
             </section>
+
+            <script>
+                // --- NEW: POINTS HISTORY LOGIC ---
+                window.loadPointsHistory = async function () {
+                    const list = document.getElementById('recent-points-list');
+                    if (!list) return;
+
+                    list.innerHTML = '<p style="color:#888; text-align:center;"><i class="fas fa-circle-notch fa-spin"></i> Loading points...</p>';
+
+                    if (!window.currentPrefectGlobal) {
+                        setTimeout(loadPointsHistory, 1000);
+                        return;
+                    }
+
+                    try {
+                        const q = query(collection(db, "points"), where("prefect_id", "==", window.currentPrefectGlobal.id), orderBy("timestamp", "desc"));
+                        const snap = await getDocs(q);
+
+                        if (snap.empty) {
+                            list.innerHTML = '<p style="padding:1rem; text-align:center; color:#888;">No point changes recorded yet.</p>';
+                        } else {
+                            let html = '<table style="width:100%; border-collapse:collapse;">';
+                            html += '<tr style="background:#f8f9fa; text-align:left;"><th style="padding:0.8rem;">Date</th><th style="padding:0.8rem;">Reason</th><th style="padding:0.8rem; text-align:right;">Points</th></tr>';
+
+                            snap.forEach(doc => {
+                                const d = doc.data();
+                                const color = d.points > 0 ? 'green' : 'red';
+                                const sign = d.points > 0 ? '+' : '';
+
+                                html += `
+                                <tr style="border-bottom:1px solid #eee;">
+                                    <td style="padding:0.8rem; font-size:0.9rem; color:#555;">${d.date}</td>
+                                    <td style="padding:0.8rem; font-weight:500;">${d.reason}</td>
+                                    <td style="padding:0.8rem; text-align:right; font-weight:bold; color:${color};">${sign}${d.points}</td>
+                                </tr>
+                               `;
+                            });
+                            html += '</table>';
+                            list.innerHTML = html;
+                        }
+                    } catch (e) {
+                        console.error("Points Error:", e);
+                        list.innerHTML = `<p style="color:red; text-align:center;">Error loading points: ${e.message}</p>`;
+                    }
+                };
+
+                // Add to navigation click listener
+                document.querySelectorAll('.nav-item[href="#points"]').forEach(btn => {
+                    btn.addEventListener('click', loadPointsHistory);
+                });
+            </script>
+
 
             <section id="about" class="content-section" style="display:none;">
                 <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">About Us</h2>
@@ -2363,7 +2934,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, limit, orderBy, addDoc, doc, updateDoc, runTransaction, arrayUnion, getDoc, setDoc, writeBatch, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, limit, orderBy, addDoc, doc, updateDoc, runTransaction, arrayUnion, getDoc, setDoc, writeBatch, serverTimestamp, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
@@ -2375,9 +2946,155 @@
             measurementId: "G-FLF7R3B8J3"
         };
 
+        // Fix ReferenceError
+        window.currentPrefectGlobal = null;
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Expose to Global Scope (for legacy scripts)
+        window.db = db;
+        window.auth = auth;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.getDocs = getDocs;
+        window.limit = limit;
+        window.orderBy = orderBy;
+        window.addDoc = addDoc;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.runTransaction = runTransaction;
+        window.arrayUnion = arrayUnion;
+        window.getDoc = getDoc;
+        window.setDoc = setDoc;
+        window.writeBatch = writeBatch;
+        window.serverTimestamp = serverTimestamp;
+        window.onSnapshot = onSnapshot;
+        window.increment = increment;
+
+        // --- NEW: AUTOMATIC DAILY ABSENCE PROCESSOR ---
+        async function checkAndRunDailyAbsence(user) {
+            try {
+                // 1. Check if User is Admin (Optimization: Don't try if not admin)
+                // We'll try to read a protected path or just check if they are in the 'admins' list locally if we had it.
+                // For now, we'll rely on the operation succeeding or failing silently. 
+                // Better: Check if user ID exists in 'hpfadminformobileapp' or 'web_admins' or 'admins'
+                const isAdmin = await verifyAdminStatus(user.uid);
+                if (!isAdmin) {
+                    console.log("Daily Process: User is not admin. Skipping.");
+                    return;
+                }
+
+                console.log("Daily Process: Admin detected. Checking status...");
+
+                // 2. Define "Yesterday"
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                // 3. Check System Status
+                const statusRef = doc(db, "system", "daily_status");
+                const statusSnap = await getDoc(statusRef);
+
+                if (statusSnap.exists() && statusSnap.data()[yesterdayStr] === true) {
+                    console.log(`Daily Process: ${yesterdayStr} already processed.`);
+                    return;
+                }
+
+                console.log(`Daily Process: Processing for ${yesterdayStr}...`);
+
+                // 4. Check Holiday
+                // Note: Ideally query collection(db, "holidays") where date == yesterdayStr
+                const holidaysQ = query(collection(db, "holidays"), where("date", "==", yesterdayStr));
+                const holidaySnap = await getDocs(holidaysQ);
+
+                const dayOfWeek = yesterday.getDay(); // 0=Sun, 6=Sat
+                if (!holidaySnap.empty || dayOfWeek === 0 || dayOfWeek === 6) {
+                    console.log(`Daily Process: ${yesterdayStr} is Holiday/Weekend. Marking done.`);
+                    await updateDoc(statusRef, { [yesterdayStr]: true }); // Mark as skipped/done
+                    return;
+                }
+
+                // 5. Run Logic: Find Missing Records
+                const prefectsSnap = await getDocs(collection(db, "prefects"));
+                // Fetch attendance for yesterday
+                const attQ = query(collection(db, "attendance"), where("date", "==", yesterdayStr));
+                const attSnap = await getDocs(attQ);
+
+                const presentIds = new Set();
+                attSnap.forEach(d => presentIds.add(d.data().prefect_id));
+
+                const batch = writeBatch(db);
+                let opsCount = 0;
+
+                prefectsSnap.forEach(docSnap => {
+                    const pid = docSnap.id;
+                    if (!presentIds.has(pid)) {
+                        // Found Missing Prefect -> Deduct 5
+                        const prefRef = doc(db, "prefects", pid);
+                        batch.update(prefRef, { total_points: increment(-5) });
+
+                        const pointsRef = doc(collection(db, "points"));
+                        batch.set(pointsRef, {
+                            prefect_id: pid,
+                            points: -5,
+                            reason: `Absent (No Record) Auto-Process (${yesterdayStr})`,
+                            date: yesterdayStr,
+                            timestamp: serverTimestamp()
+                        });
+
+                        // Optional: Create Absent Record
+                        // const attRef = doc(collection(db, "attendance"));
+                        // batch.set(attRef, { ... });
+
+                        opsCount++;
+                    }
+                });
+
+                if (opsCount > 0) {
+                    await batch.commit();
+                    console.log(`Daily Process: Deducted points for ${opsCount} missing prefects.`);
+                } else {
+                    console.log("Daily Process: Everyone present! (Or no prefects found)");
+                }
+
+                // 6. Mark Complete
+                // If doc doesn't exist, set it; else update
+                if (!statusSnap.exists()) {
+                    await setDoc(statusRef, { [yesterdayStr]: true });
+                } else {
+                    await updateDoc(statusRef, { [yesterdayStr]: true });
+                }
+
+                // Show notification to Admin
+                alert(`System Alert: Daily penalties for ${yesterdayStr} processed successfully.`);
+
+            } catch (err) {
+                console.error("Daily Process Error:", err);
+            }
+        }
+
+        async function verifyAdminStatus(uid) {
+            // Quick check against collections
+            // Note: This relies on security rules allowing reads.
+            // Simplified check: Just try to read an admin-only path or use the helper from security rules logic if possible?
+            // Client-side, we can just check existence in known admin paths.
+            try {
+                const appAdmin = await getDoc(doc(db, "hpfadminformobileapp", uid));
+                if (appAdmin.exists()) return true;
+
+                const webAdmin = await getDoc(doc(db, "web_admins", uid));
+                if (webAdmin.exists()) return true;
+
+                const superAdmin = await getDoc(doc(db, "admins", uid));
+                if (superAdmin.exists()) return true;
+
+                return false;
+            } catch (e) { return false; }
+        }
 
         // Sidebar Navigation Logic
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -2423,6 +3140,11 @@
                     targetSection.style.display = 'block';
                     // Small delay to allow display to apply before opacity transition if we add one
                     setTimeout(() => targetSection.classList.add('active'), 10);
+                }
+
+                // Trigger Event Logic
+                if (targetId === 'events') {
+                    loadMyEvents();
                 }
 
                 // Update Header Title
@@ -2745,7 +3467,8 @@
                         const prefectId = prefectDoc.id;
 
                         // Set Global Var for PDF & other functions
-                        currentPrefectGlobal = { id: prefectId, ...prefectData };
+                        window.currentPrefectGlobal = { id: prefectId, ...prefectData };
+                        console.log("Global Profile Set:", window.currentPrefectGlobal);
 
                         // Update UI with Profile Data
                         updateProfileUI(prefectData);
@@ -2765,6 +3488,9 @@
                         initializeChat(user);
                         try { initializeFutureAbsenceForm(user); } catch (e) { console.error(e); }
 
+                        // --- TRIGGER DAILY PROCESSOR ---
+                        checkAndRunDailyAbsence(user);
+
                     } else {
                         console.log("No prefect profile found for this user.");
                     }
@@ -2783,15 +3509,36 @@
             const imageUrl = data.picture || defaultImg;
             const name = data.name || "Prefect";
             const role = data.destiny || "Member";
+            const points = data.total_points || 0;
 
             // Update Header Name/Role (Mobile & Desktop)
-            const headerName = document.getElementById('header-profile-name');
-            const headerRole = document.getElementById('header-profile-role');
+            // Note: ID was changed to 'user-name' in HTML for badge layout
+            const headerName = document.getElementById('user-name') || document.getElementById('header-profile-name');
+            const headerRole = document.getElementById('user-role') || document.getElementById('header-profile-role');
             const headerImg = document.getElementById('header-profile-img');
 
             if (headerName) headerName.textContent = name;
             if (headerRole) headerRole.textContent = role;
             if (headerImg) headerImg.src = imageUrl;
+
+            // --- BADGE SYSTEM LOGIC ---
+            const badgeContainer = document.getElementById('badge-container');
+            if (badgeContainer) {
+                let badgeHTML = '';
+                if (points >= 120) {
+                    badgeHTML = `<div class="role-badge badge-platinum" title="Platinum Tier (120+ Points)"><i class="fas fa-gem"></i> PLATINUM</div>`;
+                } else if (points >= 90) {
+                    badgeHTML = `<div class="role-badge badge-gold" title="Gold Tier (90-119 Points)"><i class="fas fa-crown"></i> GOLD</div>`;
+                } else if (points >= 80) {
+                    badgeHTML = `<div class="role-badge badge-silver" title="Silver Tier (80-89 Points)"><i class="fas fa-medal"></i> SILVER</div>`;
+                } else if (points >= 50) {
+                    badgeHTML = `<div class="role-badge badge-bronze" title="Bronze Tier (50-79 Points)"><i class="fas fa-shield-alt"></i> BRONZE</div>`;
+                } else {
+                    // Rookie: No badge or simple one
+                    // badgeHTML = `<div class="role-badge badge-rookie" title="Rookie"><i class="fas fa-user"></i></div>`;
+                }
+                badgeContainer.innerHTML = badgeHTML;
+            }
 
             // Update Welcome Card
             const welcomeName = document.getElementById('welcome-name');
@@ -3129,52 +3876,155 @@
             return isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
         }
 
-        /* --- ATTENDANCE LOGIC --- */
+        /* --- HOLIDAY MANAGEMENT --- */
+        let cachedHolidays = new Set(); // Stores "YYYY-MM-DD" strings
+        let holidaysLoaded = false;
+
+        async function loadHolidays() {
+            if (holidaysLoaded) return; // Already loaded in this session
+
+            try {
+                const q = query(collection(db, "holidays"));
+                const snapshot = await getDocs(q);
+                cachedHolidays.clear();
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.date) {
+                        cachedHolidays.add(data.date); // Add "YYYY-MM-DD" to Set
+                        console.log("Loaded holiday:", data.date, "-", data.title || "");
+                    }
+                });
+
+                holidaysLoaded = true;
+                console.log(`✅ Loaded ${cachedHolidays.size} holidays`);
+            } catch (e) {
+                console.error("Error loading holidays:", e);
+                // Continue even if holidays fail to load
+            }
+        }
+
+        /* --- UPDATED: FETCH RECENT ATTENDANCE WITH MISSING DAYS --- */
         async function fetchRecentAttendance(prefectId) {
             const attendanceList = document.getElementById('recent-attendance-list');
             if (!attendanceList) return;
 
             try {
-                // Removed orderBy to prevent index error
-                const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), limit(20));
+                // 0. Load holidays first (cached after first load)
+                await loadHolidays();
+
+                // 1. Database එකෙන් දැනට ඇති Records ලබා ගැනීම (Present & Absent with Reason)
+                const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), limit(30));
                 const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
+
+                let realRecords = [];
+                // Database records වල දින (Dates) ටික වෙනම Set එකකට ගන්නවා පහසුවෙන් check කරන්න
+                const existingDates = new Set();
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    realRecords.push(data);
+
+                    // Date Format එක YYYY-MM-DD ලෙස සකසා ගැනීම
+                    let dateStr = "";
+                    if (data.date && data.date.seconds) {
+                        dateStr = new Date(data.date.seconds * 1000).toISOString().split('T')[0];
+                    } else if (typeof data.date === 'string') {
+                        dateStr = data.date;
+                    }
+                    if (dateStr) existingDates.add(dateStr);
+                });
+
+                // 2. පසුගිය දින 14 තුළ රෙකෝඩ් නැති දින සොයා ගැනීම (Auto-detect Missing Absences)
+                let missingRecords = [];
+                const today = new Date();
+
+                // දින 14ක් ආපස්සට පරීක්ෂා කිරීම
+                for (let i = 0; i < 14; i++) {
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+
+                    // සති අන්ත (Saturday=6, Sunday=0) මග හැරීම
+                    const dayNum = d.getDay();
+                    if (dayNum === 0 || dayNum === 6) continue;
+
+                    const checkDateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                    // ✨ NEW: Holidays මග හැරීම (School නොපැවැති දවස්)
+                    if (cachedHolidays.has(checkDateStr)) {
+                        console.log(`⏭️ Skipping holiday: ${checkDateStr}`);
+                        continue;
+                    }
+
+                    // අද දවස හෝ ඊට කලින් දවසක record එකක් නැත්නම්, එය Absent ලෙස සලකන්න
+                    // (අද දවස තාම ඉවර නැති නිසා, අද දවස මගහැරීමට අවශ්‍ය නම් i=1 ලෙස පටන් ගන්න)
+                    if (!existingDates.has(checkDateStr)) {
+
+                        // අද දවස තාම ඉවර නෑ, ඒ නිසා අද දවස "Missing" කියල පෙන්නන්න එපා (Optional Logic)
+                        // ඔබට අද දවසත් Absent ලෙස පෙන්නන්න ඕන නම් පහත if එක අයින් කරන්න.
+                        if (i === 0) continue;
+
+                        missingRecords.push({
+                            date: checkDateStr,
+                            status: 'Absent',
+                            time_in: null,
+                            reason: 'No reason submitted (Auto)',
+                            is_missing: true // මේක අපේ හඳුනාගැනීම සඳහා
+                        });
+                    }
+                }
+
+                // 3. Real Records සහ Missing Records එකතු කිරීම
+                let allRecords = [...realRecords, ...missingRecords];
+
+                // දින අනුව අනුපිළිවෙලට සැකසීම (Newest First)
+                allRecords.sort((a, b) => {
+                    const dateA = a.date && a.date.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
+                    const dateB = b.date && b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date);
+                    return dateB - dateA;
+                });
+
+                if (allRecords.length === 0) {
                     attendanceList.innerHTML = '<p class="text-muted">No recent attendance records.</p>';
                     return;
                 }
 
-                let records = [];
-                querySnapshot.forEach(doc => records.push(doc.data()));
-
-                // Client-side sort
-                records.sort((a, b) => {
-                    // Handle string dates or timestamp objects
-                    const dateA = a.date?.seconds ? a.date.seconds : new Date(a.date).getTime() / 1000;
-                    const dateB = b.date?.seconds ? b.date.seconds : new Date(b.date).getTime() / 1000;
-                    return dateB - dateA;
-                });
-
+                // 4. UI එක Render කිරීම
                 let html = '<div class="attendance-list-container">';
-                records.forEach(record => {
+
+                allRecords.forEach(record => {
                     let statusClass = 'neutral';
                     let iconClass = 'fa-circle';
                     let statusText = record.status || 'N/A';
                     const statusLower = (record.status || '').toLowerCase();
 
-                    if (statusLower === 'present') {
+                    // Reason එකක් නැති Absent එකක් නම් විශේෂ පාටකින් පෙන්වීම
+                    if (record.is_missing) {
+                        statusClass = 'absent'; // රතු පාට
+                        iconClass = 'fa-question-circle'; // Question mark icon
+                        statusText = 'ABSENT (NO REASON)';
+                    }
+                    else if (statusLower === 'present') {
                         statusClass = 'present';
                         iconClass = 'fa-check-circle';
                     } else if (statusLower === 'late') {
                         statusClass = 'late';
-                        iconClass = 'fa-clock'; // or fa-business-time
+                        iconClass = 'fa-clock';
                     } else if (statusLower === 'absent') {
                         statusClass = 'absent';
                         iconClass = 'fa-times-circle';
                     }
 
-                    // Format Time (if available) - Assuming time_in is a string like "07:30 AM" or timestamp
+                    // වේලාව හෝ හේතුව පෙන්වීම
                     let timeDisplay = record.time_in || '';
-                    if (!timeDisplay && statusLower === 'absent') timeDisplay = record.reason || 'No reason';
+                    if (!timeDisplay) {
+                        if (record.is_missing) timeDisplay = "Record not found";
+                        else if (statusLower === 'absent') timeDisplay = record.reason || 'No reason';
+                    }
+
+                    // දිනය Format කිරීම (Display සඳහා)
+                    const dateObj = record.date && record.date.seconds ? new Date(record.date.seconds * 1000) : new Date(record.date);
+                    const dateDisplay = dateObj.toLocaleDateString();
 
                     html += `
                     <div class="attendance-card-item ${statusClass}">
@@ -3183,7 +4033,7 @@
                                 <i class="fas ${iconClass}"></i>
                             </div>
                             <div>
-                                <span class="attendance-date-text">${formatDate(record.date)}</span>
+                                <span class="attendance-date-text">${dateDisplay}</span>
                                 <span class="attendance-time-text">${timeDisplay}</span>
                             </div>
                         </div>
@@ -3193,6 +4043,7 @@
                 });
                 html += '</div>';
                 attendanceList.innerHTML = html;
+
             } catch (e) {
                 console.error("Error fetching attendance:", e);
                 attendanceList.innerHTML = '<p class="text-error">Error loading records.</p>';
@@ -3301,56 +4152,90 @@
                 }
 
                 if (form) {
-                    form.addEventListener('submit', async (e) => {
+                    form.addEventListener('submit', (e) => {
                         e.preventDefault();
                         if (isDisabled) return;
 
-                        if (!confirm("Confirm absence reporting?")) return;
+                        // Use Premium Modal for Confirmation
+                        openModal({
+                            title: 'Confirm Submission',
+                            message: 'Are you sure you want to report this absence? 3 Points will be deducted.',
+                            type: 'confirm',
+                            confirmText: 'Yes, Report',
+                            onConfirm: async () => {
+                                // --- SUBMISSION LOGIC START ---
+                                const btn = document.getElementById('today-absence-submit-btn');
+                                const originalText = btn.innerHTML;
+                                btn.disabled = true;
+                                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-                        const btn = document.getElementById('today-absence-submit-btn');
-                        const originalText = btn.innerHTML;
-                        btn.disabled = true;
-                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                                let reason = reasonSelect.value;
+                                if (reason === 'Other') reason = reasonOther.value.trim();
 
-                        let reason = reasonSelect.value;
-                        if (reason === 'Other') reason = reasonOther.value.trim();
+                                try {
+                                    if (status === 'none') {
+                                        // Create new record
+                                        const userDoc = await getDoc(doc(db, "prefects", prefectId));
+                                        const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
 
-                        try {
-                            if (status === 'none') {
-                                // Create new record
-                                const userDoc = await getDoc(doc(db, "prefects", prefectId));
-                                const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
+                                        await addDoc(collection(db, "attendance"), {
+                                            prefect_id: prefectId,
+                                            uid: auth.currentUser.uid,
+                                            name: prefectName,
+                                            date: todayString,
+                                            time_in: null,
+                                            time_out: null,
+                                            status: "Absent",
+                                            reason: reason,
+                                            created_at: serverTimestamp()
+                                        });
 
-                                await addDoc(collection(db, "attendance"), {
-                                    prefect_id: prefectId,
-                                    uid: auth.currentUser.uid,
-                                    name: prefectName,
-                                    date: todayString,
-                                    time_in: null,
-                                    time_out: null,
-                                    status: "Absent",
-                                    reason: reason,
-                                    created_at: serverTimestamp()
-                                });
-                            } else if (status === 'absent') {
-                                // Update existing record
-                                const docId = querySnapshot.docs[0].id;
-                                await updateDoc(doc(db, "attendance", docId), {
-                                    reason: reason
-                                });
+                                        // --- NEW: DEDUCT 3 POINTS FOR ABSENCE WITH REASON ---
+                                        // Update Prefect Points
+                                        await updateDoc(doc(db, "prefects", prefectId), {
+                                            total_points: increment(-3)
+                                        });
+
+                                        // Log Points History
+                                        await addDoc(collection(db, "points"), {
+                                            prefect_id: prefectId,
+                                            points: -3,
+                                            reason: `Daily Absence: ${reason}`,
+                                            date: todayString,
+                                            timestamp: serverTimestamp()
+                                        });
+
+                                    } else if (status === 'absent') {
+                                        // Update existing record
+                                        const docId = querySnapshot.docs[0].id;
+                                        await updateDoc(doc(db, "attendance", docId), {
+                                            reason: reason
+                                        });
+                                    }
+
+                                    // Success Modal
+                                    openModal({
+                                        title: 'Success',
+                                        message: 'Your absence has been reported. 3 Points deducted.',
+                                        type: 'success',
+                                        onConfirm: async () => {
+                                            // Refresh UI
+                                            await checkForAbsenceReason(prefectId);
+                                            await fetchRecentAttendance(prefectId);
+                                            fetchKeyStats(prefectId);
+                                        }
+                                    });
+
+
+                                } catch (err) {
+                                    console.error("Error saving absence:", err);
+                                    openModal({ title: 'Error', message: 'Failed to save: ' + err.message, type: 'error' });
+                                    btn.disabled = false;
+                                    btn.innerHTML = originalText;
+                                }
+                                // --- SUBMISSION LOGIC END ---
                             }
-
-                            // Refresh UI
-                            await checkForAbsenceReason(prefectId);
-                            await fetchRecentAttendance(prefectId); // Refresh List!
-                            fetchKeyStats(prefectId);
-
-                        } catch (err) {
-                            console.error("Error saving absence:", err);
-                            alert("Error: " + err.message);
-                            btn.disabled = false;
-                            btn.innerHTML = originalText;
-                        }
+                        });
                     });
                 }
 
@@ -4255,6 +5140,894 @@ This record is generated automatically and serves as a proof of their standing w
     </div>
 
     <!-- Scirpts End -->
+    <!-- PREMIUM MODAL SYSTEM -->
+    <div id="premium-modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease;">
+        <div id="premium-modal-card"
+            style="background: white; width: 90%; max-width: 400px; border-radius: 24px; padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; position: relative; overflow: hidden;">
+            <div id="modal-accent-bar"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, #8C1C13, #D4AF37);">
+            </div>
+
+            <div id="modal-icon-container"
+                style="width: 70px; height: 70px; margin: 0 auto 1.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                <!-- Icon injected by JS -->
+            </div>
+
+            <h3 id="modal-title"
+                style="margin: 0 0 0.5rem; font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #333;">Title
+            </h3>
+            <p id="modal-message" style="margin: 0 0 2rem; color: #666; line-height: 1.5;">Message goes here.</p>
+
+            <div id="modal-actions" style="display: flex; gap: 1rem; justify-content: center;">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- ADMIN TRIGGER BUTTONS (Hidden) -->
+
+    <script>
+        /* --- PREMIUM MODAL LOGIC --- */
+        const modalOverlay = document.getElementById('premium-modal-overlay');
+        const modalCard = document.getElementById('premium-modal-card');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalIconContainer = document.getElementById('modal-icon-container');
+        const modalActions = document.getElementById('modal-actions');
+
+        function openModal({ title, message, type = 'info', onConfirm, onCancel, confirmText = 'OK', cancelText = 'Cancel' }) {
+            // Setup Content
+            modalTitle.innerText = title;
+            modalMessage.innerHTML = message; // Allow HTML
+
+            // Setup Icon & Colors
+            let iconClass = '';
+            let iconColor = '';
+            let iconBg = '';
+
+            if (type === 'success') {
+                iconClass = 'fa-check';
+                iconColor = '#4CAF50';
+                iconBg = '#E8F5E9';
+            } else if (type === 'error') {
+                iconClass = 'fa-times';
+                iconColor = '#F44336';
+                iconBg = '#FFEBEE';
+            } else if (type === 'warning' || type === 'confirm') {
+                iconClass = 'fa-exclamation';
+                iconColor = '#FFC107';
+                iconBg = '#FFF8E1';
+            } else {
+                iconClass = 'fa-info';
+                iconColor = '#2196F3';
+                iconBg = '#E3F2FD';
+            }
+
+            modalIconContainer.innerHTML = `<i class="fas ${iconClass}" style="color: ${iconColor};"></i>`;
+            modalIconContainer.style.background = iconBg;
+
+            // Setup Buttons
+            modalActions.innerHTML = '';
+
+            if (type === 'confirm') {
+                // Cancel Button
+                const btnCancel = document.createElement('button');
+                btnCancel.innerText = cancelText;
+                btnCancel.style.cssText = `border: none; background: #f5f5f5; color: #666; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; transition: 0.2s;`;
+                btnCancel.onmouseover = () => btnCancel.style.background = '#e0e0e0';
+                btnCancel.onmouseout = () => btnCancel.style.background = '#f5f5f5';
+                btnCancel.onclick = () => { closeModal(); if (onCancel) onCancel(); };
+                modalActions.appendChild(btnCancel);
+
+                // Confirm Button
+                const btnConfirm = document.createElement('button');
+                btnConfirm.innerText = confirmText;
+                btnConfirm.style.cssText = `border: none; background: linear-gradient(135deg, #8C1C13, #720e0e); color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(140, 28, 19, 0.3); transition: 0.2s;`;
+                btnConfirm.onmouseover = () => btnConfirm.style.transform = 'translateY(-2px)';
+                btnConfirm.onmouseout = () => btnConfirm.style.transform = 'translateY(0)';
+                btnConfirm.onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+                modalActions.appendChild(btnConfirm);
+            } else {
+                // OK Button (Alert)
+                const btnOk = document.createElement('button');
+                btnOk.innerText = confirmText;
+                btnOk.style.cssText = `border: none; background: linear-gradient(135deg, #8C1C13, #720e0e); color: white; padding: 12px 30px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; width: 100%; box-shadow: 0 4px 15px rgba(140, 28, 19, 0.3);`;
+                btnOk.onclick = () => { closeModal(); if (onConfirm) onConfirm(); };
+                modalActions.appendChild(btnOk);
+            }
+
+            // Show Animation
+            modalOverlay.style.display = 'flex';
+            // Trigger reflow
+            void modalOverlay.offsetWidth;
+            modalOverlay.style.opacity = '1';
+            modalCard.style.transform = 'scale(1)';
+        }
+
+        function closeModal() {
+            modalOverlay.style.opacity = '0';
+            modalCard.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+            }, 300);
+        }
+
+
+
+        /* --- AUTOMATED ADMIN TRIGGERS --- */
+        // Runs on dashboard load to check for missed deductions
+        async function runAdminAutomations() {
+            if (!window.currentPrefectGlobal) return;
+
+            // SECURITY: Only run this context if user is Head or Deputy (Admin)
+            const role = (window.currentPrefectGlobal.appointment || "").toLowerCase();
+            const isAdmin = role.includes("head") || role.includes("deputy") || role.includes("senior");
+
+            // If permissions fail, we just stop silently (to avoid console red errors for normal users)
+            // But since current User is likely just testing, let's just abort if role is generic.
+            // Actually, best way: Try/Catch the first admin op.
+
+            console.log("Checking Automations (Role: " + role + ")...");
+            if (!isAdmin) {
+                // console.log("Skipping admin tasks (insufficient role)");
+                return;
+            }
+
+            console.log("Running Admin Automations...");
+
+            // 1. EVENT FINALIZATION (Check past events that are not finalized)
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const q = query(collection(db, "events"), where("date", "<", today), where("finalized", "==", false));
+                const snap = await getDocs(q);
+
+                snap.forEach(async (eventDoc) => {
+                    const evt = eventDoc.data();
+                    console.log("Finalizing Event:", evt.title);
+
+                    // Deduct points for non-attendees
+                    // A. Get Target Grades
+                    const targetGrades = evt.target_grades || [];
+                    if (targetGrades.length === 0) return; // No targets, safe skip
+
+                    // B. Get All Prefects in those grades
+                    // Note: Firestore 'in' query works up to 10 items.
+                    // Doing client side filter for simplicity if array mismatch or simple loop
+                    // Prefect 'class' e.g. "12-A" -> startsWith grade
+
+                    const allPrefectsSnap = await getDocs(collection(db, "prefects"));
+                    const targetPrefects = [];
+                    allPrefectsSnap.forEach(p => {
+                        const pData = p.data();
+                        const grade = (pData.class || "").split("-")[0]; // "13-A" -> "13"
+                        if (targetGrades.includes(grade)) targetPrefects.push({ id: p.id, ...pData });
+                    });
+
+                    // C. Get Attendees
+                    const attQ = query(collection(db, "event_attendance"), where("eventId", "==", eventDoc.id));
+                    const attSnap = await getDocs(attQ);
+                    const attendeeIds = attSnap.docs.map(d => d.data().prefectId);
+
+                    // C2. Check if event date is a holiday
+                    const eventDateStr = evt.date;
+                    const holidayQ = query(collection(db, "holidays"), where("date", "==", eventDateStr));
+                    const holidaySnap = await getDocs(holidayQ);
+                    const isHoliday = !holidaySnap.empty;
+
+                    if (isHoliday) {
+                        console.log(`Skipping ${evt.title} - Holiday on ${eventDateStr}`);
+                        await updateDoc(doc(db, "events", eventDoc.id), { finalized: true });
+                        return; // Skip penalty for holidays
+                    }
+
+                    // D. Find Absentees and Deduct (-5 points always)
+                    const batch = writeBatch(db);
+                    let ops = 0;
+
+                    targetPrefects.forEach(p => {
+                        if (!attendeeIds.includes(p.id)) {
+                            // Always -5 points for event absence
+                            const pRef = doc(db, "prefects", p.id);
+                            batch.update(pRef, { total_points: increment(-5) });
+
+                            const pointRef = doc(collection(db, "points"));
+                            batch.set(pointRef, {
+                                prefect_id: p.id,
+                                points: -5,
+                                reason: `Missed Event: ${evt.title}`,
+                                date: new Date().toISOString().split('T')[0],
+                                timestamp: serverTimestamp()
+                            });
+                            ops++;
+                        }
+                    });
+
+                    // Update Event to Finalized
+                    batch.update(doc(db, "events", eventDoc.id), { finalized: true });
+
+                    if (ops > 0) {
+                        await batch.commit();
+                        console.log(`Finalized ${evt.title}: Deducted points from ${ops} absentees.`);
+                        openModal({ title: "System Update", message: `System automatically processed '${evt.title}' and deducted points from ${ops} absent prefects.`, type: "info" });
+                    } else {
+                        // Just mark finalized if no deductions needed
+                        await updateDoc(doc(db, "events", eventDoc.id), { finalized: true });
+                    }
+                });
+            } catch (e) {
+                console.error("Automation Error (Events):", e);
+            }
+
+            // 2. DAILY ABSENCE CHECK (Similar logic, check if 'daily_process_YYYY-MM-DD' doc exists)
+            try {
+                const todayStr = new Date().toISOString().split('T')[0];
+                const processRef = doc(db, "system_logs", `absence_process_${todayStr}`);
+                const processSnap = await getDoc(processRef);
+
+                if (!processSnap.exists()) {
+                    // Check if it's past 8:00 AM (e.g.)
+                    const hour = new Date().getHours();
+                    if (hour >= 10) { // Run after 10 AM
+                        console.log("Running Daily Absence Process...");
+
+                        // Get all attendance for today
+                        const attQ = query(collection(db, "attendance"), where("date", "==", todayStr));
+
+                        // Get all Absence Requests/Reasons for today
+                        // (Assuming collection is 'future_absences' and has 'date' field)
+                        const reasonQ = query(collection(db, "future_absences"), where("date", "==", todayStr));
+
+                        const [attSnap, reasonSnap, allPrefectsSnap] = await Promise.all([
+                            getDocs(attQ),
+                            getDocs(reasonQ),
+                            getDocs(collection(db, "prefects")) // This might be heavy, but okay for Admin script
+                        ]);
+
+                        const presentIds = new Set(attSnap.docs.map(d => d.data().prefect_id));
+                        const reasonsMap = {}; // { prefectId: "Reason string" }
+                        reasonSnap.forEach(doc => {
+                            const data = doc.data();
+                            reasonsMap[data.prefect_id] = data.reason || "Reason Submitted";
+                        });
+
+                        const batch = writeBatch(db);
+                        let absents = 0;
+
+                        allPrefectsSnap.forEach(p => {
+                            if (!presentIds.has(p.id)) {
+                                const reason = reasonsMap[p.id];
+                                let deduction = -5;
+                                let logReason = "Daily Absence (No Reason)";
+
+                                if (reason) {
+                                    deduction = -3;
+                                    logReason = `Absent: ${reason}`;
+                                }
+
+                                // Deduct Points
+                                const pRef = doc(db, "prefects", p.id);
+                                batch.update(pRef, { total_points: increment(deduction) });
+
+                                const pointRef = doc(collection(db, "points"));
+                                batch.set(pointRef, {
+                                    prefect_id: p.id,
+                                    points: deduction,
+                                    reason: logReason,
+                                    date: todayStr,
+                                    timestamp: serverTimestamp()
+                                });
+
+                                absents++;
+                            }
+                        });
+
+                        // Save process log
+                        batch.set(processRef, { processed_at: serverTimestamp(), absent_count: absents });
+
+                        if (absents > 0) {
+                            await batch.commit();
+                            openModal({ title: "Daily Attendance", message: `System processed daily attendance. ${absents} prefects marked absent (-5 pts).`, type: "info" });
+                        } else {
+                            await setDoc(processRef, { processed_at: serverTimestamp(), absent_count: 0 });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Automation Error (Daily):", e);
+            }
+        }
+
+        // Hook into auth listener or load
+        setTimeout(runAdminAutomations, 5000); // Delay to ensure auth/prefectGlobal
+
+
+        // --- 3. RETROACTIVE POINTS APPLICATION ---
+        async function applyRetroactivePoints() {
+            if (!confirm("මෙය 2026-01-05 සිට අද දක්වා ඇති සියලු past event absences වලට නව penalty system එක apply කරයි. Continue?")) {
+                return;
+            }
+
+            const startDate = "2026-01-05";
+            const today = new Date().toISOString().split('T')[0];
+
+            try {
+                openModal({
+                    title: "Processing...",
+                    message: "Retroactively applying penalties. මේක minutes කීපයක් ගතවෙන්න පුළුවන්...",
+                    type: "info"
+                });
+
+                const eventsQ = query(collection(db, "events"), where("date", ">=", startDate), where("date", "<=", today), orderBy("date"));
+                const eventsSnap = await getDocs(eventsQ);
+
+                let totalProcessed = 0;
+                let totalPenalties = 0;
+
+                for (const eventDoc of eventsSnap.docs) {
+                    const evt = eventDoc.data();
+                    const targetGrades = evt.target_grades || [];
+                    if (targetGrades.length === 0) continue;
+
+                    const eventDateStr = evt.date;
+                    const holidayQ = query(collection(db, "holidays"), where("date", "==", eventDateStr));
+                    const holidaySnap = await getDocs(holidayQ);
+                    if (!holidaySnap.empty) continue;
+
+                    const allPrefectsSnap = await getDocs(collection(db, "prefects"));
+                    const targetPrefects = [];
+                    allPrefectsSnap.forEach(p => {
+                        const grade = (p.data().class || "").split("-")[0];
+                        if (targetGrades.includes(grade)) targetPrefects.push({ id: p.id, ...p.data() });
+                    });
+
+                    const attQ = query(collection(db, "event_attendance"), where("eventId", "==", eventDoc.id));
+                    const attSnap = await getDocs(attQ);
+                    const attendeeIds = new Set(attSnap.docs.map(d => d.data().prefectId));
+
+                    const reasonsQ = query(collection(db, "absence_reasons"), where("date", "==", eventDateStr));
+                    const reasonsSnap = await getDocs(reasonsQ);
+                    const reasonsMap = {};
+                    reasonsSnap.forEach(r => reasonsMap[r.data().prefect_id] = r.data().reason || "Reason submitted");
+
+                    const batch = writeBatch(db);
+                    let batchCount = 0;
+
+                    for (const p of targetPrefects) {
+                        if (!attendeeIds.has(p.id)) {
+                            const existingQ = query(collection(db, "points"), where("prefect_id", "==", p.id), where("date", "==", eventDateStr), where("reason", ">=", `Missed Event: ${evt.title}`), where("reason", "<=", `Missed Event: ${evt.title}\uf8ff`));
+                            const existingSnap = await getDocs(existingQ);
+                            if (!existingSnap.empty) continue;
+
+                            const hasReason = reasonsMap[p.id];
+                            const penalty = hasReason ? -3 : -5;
+                            const reasonText = hasReason ? `Missed Event: ${evt.title} (${reasonsMap[p.id]})` : `Missed Event: ${evt.title} (No Reason)`;
+
+                            batch.update(doc(db, "prefects", p.id), { total_points: increment(penalty) });
+                            batch.set(doc(collection(db, "points")), { prefect_id: p.id, points: penalty, reason: reasonText, date: eventDateStr, timestamp: serverTimestamp(), retroactive: true });
+                            batchCount++; totalPenalties++;
+
+                            if (batchCount >= 400) { await batch.commit(); batchCount = 0; }
+                        }
+                    }
+                    if (batchCount > 0) await batch.commit();
+                    totalProcessed++;
+                }
+
+                openModal({ title: "සම්පූර්ණයි!", message: `✅ Processed ${totalProcessed} events\n✅ Applied ${totalPenalties} penalties`, type: "success" });
+            } catch (error) {
+                console.error(error);
+                openModal({ title: "Error", message: "Failed: " + error.message, type: "error" });
+            }
+        }
+        window.applyRetroactivePoints = applyRetroactivePoints;
+
+
+        // --- OVERRIDE NATIVE CALLS (Optional, but safer to call explicitly) ---
+        // window.alert = (msg) => openModal({title: 'Alert', message: msg });
+
+        /* --- DEVELOPER TOOLS (Reset Data) --- */
+        async function resetTodayData() {
+            openModal({
+                title: 'Reset Today\'s Data?',
+
+                message: 'This will set all attendance records for TODAY to <b>Present</b> and remove any "Late" or "Absent" statuses.<br><br><b>Are you sure?</b>',
+                type: 'confirm',
+                confirmText: 'Yes, Fix Data',
+                onConfirm: async () => {
+                    const btn = document.getElementById('reset-data-btn');
+                    if (btn) {
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
+                        btn.disabled = true;
+                    }
+
+                    try {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                        const day = String(now.getDate()).padStart(2, '0');
+                        const todayString = `${year}-${month}-${day}`;
+
+                        // Query all records for today
+                        const q = query(collection(db, "attendance"), where("date", "==", todayString));
+                        const snapshot = await getDocs(q);
+
+                        if (snapshot.empty) {
+                            openModal({ title: 'No Records', message: 'No attendance records found for today to fix.', type: 'info' });
+                            if (btn) { btn.innerHTML = '<i class="fas fa-magic"></i> Fix Data (Demo)'; btn.disabled = false; }
+                            return;
+                        }
+
+                        const updatePromises = snapshot.docs.map(docSnap =>
+                            updateDoc(doc(db, "attendance", docSnap.id), {
+                                status: "Present",
+                                reason: null,
+                                time_in: docSnap.data().time_in || "07:00 AM"
+                            })
+                        );
+
+                        await Promise.all(updatePromises);
+
+                        openModal({ title: 'Success', message: `Fixed ${snapshot.size} records. Reloading...`, type: 'success' });
+                        setTimeout(() => location.reload(), 1500);
+
+                    } catch (e) {
+                        console.error(e);
+                        openModal({ title: 'Error', message: e.message, type: 'error' });
+                        if (btn) {
+                            btn.innerHTML = '<i class="fas fa-magic"></i> Fix Data (Demo)';
+                            btn.disabled = false;
+                        }
+                    }
+                }
+            });
+        }
+        window.resetTodayData = resetTodayData;
+
+        // --- NEW: SPLIT EVENT LOGIC (History vs All) ---
+        // --- RENDER EVENTS ---
+
+        window.loadMyEvents = async () => {
+            const historyBody = document.getElementById('my-event-history-body');
+            const allEventsList = document.getElementById('all-events-list');
+
+            if (!window.currentPrefectGlobal) return;
+
+            // -- PART A: MY HISTORY (Attendance + Absences + Penalties) --
+            try {
+                // 1. Fetch Data Parallelly
+                const [eventsSnap, attSnap, pointsSnap, reasonSnap, dailySnap] = await Promise.all([
+                    getDocs(query(collection(db, "events"), orderBy("date", "desc"))),
+                    getDocs(query(collection(db, "event_attendance"), where("prefectId", "==", window.currentPrefectGlobal.id))),
+                    getDocs(query(collection(db, "points"), where("prefect_id", "==", window.currentPrefectGlobal.id))),
+                    getDocs(query(collection(db, "future_absences"), where("prefect_id", "==", window.currentPrefectGlobal.id))),
+                    getDocs(query(collection(db, "attendance"), where("prefect_id", "==", window.currentPrefectGlobal.id)))
+                ]);
+
+                // 2. Prepare Data Sets
+                const myAttendanceIds = new Set(attSnap.docs.map(d => d.data().eventId));
+                const myPoints = pointsSnap.docs.map(d => d.data());
+                const myReasons = {}; // DateString -> Reason
+                reasonSnap.forEach(d => { const data = d.data(); if (data.date) myReasons[data.date] = data.reason; });
+                const myDaily = dailySnap.docs.map(d => d.data());
+
+                const combinedHistory = [];
+                const userClass = window.currentPrefectGlobal.class || ""; // "13-B"
+                const userGrade = userClass.split("-")[0]; // "13"
+
+
+                // 3a. Process Daily Attendance (Morning Check-in)
+                // COMMENTED OUT: Daily attendance should not appear in Event History
+                /*
+                myDaily.forEach(d => {
+                    const statusVal = (d.status || "").toLowerCase();
+                    let displayStatus = "PRESENT";
+                    let rowType = "present";
+
+                    if (statusVal === "late" || (d.in_time && d.in_time > "07:30")) {
+                        displayStatus = "LATE";
+                        rowType = "late";
+                    }
+
+                    combinedHistory.push({
+                        title: "Daily Attendance",
+                        date: d.date,
+                        time: d.in_time || "-",
+                        status: displayStatus,
+                        type: rowType,
+                        timestamp: d.timestamp ? d.timestamp.toDate() : new Date(d.date)
+                    });
+                });
+                */
+
+
+                // 3b. Process Events (Determine Presence/Absence)
+                eventsSnap.forEach(doc => {
+                    const evt = doc.data();
+                    const evtId = doc.id;
+                    const evtDateStr = evt.date; // "YYYY-MM-DD"
+                    const evtDate = new Date(evt.date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    // Skip Future Events for History
+                    if (evtDate >= today) return;
+
+                    const isAudience = !evt.target_grades || evt.target_grades.length === 0 || evt.target_grades.includes(userGrade);
+
+                    if (isAudience) {
+                        if (myAttendanceIds.has(evtId)) {
+                            // Present
+                            combinedHistory.push({
+                                title: evt.title,
+                                date: evt.date,
+                                time: evt.time || "-",
+                                status: "VERIFIED",
+                                type: "present",
+                                timestamp: evtDate
+                            });
+                        } else {
+                            // Absent (Calculated)
+                            const reasonForDate = myReasons[evtDateStr];
+                            const subTextMsg = reasonForDate ? `Reason: ${reasonForDate}` : "No Reason Submitted";
+
+                            combinedHistory.push({
+                                title: evt.title,
+                                date: evt.date,
+                                time: "-",
+                                status: "ABSENT",
+                                type: "absent",
+                                details: subTextMsg,
+                                points: -5,
+                                timestamp: evtDate
+                            });
+                        }
+                    }
+                });
+
+                // 4. Process Other Penalties (Daily Absence, Manual Deductions)
+                const pointDates = new Set();
+                myPoints.forEach(p => {
+                    // Filter out "Missed Event" records if they match our calculated absences to avoid duplicates
+                    if (p.reason && p.reason.includes("Missed Event")) return;
+
+                    if (p.points < 0) {
+                        pointDates.add(p.date);
+
+                        // Detect if this is an Absence record (Daily or otherwise)
+                        const isAbsence = p.reason && (p.reason.includes("Daily Absence") || p.reason.includes("Absent:"));
+
+                        combinedHistory.push({
+                            title: p.reason || "Manual Penalty",
+                            date: p.date,
+                            time: "-",
+                            status: isAbsence ? "ABSENT" : "DEDUCTION",
+                            type: isAbsence ? "absent" : "penalty",
+                            details: isAbsence ? p.reason : null,
+                            points: p.points,
+                            timestamp: p.timestamp ? p.timestamp.toDate() : new Date(p.date)
+                        });
+                    }
+                });
+
+                // 4b. Process Standalone Absence Requests (No Event, No Points yet)
+                Object.keys(myReasons).forEach(dateStr => {
+                    // If we haven't already shown an Event, Attendance, or Point for this date
+                    const hasEvent = eventsSnap.docs.some(d => d.data().date === dateStr);
+                    const hasAttendance = myDaily.some(d => d.date === dateStr);
+                    const hasPoint = pointDates.has(dateStr);
+
+                    if (!hasEvent && !hasAttendance && !hasPoint) {
+                        combinedHistory.push({
+                            title: "Absence Request",
+                            date: dateStr,
+                            time: "-",
+                            status: "PENDING",
+                            type: "absent",
+                            details: `Reason: ${myReasons[dateStr]}`,
+                            points: 0, // No deduction processed yet
+                            timestamp: new Date(dateStr)
+                        });
+                    }
+                });
+
+                // 5. Sort
+                combinedHistory.sort((a, b) => b.timestamp - a.timestamp);
+
+                if (combinedHistory.length === 0) {
+                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:2rem; color:#888;">No history records found.</td></tr>';
+                } else {
+                    let hRows = "";
+                    combinedHistory.forEach(item => {
+                        const dateStr = item.date ? new Date(item.date).toLocaleDateString() : 'N/A';
+
+                        // Styles
+                        let rowBg = '#fff';
+                        let statusStyle = '';
+                        let titleColor = '#334155';
+                        let subText = '';
+
+                        if (item.type === 'present') {
+                            statusStyle = `background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
+                        } else if (item.type === 'late') {
+                            statusStyle = `background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
+                        } else if (item.type === 'absent') {
+                            rowBg = '#fef2f2';
+                            statusStyle = `background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border:1px solid #fecaca;`;
+                            titleColor = '#b91c1c';
+                            subText = `<div style="font-size:0.75rem; color:#ef4444;">${item.details} (-5 Pts)</div>`;
+                        } else if (item.type === 'penalty') {
+                            rowBg = '#fff1f2';
+                            statusStyle = `background: #ffe4e6; color: #be123c; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
+                            subText = `<div style="font-size:0.75rem; color:#e11d48;">${item.points} Points</div>`;
+                        }
+
+                        hRows += `
+                <tr style="border-bottom: 1px solid #f1f5f9; background: ${rowBg};">
+                    <td style="padding: 1rem; font-weight: 600; color: ${titleColor};">
+                        ${item.title}
+                        ${subText}
+                    </td>
+                    <td style="padding: 1rem; color: var(--gray-600); font-size: 0.9rem;">${dateStr}</td>
+                    <td style="padding: 1rem; font-family: monospace; color: var(--primary-600);">${item.time}</td>
+                    <td style="padding: 1rem;">
+                        <span style="${statusStyle}">${item.status}</span>
+                    </td>
+                </tr>`;
+                    });
+                    historyBody.innerHTML = hRows;
+                }
+
+            } catch (e) {
+                console.error("History Error:", e);
+                let errorMsg = e.message;
+                if (e.message.includes("index")) {
+                    errorMsg = '<b>MISSING INDEX</b><br>Check Console for link.';
+                }
+                historyBody.innerHTML = `<tr><td colspan="4" style="padding:1rem; color:red; text-align:center;">Load Failed: ${errorMsg}</td></tr>`;
+            }
+
+
+            /* const [attSnap, pointsSnap] = await Promise.all([getDocs(qAttendance), getDocs(qPoints)]);
+    
+            const combinedHistory = [];
+    
+            // Process Attendance
+            attSnap.forEach(doc => {
+                const data = doc.data();
+                combinedHistory.push({
+                    type: 'present',
+                    title: data.eventTitle || "Unknown Event",
+                    date: data.date,
+                    time: data.time || "-",
+                    timestamp: data.timestamp ? data.timestamp.toDate() : new Date(data.date),
+                    status: "VERIFIED"
+                });
+            });
+    
+            // Process Absences (Negative Points)
+            pointsSnap.forEach(doc => {
+                const data = doc.data();
+                if (data.points < 0) {
+                    // Check if it's already in combinedHistory? (To avoid duplicates if we wrote both places)
+                    // For now assume points record is the source of truth for absence.
+                    combinedHistory.push({
+                        type: 'absent',
+                        title: data.reason || "Penalty / Absence", // Reason usually contains "Missed Event: ..."
+                        date: data.date,
+                        time: "-", // usually no time for absence
+                        timestamp: data.timestamp ? data.timestamp.toDate() : new Date(data.date),
+                        status: "ABSENT"
+                    });
+                }
+            });
+    
+            // Sort by Timestamp Descending
+            combinedHistory.sort((a, b) => b.timestamp - a.timestamp);
+    
+            if (combinedHistory.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:2rem; color:#888;">No attendance or absence records found.</td></tr>';
+            } else {
+                let hRows = "";
+                combinedHistory.forEach(item => {
+                    const dateStr = item.date ? new Date(item.date).toLocaleDateString() : 'N/A';
+    
+                    // Styling based on type
+                    const isAbsent = item.type === 'absent';
+                    const rowBg = isAbsent ? '#fef2f2' : 'transparent'; // Light red bg for absent? Or just text? User asked for red list.
+                    const statusStyle = isAbsent
+                        ? `background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;`
+                        : `background: #dcfce7; color: #166534;`;
+    
+                    const titleColor = isAbsent ? '#ef4444' : 'var(--gray-800)';
+    
+                    hRows += `
+                    <tr style="border-bottom: 1px solid #f1f5f9; background: ${rowBg};">
+                        <td style="padding: 1rem; font-weight: 600; color: ${titleColor};">
+                            ${item.title}
+                            ${isAbsent ? '<div style="font-size:0.75rem; color:#b91c1c; font-weight:normal;">Pt Deduction</div>' : ''}
+                        </td>
+                        <td style="padding: 1rem; color: var(--gray-600); font-size: 0.9rem;">${dateStr}</td>
+                        <td style="padding: 1rem; font-family: monospace; color: var(--primary-600);">${item.time}</td>
+                        <td style="padding: 1rem;">
+                            <span style="padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; ${statusStyle}">
+                                ${item.status}
+                            </span>
+                        </td>
+                    </tr>
+                    `;
+                });
+                historyBody.innerHTML = hRows;
+            }
+            } catch (e) {
+                console.error("History Error:", e);
+                let errorMsg = e.message;
+                if (e.message.includes("index")) {
+                    errorMsg = '<b>MISSING INDEX</b><br>Check Console for link.';
+                }
+                historyBody.innerHTML = `<tr><td colspan="4" style="padding:1rem; color:red; text-align:center;">Load Failed: ${errorMsg}</td></tr>`;
+            } */
+
+            // -- PART B: UPCOMING EVENTS & DUTY SLOTS --
+            try {
+                const qEvents = query(collection(db, "events"), orderBy("date", "desc"));
+                const eventSnap = await getDocs(qEvents);
+
+                if (eventSnap.empty) {
+                    allEventsList.innerHTML = '<p style="padding:1rem; color:#888; text-align:center;">No events found.</p>';
+                    return;
+                }
+
+                let eHtml = "";
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // Use for...of loop to handle async/await correctly
+                for (const docSnapshot of eventSnap.docs) {
+                    const evt = docSnapshot.data();
+                    const eventId = docSnapshot.id;
+                    const eDate = new Date(evt.date);
+                    const isUpcoming = eDate >= today;
+
+                    let tag = isUpcoming
+                        ? `<span style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:bold;">UPCOMING</span>`
+                        : `<span style="background:#f1f5f9; color:#64748b; padding:2px 8px; border-radius:4px; font-size:0.7rem;">PAST</span>`;
+
+                    // Duty Slots Section (Only for Upcoming)
+                    let dutiesHtml = "";
+                    if (isUpcoming) {
+                        try {
+                            const qDuties = query(collection(db, "event_duties"), where("eventId", "==", eventId));
+                            const dutySnap = await getDocs(qDuties);
+
+                            if (!dutySnap.empty) {
+                                dutiesHtml = `<div style="margin-top:1rem; background:#f8fafc; padding:0.8rem; border-radius:8px; border:1px solid #e2e8f0;">
+                                                <div style="font-size:0.75rem; font-weight:700; color:#64748b; margin-bottom:0.5rem; text-transform:uppercase;">Available Duty Slots</div>
+                                                <div style="display:flex; flex-direction:column; gap:0.5rem;">`;
+
+                                dutySnap.forEach((dDoc) => {
+                                    const duty = dDoc.data();
+                                    const assignedToName = duty.assignedPrefectName;
+                                    const assignedToId = duty.assignedPrefectId;
+                                    const isMe = assignedToId === window.currentPrefectGlobal.id;
+
+                                    let btn = "";
+                                    if (!assignedToName) {
+                                        // Open Slot
+                                        btn = `<button onclick="window.takeDuty('${dDoc.id}', '${duty.title}', '${evt.title}')" style="margin-left:auto; background:var(--primary-600); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                                                <i class="fas fa-plus"></i> Take
+                                               </button>`;
+                                    } else if (isMe) {
+                                        // My Slot
+                                        btn = `<span style="margin-left:auto; background:#dcfce7; color:#166534; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:700; border:1px solid #86efac;">
+                                                <i class="fas fa-user-check"></i> YOUR DUTY
+                                               </span>`;
+                                    } else {
+                                        // Taken Slot
+                                        btn = `<span style="margin-left:auto; color:#94a3b8; font-size:0.75rem; font-style:italic;">
+                                                <i class="fas fa-lock"></i> ${assignedToName}
+                                               </span>`;
+                                    }
+
+                                    dutiesHtml += `
+                                    <div style="display:flex; align-items:center; background:white; padding:0.5rem; border-radius:6px; border:1px solid ${isMe ? '#86efac' : '#f1f5f9'};">
+                                        <div style="font-weight:600; color:#334155; font-size:0.85rem;">${duty.title}</div>
+                                        ${btn}
+                                    </div>`;
+                                });
+                                dutiesHtml += `</div></div>`;
+                            } else {
+                                dutiesHtml = `<div style="margin-top:0.5rem; padding:0.5rem; color:#94a3b8; font-size:0.8rem; font-style:italic;">No duty slots created by admin yet.</div>`;
+                            }
+                        } catch (err) {
+                            console.error("Duty Load Error", err);
+                        }
+                    }
+
+                    eHtml += `
+                <div style="background:white; padding:1.2rem; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:0.5rem;">
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:${isUpcoming ? '0.5rem' : '0'};">
+                        <div style="flex:1;">
+                            <div style="font-weight:600; color:#334155; margin-bottom:0.2rem; font-size:1rem;">${evt.title || "No Title"} <span style="margin-left:8px;">${tag}</span></div>
+                            <div style="font-size:0.85rem; color:#64748b;"><i class="far fa-calendar-alt"></i> ${evt.date}</div>
+                        </div>
+                    </div>
+                    ${dutiesHtml}
+                </div>`;
+                }
+
+                allEventsList.innerHTML = eHtml;
+
+            } catch (e) {
+                console.error("All Events Error:", e);
+                allEventsList.innerHTML = `<p style="color:red; font-size:0.8rem; text-align:center;">List Failed: ${e.message}</p>`;
+            }
+        };
+
+        window.takeDuty = async (dutyId, dutyTitle, eventTitle) => {
+            if (!confirm(`Take responsibility for "${dutyTitle}" at ${eventTitle}?`)) return;
+
+            try {
+                const dutyRef = doc(db, "event_duties", dutyId);
+                await updateDoc(dutyRef, {
+                    assignedPrefectId: window.currentPrefectGlobal.id,
+                    assignedPrefectName: window.currentPrefectGlobal.name,
+                    status: 'assigned',
+                    updatedAt: serverTimestamp()
+                });
+
+                alert("Duty Assigned Successfully!");
+                loadMyEvents(); // Refresh list
+
+            } catch (e) {
+                console.error("Take Duty Error:", e);
+                alert("Failed to assign duty: " + e.message);
+            }
+        };
+
+        // --- MIGRATION SCRIPT (ALL PREFECTS) ---
+        window.initializeAllPrefectsPoints = async () => {
+            if (!confirm("WARNING: RESET ALL PREFECTS to 100 points? (Requires Admin Permissions)")) return;
+
+            try {
+                const batch = writeBatch(db);
+                const prefectsSnap = await getDocs(collection(db, "prefects"));
+
+                let count = 0;
+                const today = new Date().toISOString().split('T')[0];
+
+                prefectsSnap.forEach(docSnap => {
+                    const ref = doc(db, "prefects", docSnap.id);
+                    // Set to 100
+                    batch.update(ref, { total_points: 100 });
+
+                    // Add History
+                    const pRef = doc(collection(db, "points"));
+                    batch.set(pRef, {
+                        prefect_id: docSnap.id,
+                        points: 100,
+                        reason: "Initial Bonus (System Start)",
+                        date: today,
+                        timestamp: serverTimestamp()
+                    });
+
+                    count++;
+                });
+
+                await batch.commit();
+                alert(`SUCCESS: Initialized ${count} prefects.`);
+                location.reload();
+            } catch (e) {
+                console.error("Migration Failed:", e);
+                alert(`FAILED: ${e.message}\n\n(If you get 'Missing permissions', your account is not an Admin in Firestore Rules)`);
+            }
+        };
+
+
+    </script>
 </body>
 
 </html>
