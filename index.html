@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Maintenance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        img {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #8C1C13; /* Maroon branding color */
+            margin-bottom: 15px;
+        }
+        .message {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .time {
+            font-weight: bold;
+            color: #d9534f;
+            background: #fff5f5;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Using school logo.png as requested (found logoschool.png in public dir which seems closest) -->
+        <img src="logoschool.png" alt="School Logo">
+        
+        <h1>System Maintenance</h1>
+        
+        <p class="message">
+            The system is currently updating to improve performance. 
+            All services will be unavailable until:
+        </p>
+
+        <div class="time">
+            Tomorrow at 10:00 AM
+        </div>
+
+        <p class="note">
+            <strong>Don't Panic:</strong> If you see missing or incorrect data on your profile right now, 
+            it is just temporary while we update the system. Everything will be back to normal soon.
+        </p>
+    </div>
+
+</body>
+</html>
