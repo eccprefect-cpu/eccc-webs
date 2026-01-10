@@ -2772,7 +2772,7 @@
                         </div>
                         <div class="form-group">
                             <label for="profile-class-static">Class</label>
-                            <input type="text" id="profile-class-static" value="-" disabled>
+                            <input type="text" id="profile-class-static" value="-">
                         </div>
 
                         <div class="form-group">
@@ -2789,7 +2789,11 @@
                         </div>
                         <div class="form-group">
                             <label for="profile-current-duty">Current Duty</label>
-                            <input type="text" id="profile-current-duty" value="-" disabled>
+                            <input type="text" id="profile-current-duty" value="-">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-role-input">Role (Destiny)</label>
+                            <input type="text" id="profile-role-input" value="-">
                         </div>
                         <div class="form-group">
                             <label for="profile-total-points">Total Points</label>
@@ -2797,136 +2801,143 @@
                                 style="font-weight:bold; color:var(--primary-color);">
                         </div>
                     </div>
+                    <div style="margin-top: 1.5rem; text-align: right;">
+                        <button class="supiri-btn" onclick="saveProfileChanges()"
+                            style="width: auto; padding: 0.8rem 2rem;">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </div>
                 </div>
-            </section>
+        </div>
+        </section>
 
-            <script>
-                // --- NEW: POINTS HISTORY LOGIC ---
-                window.loadPointsHistory = async function () {
-                    const list = document.getElementById('recent-points-list');
-                    if (!list) return;
+        <script>
+            // --- NEW: POINTS HISTORY LOGIC ---
+            window.loadPointsHistory = async function () {
+                const list = document.getElementById('recent-points-list');
+                if (!list) return;
 
-                    list.innerHTML = '<p style="color:#888; text-align:center;"><i class="fas fa-circle-notch fa-spin"></i> Loading points...</p>';
+                list.innerHTML = '<p style="color:#888; text-align:center;"><i class="fas fa-circle-notch fa-spin"></i> Loading points...</p>';
 
-                    if (!window.currentPrefectGlobal) {
-                        setTimeout(loadPointsHistory, 1000);
-                        return;
-                    }
+                if (!window.currentPrefectGlobal) {
+                    setTimeout(loadPointsHistory, 1000);
+                    return;
+                }
 
-                    try {
-                        const q = query(collection(db, "points"), where("prefect_id", "==", window.currentPrefectGlobal.id), orderBy("timestamp", "desc"));
-                        const snap = await getDocs(q);
+                try {
+                    const q = query(collection(db, "points"), where("prefect_id", "==", window.currentPrefectGlobal.id), orderBy("timestamp", "desc"));
+                    const snap = await getDocs(q);
 
-                        if (snap.empty) {
-                            list.innerHTML = '<p style="padding:1rem; text-align:center; color:#888;">No point changes recorded yet.</p>';
-                        } else {
-                            let html = '<table style="width:100%; border-collapse:collapse;">';
-                            html += '<tr style="background:#f8f9fa; text-align:left;"><th style="padding:0.8rem;">Date</th><th style="padding:0.8rem;">Reason</th><th style="padding:0.8rem; text-align:right;">Points</th></tr>';
+                    if (snap.empty) {
+                        list.innerHTML = '<p style="padding:1rem; text-align:center; color:#888;">No point changes recorded yet.</p>';
+                    } else {
+                        let html = '<table style="width:100%; border-collapse:collapse;">';
+                        html += '<tr style="background:#f8f9fa; text-align:left;"><th style="padding:0.8rem;">Date</th><th style="padding:0.8rem;">Reason</th><th style="padding:0.8rem; text-align:right;">Points</th></tr>';
 
-                            snap.forEach(doc => {
-                                const d = doc.data();
-                                const color = d.points > 0 ? 'green' : 'red';
-                                const sign = d.points > 0 ? '+' : '';
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            const color = d.points > 0 ? 'green' : 'red';
+                            const sign = d.points > 0 ? '+' : '';
 
-                                html += `
+                            html += `
                                 <tr style="border-bottom:1px solid #eee;">
                                     <td style="padding:0.8rem; font-size:0.9rem; color:#555;">${d.date}</td>
                                     <td style="padding:0.8rem; font-weight:500;">${d.reason}</td>
                                     <td style="padding:0.8rem; text-align:right; font-weight:bold; color:${color};">${sign}${d.points}</td>
                                 </tr>
                                `;
-                            });
-                            html += '</table>';
-                            list.innerHTML = html;
-                        }
-                    } catch (e) {
-                        console.error("Points Error:", e);
-                        list.innerHTML = `<p style="color:red; text-align:center;">Error loading points: ${e.message}</p>`;
+                        });
+                        html += '</table>';
+                        list.innerHTML = html;
                     }
-                };
+                } catch (e) {
+                    console.error("Points Error:", e);
+                    list.innerHTML = `<p style="color:red; text-align:center;">Error loading points: ${e.message}</p>`;
+                }
+            };
 
-                // Add to navigation click listener
-                document.querySelectorAll('.nav-item[href="#points"]').forEach(btn => {
-                    btn.addEventListener('click', loadPointsHistory);
-                });
-            </script>
+            // Add to navigation click listener
+            document.querySelectorAll('.nav-item[href="#points"]').forEach(btn => {
+                btn.addEventListener('click', loadPointsHistory);
+            });
+        </script>
 
 
-            <section id="about" class="content-section" style="display:none;">
-                <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">About Us</h2>
+        <section id="about" class="content-section" style="display:none;">
+            <h2 style="margin-bottom: 1.5rem; font-family: var(--font-display);">About Us</h2>
 
-                <div class="card" style="margin-bottom: 2rem;">
-                    <div class="about-header" style="text-align: center; max-width: 800px; margin: 0 auto;">
-                        <h2 style="color: var(--primary-700); margin-bottom: 1rem;">About Our Mission</h2>
-                        <p style="color: var(--gray-600); line-height: 1.6;">We are a team of passionate and innovative
-                            students from Eheliyagoda Central College, brought
-                            together by a shared vision of leveraging technology to improve our school's ecosystem.</p>
-                    </div>
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="about-header" style="text-align: center; max-width: 800px; margin: 0 auto;">
+                    <h2 style="color: var(--primary-700); margin-bottom: 1rem;">About Our Mission</h2>
+                    <p style="color: var(--gray-600); line-height: 1.6;">We are a team of passionate and innovative
+                        students from Eheliyagoda Central College, brought
+                        together by a shared vision of leveraging technology to improve our school's ecosystem.</p>
                 </div>
+            </div>
 
-                <div class="about-grid">
-                    <div class="about-card">
-                        <div class="stat-icon" style="margin: 0 auto 1rem;"><i class="fas fa-rocket"></i></div>
-                        <h3>About The Project</h3>
-                        <p style="color: var(--gray-600); margin-top: 0.5rem;">Welcome to the official portal for the
-                            Eheliyagoda Central College Prefect Management
-                            System (ECCPMS). Digitzing the Prefects' Guild.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="stat-icon" style="margin: 0 auto 1rem;"><i class="fas fa-code-branch"></i></div>
-                        <h3>Project Version</h3>
-                        <p style="color: var(--gray-600); margin-top: 0.5rem;">Current Version: <strong>1.0.0</strong>.
-                            The first official release of the ECCPMS.</p>
-                    </div>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="stat-icon" style="margin: 0 auto 1rem;"><i class="fas fa-rocket"></i></div>
+                    <h3>About The Project</h3>
+                    <p style="color: var(--gray-600); margin-top: 0.5rem;">Welcome to the official portal for the
+                        Eheliyagoda Central College Prefect Management
+                        System (ECCPMS). Digitzing the Prefects' Guild.</p>
                 </div>
+                <div class="about-card">
+                    <div class="stat-icon" style="margin: 0 auto 1rem;"><i class="fas fa-code-branch"></i></div>
+                    <h3>Project Version</h3>
+                    <p style="color: var(--gray-600); margin-top: 0.5rem;">Current Version: <strong>1.0.0</strong>.
+                        The first official release of the ECCPMS.</p>
+                </div>
+            </div>
 
-                <h3 style="margin-bottom: 1.5rem;">Meet The Team</h3>
-                <div class="team-grid">
-                    <!-- Developers -->
-                    <div class="team-member">
-                        <img src="Developer Team/Adeesha.jpg" alt="Adeesha"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Adeesha Ravimal</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Backend & Desktop
-                            App</p>
-                        <p style="font-size: 0.8rem; color: var(--gray-600);">System Architect</p>
-                    </div>
-                    <div class="team-member">
-                        <img src="Developer Team/Hansaka.png" alt="Hansaka"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Hansaka Fernando</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Web & Mobile App
-                        </p>
-                        <p style="font-size: 0.8rem; color: var(--gray-600);">UI/UX Designer</p>
-                    </div>
-                    <div class="team-member">
-                        <img src="Developer Team/thevindu.JPG" alt="Thevindu"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Thevindu Thisev</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Data Collector</p>
-                        <p style="font-size: 0.8rem; color: var(--gray-600);">Database Admin</p>
-                    </div>
-                    <div class="team-member">
-                        <img src="Developer Team/Nethmi.jpg" alt="Nethmi"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Nethmi Dhananjana</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Coordinator</p>
-                    </div>
-                    <div class="team-member">
-                        <img src="Developer Team/Rashmi.jpg" alt="Rashmi"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Rashmi Jananjana</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Student Mgmt Lead
-                        </p>
-                    </div>
-                    <div class="team-member">
-                        <img src="Developer Team/Avishka.jpg" alt="Avishka"
-                            onerror="this.src='meroon Transparent logo prefect.png'">
-                        <h4>Avishka Kalhara</h4>
-                        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Media Partner</p>
-                    </div>
+            <h3 style="margin-bottom: 1.5rem;">Meet The Team</h3>
+            <div class="team-grid">
+                <!-- Developers -->
+                <div class="team-member">
+                    <img src="Developer Team/Adeesha.jpg" alt="Adeesha"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Adeesha Ravimal</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Backend & Desktop
+                        App</p>
+                    <p style="font-size: 0.8rem; color: var(--gray-600);">System Architect</p>
                 </div>
-            </section>
+                <div class="team-member">
+                    <img src="Developer Team/Hansaka.png" alt="Hansaka"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Hansaka Fernando</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Web & Mobile App
+                    </p>
+                    <p style="font-size: 0.8rem; color: var(--gray-600);">UI/UX Designer</p>
+                </div>
+                <div class="team-member">
+                    <img src="Developer Team/thevindu.JPG" alt="Thevindu"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Thevindu Thisev</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Data Collector</p>
+                    <p style="font-size: 0.8rem; color: var(--gray-600);">Database Admin</p>
+                </div>
+                <div class="team-member">
+                    <img src="Developer Team/Nethmi.jpg" alt="Nethmi"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Nethmi Dhananjana</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Coordinator</p>
+                </div>
+                <div class="team-member">
+                    <img src="Developer Team/Rashmi.jpg" alt="Rashmi"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Rashmi Jananjana</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Student Mgmt Lead
+                    </p>
+                </div>
+                <div class="team-member">
+                    <img src="Developer Team/Avishka.jpg" alt="Avishka"
+                        onerror="this.src='meroon Transparent logo prefect.png'">
+                    <h4>Avishka Kalhara</h4>
+                    <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">Media Partner</p>
+                </div>
+            </div>
+        </section>
 
         </div>
     </main>
@@ -3567,6 +3578,7 @@
                 'profile-index': data.school_index_number,
                 'profile-parents-phone': data.parents_phone,
                 'profile-current-duty': data.current_duty,
+                'profile-role-input': data.destiny,
                 'profile-total-points': data.total_points || 0
             };
 
@@ -3581,6 +3593,37 @@
             for (const [id, value] of Object.entries(fieldMap)) {
                 const el = document.getElementById(id);
                 if (el) el.value = value || '-';
+            }
+        }
+
+        // --- SAVE PROFILE LOGIC ---
+        window.saveProfileChanges = async function () {
+            if (!currentPrefectGlobal) return alert("Profile not loaded.");
+
+            const newClass = document.getElementById('profile-class-static').value;
+            const newDuty = document.getElementById('profile-current-duty').value;
+            const newRole = document.getElementById('profile-role-input').value;
+
+            if (!confirm("Are you sure you want to update your profile?")) return;
+
+            try {
+                const prefRef = doc(db, "prefects", currentPrefectGlobal.id);
+                await updateDoc(prefRef, {
+                    class: newClass,
+                    current_duty: newDuty,
+                    destiny: newRole
+                });
+
+                alert("Profile updated successfully!");
+                // Optimistically update the global object and UI
+                currentPrefectGlobal.class = newClass;
+                currentPrefectGlobal.current_duty = newDuty;
+                currentPrefectGlobal.destiny = newRole;
+                updateProfileUI(currentPrefectGlobal);
+
+            } catch (e) {
+                console.error("Update Error:", e);
+                alert("Failed to update profile: " + e.message);
             }
         }
 
@@ -4784,22 +4827,22 @@
                 form.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     if (!currentPrefectGlobal) {
-                         const user = auth.currentUser; 
-                         if (!user) return alert("Please log in first.");
-                        
-                         // Autoself-heal: Fetch profile
-                         try {
-                              const q = query(collection(db, "prefects"), where("uid", "==", user.uid));
-                              const snapshot = await getDocs(q);
-                              if (!snapshot.empty) {
-                                  currentPrefectGlobal = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-                              } else {
-                                  return alert("Profile could not be verified. Please refresh page.");
-                              }
-                         } catch (e) {
-                              console.error(e);
-                              return alert("Connection error. Please try again.");
-                         }
+                        const user = auth.currentUser;
+                        if (!user) return alert("Please log in first.");
+
+                        // Autoself-heal: Fetch profile
+                        try {
+                            const q = query(collection(db, "prefects"), where("uid", "==", user.uid));
+                            const snapshot = await getDocs(q);
+                            if (!snapshot.empty) {
+                                currentPrefectGlobal = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                            } else {
+                                return alert("Profile could not be verified. Please refresh page.");
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            return alert("Connection error. Please try again.");
+                        }
                     }
 
                     const btn = document.getElementById('future-absence-submit-btn');
