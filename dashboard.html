@@ -2793,7 +2793,17 @@
                         </div>
                         <div class="form-group">
                             <label for="profile-role-input">Role (Destiny)</label>
-                            <input type="text" id="profile-role-input" value="-">
+                            <select id="profile-role-input" class="form-control"
+                                style="width: 100%; padding: 0.8rem; border: 1px solid var(--gray-300); border-radius: 8px; font-family: inherit;">
+                                <option value="Head Prefect">Head Prefect</option>
+                                <option value="Deputy Head Prefect">Deputy Head Prefect</option>
+                                <option value="Co.Cu.Head Prefect">Co.Cu.Head Prefect</option>
+                                <option value="Sectional Head Prefect">Sectional Head Prefect</option>
+                                <option value="Senior Prefect">Senior Prefect</option>
+                                <option value="Junior Prefect">Junior Prefect</option>
+                                <option value="Senior Probation">Senior Probation</option>
+                                <option value="Junior Probation">Junior Probation</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="profile-total-points">Total Points</label>
@@ -3623,7 +3633,9 @@
 
             } catch (e) {
                 console.error("Update Error:", e);
-                alert("Failed to update profile: " + e.message);
+                // Show detailed error
+                console.log(JSON.stringify(e)); // Debug
+                alert(`Failed to update profile.\nCode: ${e.code || 'unknown'}\nMessage: ${e.message}`);
             }
         }
 
