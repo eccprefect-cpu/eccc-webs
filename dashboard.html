@@ -2801,8 +2801,8 @@
                                 <option value="Sectional Head Prefect">Sectional Head Prefect</option>
                                 <option value="Senior Prefect">Senior Prefect</option>
                                 <option value="Junior Prefect">Junior Prefect</option>
-                                <option value="Senior Probation">Senior Probation</option>
-                                <option value="Junior Probation">Junior Probation</option>
+                                <option value="Senior Probationary Prefect">Senior Probationary Prefect</option>
+                                <option value="Junior Probationary Prefect">Junior Probationary Prefect</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -3607,8 +3607,24 @@
         }
 
         // --- SAVE PROFILE LOGIC ---
+        // --- SAVE PROFILE LOGIC ---
         window.saveProfileChanges = async function () {
-            if (!currentPrefectGlobal) return alert("Profile not loaded.");
+            // Self-Healing: If global is null, try to fetch it
+            if (!currentPrefectGlobal) {
+                const user = auth.currentUser;
+                if (user) {
+                    try {
+                        const q = query(collection(db, "prefects"), where("uid", "==", user.uid));
+                        const snapshot = await getDocs(q);
+                        if (!snapshot.empty) {
+                            currentPrefectGlobal = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+                            console.log("Global Profile Healed:", currentPrefectGlobal);
+                        }
+                    } catch (e) { console.error("Self-heal error:", e); }
+                }
+            }
+
+            if (!currentPrefectGlobal) return alert("Profile not loaded. Please refresh the page.");
 
             const newClass = document.getElementById('profile-class-static').value;
             const newDuty = document.getElementById('profile-current-duty').value;
