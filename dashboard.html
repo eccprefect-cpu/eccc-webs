@@ -556,8 +556,8 @@
         }
 
         .hero-profile-img {
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #f1f5f9;
@@ -2383,13 +2383,16 @@
                                 <div class="hero-text">
                                     <h1>Welcome Back,<br><span id="welcome-name"
                                             style="color:var(--primary-600)">Prefect</span></h1>
-                                    <p>You have <strong style="color:var(--gray-900)">2 pending</strong> reports today.
+                                    <p id="hero-rank-display"
+                                        style="font-size: 1rem; color: var(--gray-600); font-weight: 500;">
+                                        Loading Rank...
                                     </p>
                                 </div>
                             </div>
-                            <div class="hero-status">
-                                <div class="status-badge"><i class="fas fa-check-circle"></i> On Duty</div>
-                                <div style="font-size:0.8rem; color:var(--gray-500);">Next: Gate Duty at 14:00</div>
+                            <div class="hero-status" id="hero-status-display">
+                                <div class="status-badge" style="background:#f3f4f6; color:#6b7280;">
+                                    <i class="fas fa-circle-notch fa-spin"></i> Checking...
+                                </div>
                             </div>
                         </div>
 
@@ -2419,12 +2422,14 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="metric-value">98%</div>
+                                    <div class="metric-value" id="attendance-health-value">--%</div>
                                     <div class="metric-label">Attendance Health</div>
                                 </div>
                                 <div
                                     style="height:4px; width:100%; background:#f1f5f9; border-radius:2px; margin-top:0.5rem;">
-                                    <div style="height:100%; width:98%; background:#059669; border-radius:2px;"></div>
+                                    <div id="attendance-health-bar"
+                                        style="height:100%; width:0%; background:#059669; border-radius:2px; transition: width 1s ease;">
+                                    </div>
                                 </div>
                             </div>
 
@@ -2736,12 +2741,12 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2 style="margin: 0; font-family: var(--font-display);">My Profile</h2>
                     <div style="display: flex; gap: 10px;">
-                       <!-- <button class="supiri-btn"
+                        <!-- <button class="supiri-btn"
                             style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem; background: var(--primary-600);"
                             onclick="openDigitalID()">
                             <i class="fas fa-id-card"></i> View ID
                         </button>-->
-                   <!-- <button class="supiri-btn"
+                        <!-- <button class="supiri-btn"
                             style="width: auto; padding: 0.5rem 1rem; font-size: 0.9rem; background: var(--gray-600);"
                             onclick="generateServiceLetterPDF()">
                             <i class="fas fa-file-download"></i> Download CV
@@ -3546,19 +3551,31 @@
             const badgeContainer = document.getElementById('badge-container');
             if (badgeContainer) {
                 let badgeHTML = '';
+                let rankText = 'Rookie Prefect'; // Default
+
                 if (points >= 120) {
                     badgeHTML = `<div class="role-badge badge-platinum" title="Platinum Tier (120+ Points)"><i class="fas fa-gem"></i> PLATINUM</div>`;
+                    rankText = "💎 Platinum Prefect";
                 } else if (points >= 90) {
                     badgeHTML = `<div class="role-badge badge-gold" title="Gold Tier (90-119 Points)"><i class="fas fa-crown"></i> GOLD</div>`;
+                    rankText = "👑 Gold Prefect";
                 } else if (points >= 80) {
                     badgeHTML = `<div class="role-badge badge-silver" title="Silver Tier (80-89 Points)"><i class="fas fa-medal"></i> SILVER</div>`;
+                    rankText = "🥈 Silver Prefect";
                 } else if (points >= 50) {
                     badgeHTML = `<div class="role-badge badge-bronze" title="Bronze Tier (50-79 Points)"><i class="fas fa-shield-alt"></i> BRONZE</div>`;
+                    rankText = "🛡️ Bronze Prefect";
                 } else {
-                    // Rookie: No badge or simple one
-                    // badgeHTML = `<div class="role-badge badge-rookie" title="Rookie"><i class="fas fa-user"></i></div>`;
+                    // Rookie
+                    rankText = "⭐ Rookie Prefect";
                 }
                 badgeContainer.innerHTML = badgeHTML;
+
+                // Update Hero Rank
+                const heroRankEl = document.getElementById('hero-rank-display');
+                if (heroRankEl) {
+                    heroRankEl.innerHTML = `<strong style="color:var(--primary-600)">${rankText}</strong> • ${points} Points`;
+                }
             }
 
             // Update Welcome Card
@@ -3668,17 +3685,23 @@
                 console.error("Error listening to points:", error);
             });
 
-            // Attendance (Absences & Late) - Using real-time listener
+            // Attendance (Absences & Late & Health) - Using real-time listener
             const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
             onSnapshot(attendanceQuery, (attendanceSnapshot) => {
                 let totalAbsences = 0;
                 let totalLate = 0;
+                let totalPresent = 0;
 
                 attendanceSnapshot.forEach(doc => {
                     const record = doc.data();
                     const status = (record.status || '').toLowerCase(); // Case-insensitive comparison
+
                     if (status === 'absent') totalAbsences++;
-                    else if (status === 'late') totalLate++;
+                    else if (status === 'late') {
+                        totalLate++;
+                        totalPresent++; // Late counts as present for health
+                    }
+                    else if (status === 'present') totalPresent++;
                 });
 
                 const absencesEl = document.getElementById('total-absences');
@@ -3686,6 +3709,29 @@
 
                 if (absencesEl) absencesEl.textContent = totalAbsences;
                 if (lateEl) lateEl.textContent = totalLate;
+
+                // --- Calculate Attendance Health ---
+                // Formula: (Total Present / Total Recorded Days) * 100
+                const totalRecorded = totalPresent + totalAbsences; // Note: totalPresent includes Late
+                let healthPercentage = 100; // Default to 100 if no records
+
+                if (totalRecorded > 0) {
+                    healthPercentage = Math.round((totalPresent / totalRecorded) * 100);
+                }
+
+                const healthValEl = document.getElementById('attendance-health-value');
+                const healthBarEl = document.getElementById('attendance-health-bar');
+
+                if (healthValEl) healthValEl.textContent = `${healthPercentage}%`;
+                if (healthBarEl) {
+                    healthBarEl.style.width = `${healthPercentage}%`;
+
+                    // Dynamic Color
+                    if (healthPercentage >= 80) healthBarEl.style.background = '#059669'; // Green
+                    else if (healthPercentage >= 50) healthBarEl.style.background = '#d97706'; // Orange
+                    else healthBarEl.style.background = '#dc2626'; // Red
+                }
+
             }, (error) => {
                 console.error("Error listening to attendance:", error);
             });
@@ -4145,23 +4191,42 @@
                 }
 
                 // Determine UI State
-                let isDisabled = false;
+                let isDisabled = false; // Will set to true if not active
                 let cardColor = '#fff';
                 let borderColor = '#ccc';
                 let titleColor = '#333';
                 let titleText = 'Absence Reporting';
                 let messageText = `If you are absent today (<strong>${todayString}</strong>), please report it here.`;
                 let icon = 'fas fa-info-circle';
-                let showSpinner = false;
 
-                if (status === 'present') {
+                // NEW: Warning Message Placeholder
+                let warningMessageHtml = `<div id="today-absence-warning" style="margin-bottom:10px; color:#e67e22; font-size:0.9rem; font-weight:600; display:block;">
+                    <i class="fas fa-satellite-dish fa-spin"></i> Checking school availability...
+                </div>`;
+
+
+                if (status === 'present' || status === 'late') {
+                    // Present/Late -> DISABLE FORM
                     isDisabled = true;
-                    cardColor = '#f1f8e9'; // Greenish
-                    borderColor = '#66bb6a';
-                    titleColor = '#2e7d32';
-                    titleText = 'Present Today';
-                    messageText = `You have been marked <strong>Present</strong> at ${recordData.time_in || 'Unknown Time'}.`;
+                    cardColor = '#f0fff4'; // Greenish
+                    borderColor = '#00b894';
+                    titleColor = '#2d3436';
+                    titleText = status === 'late' ? 'Marked Present (Late)' : 'Marked Present';
+                    messageText = `You have successfully checked in at <strong>${timeIn}</strong>.`;
                     icon = 'fas fa-check-circle';
+                    warningMessageHtml = ''; // No warning if present
+
+                    // HERO STATUS UPDATE: CHECKED IN
+                    const heroStatusEl = document.getElementById('hero-status-display');
+                    if (heroStatusEl) {
+                        heroStatusEl.innerHTML = `
+                            <div class="status-badge" style="background:#dcfce7; color:#166534; border: 1px solid #bbf7d0;">
+                                <i class="fas fa-check-circle"></i> Checked In
+                            </div>
+                            <div style="font-size:0.8rem; color:#166534; margin-top:4px;">In at ${timeIn}</div>
+                        `;
+                    }
+
                 } else if (status === 'absent') {
                     // Marked Absent -> DISABLE FORM
                     isDisabled = true;
@@ -4172,15 +4237,40 @@
                     const existingReason = recordData.reason || 'No reason provided';
                     messageText = `You have reported absence. Reason: <strong>${existingReason}</strong>.`;
                     icon = 'fas fa-user-times';
+                    warningMessageHtml = '';
+
+                    // HERO STATUS UPDATE: ABSENT
+                    const heroStatusEl = document.getElementById('hero-status-display');
+                    if (heroStatusEl) {
+                        heroStatusEl.innerHTML = `
+                            <div class="status-badge" style="background:#fee2e2; color:#991b1b; border: 1px solid #fecaca;">
+                                <i class="fas fa-times-circle"></i> Absent
+                            </div>
+                            <div style="font-size:0.8rem; color:#991b1b; margin-top:4px;">${existingReason}</div>
+                        `;
+                    }
+
                 } else {
                     // No Record (None) -> Treat as potential absence
-                    isDisabled = false;
+                    // *** CRITICAL CHANGE: DEFAULT TO DISABLED UNTIL CHECKED ***
+                    isDisabled = true;
                     cardColor = '#ffffff'; // White/Neutral
                     borderColor = '#ffa726'; // Orange warning
                     titleColor = '#ef6c00';
                     titleText = 'Not Checked In';
                     messageText = `You have not scanned in for today (<strong>${todayString}</strong>). If you are absent, please submit a reason.`;
                     icon = 'fas fa-exclamation-triangle';
+
+                    // HERO STATUS UPDATE: NOT SCANNED
+                    const heroStatusEl = document.getElementById('hero-status-display');
+                    if (heroStatusEl) {
+                        heroStatusEl.innerHTML = `
+                            <div class="status-badge" style="background:#ffedd5; color:#9a3412; border: 1px solid #fed7aa;">
+                                <i class="fas fa-clock"></i> Not Scanned
+                            </div>
+                            <div style="font-size:0.8rem; color:#9a3412; margin-top:4px;">Mark attendance now</div>
+                        `;
+                    }
                 }
 
                 // Render ALWAYS
@@ -4189,7 +4279,9 @@
                         <h3 style="color: ${titleColor}; margin-top:0; font-size: 1.1rem;"><i class="${icon}"></i> ${titleText}</h3>
                         <p style="margin-bottom: 1rem; color: #444; font-size: 0.95rem;">${messageText}</p>
                         
-                        <form id="today-absence-form" style="opacity: ${isDisabled ? '0.6' : '1'}; pointer-events: ${isDisabled ? 'none' : 'all'};">
+                        ${warningMessageHtml}
+
+                        <form id="today-absence-form" style="opacity: ${isDisabled && status === 'none' ? '0.6' : (isDisabled ? '0.6' : '1')}; pointer-events: ${isDisabled && status === 'none' ? 'none' : (isDisabled ? 'none' : 'all')};">
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <select id="today-absence-reason-select" style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; background: white;" ${isDisabled ? 'disabled' : 'required'}>
                                     <option value="" disabled selected>Select Reason for Absence</option>
@@ -4222,15 +4314,66 @@
                     });
                 }
 
+                // --- SMART SCHOOL DAY CHECK ---
+                // This function will check the daily status and enable/disable the form
+                async function checkStatus() {
+                    const today = new Date();
+                    const y = today.getFullYear();
+                    const m = String(today.getMonth() + 1).padStart(2, '0');
+                    const d = String(today.getDate()).padStart(2, '0');
+                    const todayStr = `${y}-${m}-${d}`;
+
+                    // If present/absent already, skip check
+                    if (status !== 'none') return;
+
+                    const reasonSelectElement = document.getElementById('today-absence-reason-select');
+                    const submitBtn = document.getElementById('today-absence-submit-btn');
+                    const formElement = document.getElementById('today-absence-form');
+                    const warningMsg = document.getElementById('today-absence-warning');
+
+                    try {
+                        // Check Active Status
+                        const statusSnap = await getDoc(doc(db, "daily_status", todayStr));
+                        const isDayActive = statusSnap.exists() && statusSnap.data().active;
+
+                        if (!isDayActive) {
+                            // KEEP DISABLED
+                            if (warningMsg) {
+                                warningMsg.innerHTML = "⚠ Today has not been activated via the Mobile App scanner. <br>Absence marking is disabled for non-school days.";
+                                warningMsg.style.color = "#d63031"; // Red
+                            }
+                        } else {
+                            // ENABLE
+                            if (reasonSelectElement) reasonSelectElement.disabled = false;
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.style.background = '#d63031'; // Restore Red Color
+                            }
+                            if (formElement) {
+                                formElement.style.opacity = '1';
+                                formElement.style.pointerEvents = 'all';
+                            }
+                            if (warningMsg) warningMsg.style.display = "none";
+                        }
+                    } catch (e) {
+                        console.error("Status Check Failed", e);
+                        if (warningMsg) warningMsg.innerText = "⚠ Status check failed. Please refresh.";
+                    }
+                }
+
+                // Initialize
+                checkStatus();
+
                 if (form) {
                     form.addEventListener('submit', (e) => {
                         e.preventDefault();
-                        if (isDisabled) return;
+                        // Double check disabled status
+                        if (document.getElementById('today-absence-submit-btn').disabled) return;
 
                         // Use Premium Modal for Confirmation
                         openModal({
                             title: 'Confirm Submission',
-                            message: 'Are you sure you want to report this absence? 3 Points will be deducted.',
+                            message: 'Are you sure you want to report this absence? 5 Points will be deducted.',
                             type: 'confirm',
                             confirmText: 'Yes, Report',
                             onConfirm: async () => {
@@ -4261,16 +4404,16 @@
                                             created_at: serverTimestamp()
                                         });
 
-                                        // --- NEW: DEDUCT 3 POINTS FOR ABSENCE WITH REASON ---
+                                        // --- NEW: DEDUCT 5 POINTS FOR ABSENCE WITH REASON ---
                                         // Update Prefect Points
                                         await updateDoc(doc(db, "prefects", prefectId), {
-                                            total_points: increment(-3)
+                                            total_points: increment(-5)
                                         });
 
                                         // Log Points History
                                         await addDoc(collection(db, "points"), {
                                             prefect_id: prefectId,
-                                            points: -3,
+                                            points: -5,
                                             reason: `Daily Absence: ${reason}`,
                                             date: todayString,
                                             timestamp: serverTimestamp()
@@ -4287,7 +4430,7 @@
                                     // Success Modal
                                     openModal({
                                         title: 'Success',
-                                        message: 'Your absence has been reported. 3 Points deducted.',
+                                        message: 'Your absence has been reported. 5 Points deducted.',
                                         type: 'success',
                                         onConfirm: async () => {
                                             // Refresh UI
@@ -5346,334 +5489,8 @@ This record is generated automatically and serves as a proof of their standing w
 
 
 
-        /* --- AUTOMATED ADMIN TRIGGERS --- */
-        // Runs on dashboard load to check for missed deductions
-        async function runAdminAutomations() {
-            if (!window.currentPrefectGlobal) return;
-
-            // SECURITY: Only run this context if user is Head or Deputy (Admin)
-            const role = (window.currentPrefectGlobal.appointment || "").toLowerCase();
-            const isAdmin = role.includes("head") || role.includes("deputy") || role.includes("senior");
-
-            // If permissions fail, we just stop silently (to avoid console red errors for normal users)
-            // But since current User is likely just testing, let's just abort if role is generic.
-            // Actually, best way: Try/Catch the first admin op.
-
-            console.log("Checking Automations (Role: " + role + ")...");
-            if (!isAdmin) {
-                // console.log("Skipping admin tasks (insufficient role)");
-                return;
-            }
-
-            console.log("Running Admin Automations...");
-
-            // 1. EVENT FINALIZATION (Check past events that are not finalized)
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const q = query(collection(db, "events"), where("date", "<", today), where("finalized", "==", false));
-                const snap = await getDocs(q);
-
-                snap.forEach(async (eventDoc) => {
-                    const evt = eventDoc.data();
-                    console.log("Finalizing Event:", evt.title);
-
-                    // Deduct points for non-attendees
-                    // A. Get Target Grades
-                    const targetGrades = evt.target_grades || [];
-                    if (targetGrades.length === 0) return; // No targets, safe skip
-
-                    // B. Get All Prefects in those grades
-                    // Note: Firestore 'in' query works up to 10 items.
-                    // Doing client side filter for simplicity if array mismatch or simple loop
-                    // Prefect 'class' e.g. "12-A" -> startsWith grade
-
-                    const allPrefectsSnap = await getDocs(collection(db, "prefects"));
-                    const targetPrefects = [];
-                    allPrefectsSnap.forEach(p => {
-                        const pData = p.data();
-                        const grade = (pData.class || "").split("-")[0]; // "13-A" -> "13"
-                        if (targetGrades.includes(grade)) targetPrefects.push({ id: p.id, ...pData });
-                    });
-
-                    // C. Get Attendees
-                    const attQ = query(collection(db, "event_attendance"), where("eventId", "==", eventDoc.id));
-                    const attSnap = await getDocs(attQ);
-                    const attendeeIds = attSnap.docs.map(d => d.data().prefectId);
-
-                    // C2. Check if event date is a holiday
-                    const eventDateStr = evt.date;
-                    const holidayQ = query(collection(db, "holidays"), where("date", "==", eventDateStr));
-                    const holidaySnap = await getDocs(holidayQ);
-                    const isHoliday = !holidaySnap.empty;
-
-                    if (isHoliday) {
-                        console.log(`Skipping ${evt.title} - Holiday on ${eventDateStr}`);
-                        await updateDoc(doc(db, "events", eventDoc.id), { finalized: true });
-                        return; // Skip penalty for holidays
-                    }
-
-                    // D. Find Absentees and Deduct (-5 points always)
-                    const batch = writeBatch(db);
-                    let ops = 0;
-
-                    targetPrefects.forEach(p => {
-                        if (!attendeeIds.includes(p.id)) {
-                            // Always -5 points for event absence
-                            const pRef = doc(db, "prefects", p.id);
-                            batch.update(pRef, { total_points: increment(-5) });
-
-                            const pointRef = doc(collection(db, "points"));
-                            batch.set(pointRef, {
-                                prefect_id: p.id,
-                                points: -5,
-                                reason: `Missed Event: ${evt.title}`,
-                                date: new Date().toISOString().split('T')[0],
-                                timestamp: serverTimestamp()
-                            });
-                            ops++;
-                        }
-                    });
-
-                    // Update Event to Finalized
-                    batch.update(doc(db, "events", eventDoc.id), { finalized: true });
-
-                    if (ops > 0) {
-                        await batch.commit();
-                        console.log(`Finalized ${evt.title}: Deducted points from ${ops} absentees.`);
-                        openModal({ title: "System Update", message: `System automatically processed '${evt.title}' and deducted points from ${ops} absent prefects.`, type: "info" });
-                    } else {
-                        // Just mark finalized if no deductions needed
-                        await updateDoc(doc(db, "events", eventDoc.id), { finalized: true });
-                    }
-                });
-            } catch (e) {
-                console.error("Automation Error (Events):", e);
-            }
-
-            // 2. DAILY ABSENCE CHECK (Similar logic, check if 'daily_process_YYYY-MM-DD' doc exists)
-            try {
-                const todayStr = new Date().toISOString().split('T')[0];
-                const processRef = doc(db, "system_logs", `absence_process_${todayStr}`);
-                const processSnap = await getDoc(processRef);
-
-                if (!processSnap.exists()) {
-                    // Check if it's past 8:00 AM (e.g.)
-                    const hour = new Date().getHours();
-                    if (hour >= 10) { // Run after 10 AM
-                        console.log("Running Daily Absence Process...");
-
-                        // Get all attendance for today
-                        const attQ = query(collection(db, "attendance"), where("date", "==", todayStr));
-
-                        // Get all Absence Requests/Reasons for today
-                        // (Assuming collection is 'future_absences' and has 'date' field)
-                        const reasonQ = query(collection(db, "future_absences"), where("date", "==", todayStr));
-
-                        const [attSnap, reasonSnap, allPrefectsSnap] = await Promise.all([
-                            getDocs(attQ),
-                            getDocs(reasonQ),
-                            getDocs(collection(db, "prefects")) // This might be heavy, but okay for Admin script
-                        ]);
-
-                        const presentIds = new Set(attSnap.docs.map(d => d.data().prefect_id));
-                        const reasonsMap = {}; // { prefectId: "Reason string" }
-                        reasonSnap.forEach(doc => {
-                            const data = doc.data();
-                            reasonsMap[data.prefect_id] = data.reason || "Reason Submitted";
-                        });
-
-                        const batch = writeBatch(db);
-                        let absents = 0;
-
-                        allPrefectsSnap.forEach(p => {
-                            if (!presentIds.has(p.id)) {
-                                const reason = reasonsMap[p.id];
-                                let deduction = -5;
-                                let logReason = "Daily Absence (No Reason)";
-
-                                if (reason) {
-                                    deduction = -3;
-                                    logReason = `Absent: ${reason}`;
-                                }
-
-                                // Deduct Points
-                                const pRef = doc(db, "prefects", p.id);
-                                batch.update(pRef, { total_points: increment(deduction) });
-
-                                const pointRef = doc(collection(db, "points"));
-                                batch.set(pointRef, {
-                                    prefect_id: p.id,
-                                    points: deduction,
-                                    reason: logReason,
-                                    date: todayStr,
-                                    timestamp: serverTimestamp()
-                                });
-
-                                absents++;
-                            }
-                        });
-
-                        // Save process log
-                        batch.set(processRef, { processed_at: serverTimestamp(), absent_count: absents });
-
-                        if (absents > 0) {
-                            await batch.commit();
-                            openModal({ title: "Daily Attendance", message: `System processed daily attendance. ${absents} prefects marked absent (-5 pts).`, type: "info" });
-                        } else {
-                            await setDoc(processRef, { processed_at: serverTimestamp(), absent_count: 0 });
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error("Automation Error (Daily):", e);
-            }
-        }
-
-        // Hook into auth listener or load
-        setTimeout(runAdminAutomations, 5000); // Delay to ensure auth/prefectGlobal
-
-
-        // --- 3. RETROACTIVE POINTS APPLICATION ---
-        async function applyRetroactivePoints() {
-            if (!confirm("මෙය 2026-01-05 සිට අද දක්වා ඇති සියලු past event absences වලට නව penalty system එක apply කරයි. Continue?")) {
-                return;
-            }
-
-            const startDate = "2026-01-05";
-            const today = new Date().toISOString().split('T')[0];
-
-            try {
-                openModal({
-                    title: "Processing...",
-                    message: "Retroactively applying penalties. මේක minutes කීපයක් ගතවෙන්න පුළුවන්...",
-                    type: "info"
-                });
-
-                const eventsQ = query(collection(db, "events"), where("date", ">=", startDate), where("date", "<=", today), orderBy("date"));
-                const eventsSnap = await getDocs(eventsQ);
-
-                let totalProcessed = 0;
-                let totalPenalties = 0;
-
-                for (const eventDoc of eventsSnap.docs) {
-                    const evt = eventDoc.data();
-                    const targetGrades = evt.target_grades || [];
-                    if (targetGrades.length === 0) continue;
-
-                    const eventDateStr = evt.date;
-                    const holidayQ = query(collection(db, "holidays"), where("date", "==", eventDateStr));
-                    const holidaySnap = await getDocs(holidayQ);
-                    if (!holidaySnap.empty) continue;
-
-                    const allPrefectsSnap = await getDocs(collection(db, "prefects"));
-                    const targetPrefects = [];
-                    allPrefectsSnap.forEach(p => {
-                        const grade = (p.data().class || "").split("-")[0];
-                        if (targetGrades.includes(grade)) targetPrefects.push({ id: p.id, ...p.data() });
-                    });
-
-                    const attQ = query(collection(db, "event_attendance"), where("eventId", "==", eventDoc.id));
-                    const attSnap = await getDocs(attQ);
-                    const attendeeIds = new Set(attSnap.docs.map(d => d.data().prefectId));
-
-                    const reasonsQ = query(collection(db, "absence_reasons"), where("date", "==", eventDateStr));
-                    const reasonsSnap = await getDocs(reasonsQ);
-                    const reasonsMap = {};
-                    reasonsSnap.forEach(r => reasonsMap[r.data().prefect_id] = r.data().reason || "Reason submitted");
-
-                    const batch = writeBatch(db);
-                    let batchCount = 0;
-
-                    for (const p of targetPrefects) {
-                        if (!attendeeIds.has(p.id)) {
-                            const existingQ = query(collection(db, "points"), where("prefect_id", "==", p.id), where("date", "==", eventDateStr), where("reason", ">=", `Missed Event: ${evt.title}`), where("reason", "<=", `Missed Event: ${evt.title}\uf8ff`));
-                            const existingSnap = await getDocs(existingQ);
-                            if (!existingSnap.empty) continue;
-
-                            const hasReason = reasonsMap[p.id];
-                            const penalty = hasReason ? -3 : -5;
-                            const reasonText = hasReason ? `Missed Event: ${evt.title} (${reasonsMap[p.id]})` : `Missed Event: ${evt.title} (No Reason)`;
-
-                            batch.update(doc(db, "prefects", p.id), { total_points: increment(penalty) });
-                            batch.set(doc(collection(db, "points")), { prefect_id: p.id, points: penalty, reason: reasonText, date: eventDateStr, timestamp: serverTimestamp(), retroactive: true });
-                            batchCount++; totalPenalties++;
-
-                            if (batchCount >= 400) { await batch.commit(); batchCount = 0; }
-                        }
-                    }
-                    if (batchCount > 0) await batch.commit();
-                    totalProcessed++;
-                }
-
-                openModal({ title: "සම්පූර්ණයි!", message: `✅ Processed ${totalProcessed} events\n✅ Applied ${totalPenalties} penalties`, type: "success" });
-            } catch (error) {
-                console.error(error);
-                openModal({ title: "Error", message: "Failed: " + error.message, type: "error" });
-            }
-        }
-        window.applyRetroactivePoints = applyRetroactivePoints;
-
-
-        // --- OVERRIDE NATIVE CALLS (Optional, but safer to call explicitly) ---
-        // window.alert = (msg) => openModal({title: 'Alert', message: msg });
-
-        /* --- DEVELOPER TOOLS (Reset Data) --- */
-        async function resetTodayData() {
-            openModal({
-                title: 'Reset Today\'s Data?',
-
-                message: 'This will set all attendance records for TODAY to <b>Present</b> and remove any "Late" or "Absent" statuses.<br><br><b>Are you sure?</b>',
-                type: 'confirm',
-                confirmText: 'Yes, Fix Data',
-                onConfirm: async () => {
-                    const btn = document.getElementById('reset-data-btn');
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
-                        btn.disabled = true;
-                    }
-
-                    try {
-                        const now = new Date();
-                        const year = now.getFullYear();
-                        const month = String(now.getMonth() + 1).padStart(2, '0');
-                        const day = String(now.getDate()).padStart(2, '0');
-                        const todayString = `${year}-${month}-${day}`;
-
-                        // Query all records for today
-                        const q = query(collection(db, "attendance"), where("date", "==", todayString));
-                        const snapshot = await getDocs(q);
-
-                        if (snapshot.empty) {
-                            openModal({ title: 'No Records', message: 'No attendance records found for today to fix.', type: 'info' });
-                            if (btn) { btn.innerHTML = '<i class="fas fa-magic"></i> Fix Data (Demo)'; btn.disabled = false; }
-                            return;
-                        }
-
-                        const updatePromises = snapshot.docs.map(docSnap =>
-                            updateDoc(doc(db, "attendance", docSnap.id), {
-                                status: "Present",
-                                reason: null,
-                                time_in: docSnap.data().time_in || "07:00 AM"
-                            })
-                        );
-
-                        await Promise.all(updatePromises);
-
-                        openModal({ title: 'Success', message: `Fixed ${snapshot.size} records. Reloading...`, type: 'success' });
-                        setTimeout(() => location.reload(), 1500);
-
-                    } catch (e) {
-                        console.error(e);
-                        openModal({ title: 'Error', message: e.message, type: 'error' });
-                        if (btn) {
-                            btn.innerHTML = '<i class="fas fa-magic"></i> Fix Data (Demo)';
-                            btn.disabled = false;
-                        }
-                    }
-                }
-            });
-        }
-        window.resetTodayData = resetTodayData;
+        // --- AUTOMATED ADMIN TRIGGERS REMOVED ---
+        // logic for runAdminAutomations, applyRetroactivePoints, resetTodayData has been removed.
 
         // --- NEW: SPLIT EVENT LOGIC (History vs All) ---
         // --- RENDER EVENTS ---
@@ -5684,59 +5501,25 @@ This record is generated automatically and serves as a proof of their standing w
 
             if (!window.currentPrefectGlobal) return;
 
-            // -- PART A: MY HISTORY (Attendance + Absences + Penalties) --
+            // -- PART A: MY HISTORY (Attendance Only) --
             try {
                 // 1. Fetch Data Parallelly
-                const [eventsSnap, attSnap, pointsSnap, reasonSnap, dailySnap] = await Promise.all([
+                const [eventsSnap, attSnap] = await Promise.all([
                     getDocs(query(collection(db, "events"), orderBy("date", "desc"))),
-                    getDocs(query(collection(db, "event_attendance"), where("prefectId", "==", window.currentPrefectGlobal.id))),
-                    getDocs(query(collection(db, "points"), where("prefect_id", "==", window.currentPrefectGlobal.id))),
-                    getDocs(query(collection(db, "future_absences"), where("prefect_id", "==", window.currentPrefectGlobal.id))),
-                    getDocs(query(collection(db, "attendance"), where("prefect_id", "==", window.currentPrefectGlobal.id)))
+                    getDocs(query(collection(db, "event_attendance"), where("prefectId", "==", window.currentPrefectGlobal.id)))
                 ]);
 
                 // 2. Prepare Data Sets
                 const myAttendanceIds = new Set(attSnap.docs.map(d => d.data().eventId));
-                const myPoints = pointsSnap.docs.map(d => d.data());
-                const myReasons = {}; // DateString -> Reason
-                reasonSnap.forEach(d => { const data = d.data(); if (data.date) myReasons[data.date] = data.reason; });
-                const myDaily = dailySnap.docs.map(d => d.data());
 
                 const combinedHistory = [];
                 const userClass = window.currentPrefectGlobal.class || ""; // "13-B"
                 const userGrade = userClass.split("-")[0]; // "13"
 
-
-                // 3a. Process Daily Attendance (Morning Check-in)
-                // COMMENTED OUT: Daily attendance should not appear in Event History
-                /*
-                myDaily.forEach(d => {
-                    const statusVal = (d.status || "").toLowerCase();
-                    let displayStatus = "PRESENT";
-                    let rowType = "present";
-
-                    if (statusVal === "late" || (d.in_time && d.in_time > "07:30")) {
-                        displayStatus = "LATE";
-                        rowType = "late";
-                    }
-
-                    combinedHistory.push({
-                        title: "Daily Attendance",
-                        date: d.date,
-                        time: d.in_time || "-",
-                        status: displayStatus,
-                        type: rowType,
-                        timestamp: d.timestamp ? d.timestamp.toDate() : new Date(d.date)
-                    });
-                });
-                */
-
-
-                // 3b. Process Events (Determine Presence/Absence)
+                // 3. Process Events (Determine Presence)
                 eventsSnap.forEach(doc => {
                     const evt = doc.data();
                     const evtId = doc.id;
-                    const evtDateStr = evt.date; // "YYYY-MM-DD"
                     const evtDate = new Date(evt.date);
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -5757,117 +5540,48 @@ This record is generated automatically and serves as a proof of their standing w
                                 type: "present",
                                 timestamp: evtDate
                             });
-                        } else {
-                            // Absent (Calculated)
-                            const reasonForDate = myReasons[evtDateStr];
-                            const subTextMsg = reasonForDate ? `Reason: ${reasonForDate}` : "No Reason Submitted";
-
-                            combinedHistory.push({
-                                title: evt.title,
-                                date: evt.date,
-                                time: "-",
-                                status: "ABSENT",
-                                type: "absent",
-                                details: subTextMsg,
-                                points: -5,
-                                timestamp: evtDate
-                            });
                         }
+                        // Note: Absent/Penalty logic removed as per user request.
                     }
                 });
 
-                // 4. Process Other Penalties (Daily Absence, Manual Deductions)
-                const pointDates = new Set();
-                myPoints.forEach(p => {
-                    // Filter out "Missed Event" records if they match our calculated absences to avoid duplicates
-                    if (p.reason && p.reason.includes("Missed Event")) return;
-
-                    if (p.points < 0) {
-                        pointDates.add(p.date);
-
-                        // Detect if this is an Absence record (Daily or otherwise)
-                        const isAbsence = p.reason && (p.reason.includes("Daily Absence") || p.reason.includes("Absent:"));
-
-                        combinedHistory.push({
-                            title: p.reason || "Manual Penalty",
-                            date: p.date,
-                            time: "-",
-                            status: isAbsence ? "ABSENT" : "DEDUCTION",
-                            type: isAbsence ? "absent" : "penalty",
-                            details: isAbsence ? p.reason : null,
-                            points: p.points,
-                            timestamp: p.timestamp ? p.timestamp.toDate() : new Date(p.date)
-                        });
-                    }
-                });
-
-                // 4b. Process Standalone Absence Requests (No Event, No Points yet)
-                Object.keys(myReasons).forEach(dateStr => {
-                    // If we haven't already shown an Event, Attendance, or Point for this date
-                    const hasEvent = eventsSnap.docs.some(d => d.data().date === dateStr);
-                    const hasAttendance = myDaily.some(d => d.date === dateStr);
-                    const hasPoint = pointDates.has(dateStr);
-
-                    if (!hasEvent && !hasAttendance && !hasPoint) {
-                        combinedHistory.push({
-                            title: "Absence Request",
-                            date: dateStr,
-                            time: "-",
-                            status: "PENDING",
-                            type: "absent",
-                            details: `Reason: ${myReasons[dateStr]}`,
-                            points: 0, // No deduction processed yet
-                            timestamp: new Date(dateStr)
-                        });
-                    }
-                });
-
-                // 5. Sort
+                // 4. Sort & Render
                 combinedHistory.sort((a, b) => b.timestamp - a.timestamp);
 
+                let hRows = "";
                 if (combinedHistory.length === 0) {
-                    historyBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:2rem; color:#888;">No history records found.</td></tr>';
+                    hRows = `<tr><td colspan="4" style="text-align:center; padding: 2rem; color: #94a3b8;">No participation history found.</td></tr>`;
                 } else {
-                    let hRows = "";
                     combinedHistory.forEach(item => {
-                        const dateStr = item.date ? new Date(item.date).toLocaleDateString() : 'N/A';
-
-                        // Styles
-                        let rowBg = '#fff';
-                        let statusStyle = '';
-                        let titleColor = '#334155';
+                        let rowBg = '#ffffff';
+                        let titleColor = '#1e293b';
+                        let statusStyle = 'background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;';
                         let subText = '';
+                        const dateStr = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                         if (item.type === 'present') {
                             statusStyle = `background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
-                        } else if (item.type === 'late') {
-                            statusStyle = `background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
-                        } else if (item.type === 'absent') {
-                            rowBg = '#fef2f2';
-                            statusStyle = `background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border:1px solid #fecaca;`;
-                            titleColor = '#b91c1c';
-                            subText = `<div style="font-size:0.75rem; color:#ef4444;">${item.details} (-5 Pts)</div>`;
-                        } else if (item.type === 'penalty') {
+                        } else if (item.type === 'penalty' || item.type === 'absent') {
+                            // Keep legacy support just in case
                             rowBg = '#fff1f2';
                             statusStyle = `background: #ffe4e6; color: #be123c; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;`;
-                            subText = `<div style="font-size:0.75rem; color:#e11d48;">${item.points} Points</div>`;
                         }
 
                         hRows += `
-                <tr style="border-bottom: 1px solid #f1f5f9; background: ${rowBg};">
-                    <td style="padding: 1rem; font-weight: 600; color: ${titleColor};">
-                        ${item.title}
-                        ${subText}
-                    </td>
-                    <td style="padding: 1rem; color: var(--gray-600); font-size: 0.9rem;">${dateStr}</td>
-                    <td style="padding: 1rem; font-family: monospace; color: var(--primary-600);">${item.time}</td>
-                    <td style="padding: 1rem;">
-                        <span style="${statusStyle}">${item.status}</span>
-                    </td>
-                </tr>`;
+                        <tr style="border-bottom: 1px solid #f1f5f9; background: ${rowBg};">
+                            <td style="padding: 1rem; font-weight: 600; color: ${titleColor};">
+                                ${item.title}
+                                ${subText}
+                            </td>
+                            <td style="padding: 1rem; color: var(--gray-600); font-size: 0.9rem;">${dateStr}</td>
+                            <td style="padding: 1rem; font-family: monospace; color: var(--primary-600);">${item.time}</td>
+                            <td style="padding: 1rem;">
+                                <span style="${statusStyle}">${item.status}</span>
+                            </td>
+                        </tr>`;
                     });
-                    historyBody.innerHTML = hRows;
                 }
+                historyBody.innerHTML = hRows;
 
             } catch (e) {
                 console.error("History Error:", e);
@@ -6119,5 +5833,3 @@ This record is generated automatically and serves as a proof of their standing w
 </body>
 
 </html>
-
-
