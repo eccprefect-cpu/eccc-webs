@@ -3280,6 +3280,8 @@
         window.serverTimestamp = serverTimestamp;
         window.onSnapshot = onSnapshot;
         window.increment = increment;
+        window.deleteDoc = deleteDoc;
+        window.deleteField = deleteField;
 
         // --- NEW: AUTOMATIC DAILY ABSENCE PROCESSOR ---
         async function checkAndRunDailyAbsence(user) {
@@ -4881,6 +4883,7 @@
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const todayString = `${year}-${month}-${day}`;
+            const currentMonthPrefix = `${year}-${month}`;
 
             const q = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), where("date", "==", todayString), limit(1));
 
@@ -4903,7 +4906,7 @@
                 let messageText = `If you are absent today (<strong>${todayString}</strong>), please report it here.`;
                 let icon = 'fas fa-info-circle';
 
-                // NEW: Warning Message Placeholder
+                // Warning Message Placeholder
                 let warningMessageHtml = `<div id="today-absence-warning" style="margin-bottom:10px; color:#e67e22; font-size:0.9rem; font-weight:600; display:block;">
                     <i class="fas fa-satellite-dish fa-spin"></i> Checking school availability...
                 </div>`;
@@ -4916,9 +4919,9 @@
                     borderColor = '#00b894';
                     titleColor = '#2d3436';
                     titleText = status === 'late' ? 'Marked Present (Late)' : 'Marked Present';
-                    messageText = `You have successfully checked in at <strong>${timeIn}</strong>.`;
+                    messageText = `You have successfully checked in at <strong>${recordData.time_in || 'Unknown'}</strong>.`;
                     icon = 'fas fa-check-circle';
-                    warningMessageHtml = ''; // No warning if present
+                    warningMessageHtml = '';
 
                     // HERO STATUS UPDATE: CHECKED IN
                     const heroStatusEl = document.getElementById('hero-status-display');
@@ -4927,7 +4930,7 @@
                             <div class="status-badge" style="background:#dcfce7; color:#166534; border: 1px solid #bbf7d0;">
                                 <i class="fas fa-check-circle"></i> Checked In
                             </div>
-                            <div style="font-size:0.8rem; color:#166534; margin-top:4px;">In at ${timeIn}</div>
+                            <div style="font-size:0.8rem; color:#166534; margin-top:4px;">In at ${recordData.time_in || 'Unknown'}</div>
                         `;
                     }
 
@@ -4956,7 +4959,7 @@
 
                 } else {
                     // No Record (None) -> Treat as potential absence
-                    // *** CRITICAL CHANGE: DEFAULT TO DISABLED UNTIL CHECKED ***
+                    // DEFAULT TO DISABLED UNTIL CHECKED
                     isDisabled = true;
                     cardColor = '#ffffff'; // White/Neutral
                     borderColor = '#ffa726'; // Orange warning
@@ -4986,40 +4989,90 @@
                         ${warningMessageHtml}
 
                         <form id="today-absence-form" style="opacity: ${isDisabled && status === 'none' ? '0.6' : (isDisabled ? '0.6' : '1')}; pointer-events: ${isDisabled && status === 'none' ? 'none' : (isDisabled ? 'none' : 'all')};">
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <select id="today-absence-reason-select" style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; background: white;" ${isDisabled ? 'disabled' : 'required'}>
-                                    <option value="" disabled selected>Select Reason for Absence</option>
-                                    <option value="Sick">Sick / Medical</option>
-                                    <option value="Family Emergency">Family Emergency</option>
-                                    <option value="Exam / Tuition">Exam / Tuition</option>
-                                    <option value="Transport Issue">Transport Issue</option>
-                                    <option value="Official Duty">Official Duty</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <button type="submit" id="today-absence-submit-btn" style="background: ${isDisabled ? '#999' : '#d63031'}; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;" ${isDisabled ? 'disabled' : ''}>
-                                    <i class="fas fa-save"></i> ${status === 'absent' ? 'Submitted' : 'Mark Absent'}
-                                </button>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <select id="today-absence-reason-select" style="flex: 1; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; background: white;" ${isDisabled ? 'disabled' : 'required'}>
+                                        <option value="" disabled selected>Select Reason for Absence</option>
+                                        <option value="Sick">Sick / Medical (3 Days Max/Month)</option>
+                                        <option value="Family Emergency">Family Emergency</option>
+                                        <option value="Exam / Tuition">Exam / Tuition</option>
+                                        <option value="Transport Issue">Transport Issue</option>
+                                        <option value="Official Duty">Official Duty</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <button type="submit" id="today-absence-submit-btn" style="background: ${isDisabled ? '#999' : '#d63031'}; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600;" ${isDisabled ? 'disabled' : ''}>
+                                        <i class="fas fa-save"></i> ${status === 'absent' ? 'Submitted' : 'Mark Absent'}
+                                    </button>
+                                </div>
+                                <input type="text" id="today-absence-reason-other" placeholder="Please specify reason..." style="display:none; width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc;" ${isDisabled ? 'disabled' : ''}>
+                                
+                                <div id="medical-upload-container" style="display:none; background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px dashed #ffa726;">
+                                    <label style="display:block; font-size: 0.85rem; color: #d35400; margin-bottom: 5px; font-weight:600;">⚠️ Medical Slip Required (Mandatory)</label>
+                                    <div style="font-size: 0.8rem; color: #555; margin-bottom: 5px;">Upload a clear photo. AI will scan this document for verification.</div>
+                                    <input type="file" id="medical-file-input" accept="image/*" style="font-size: 0.9rem;">
+                                </div>
                             </div>
-                            <input type="text" id="today-absence-reason-other" placeholder="Please specify reason..." style="display:none; width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ccc; margin-top: 10px;" ${isDisabled ? 'disabled' : ''}>
                         </form>
                     </div>
+
+                    <!-- FAKE SCANNING MODAL -->
+                    <div id="ai-scan-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; flex-direction: column;">
+                        <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; width: 300px; box-shadow: 0 4px 15px rgba(0,255,100,0.2);">
+                            <div id="scan-animation">
+                                <i class="fas fa-microchip fa-3x" style="color: #0984e3; animation: pulse 1.5s infinite;"></i>
+                            </div>
+                            <h3 id="scan-title" style="margin: 15px 0 10px; color: #2d3436;">AI Processing</h3>
+                            <p id="scan-status" style="color:#636e72; font-size: 0.9rem;">Analyzing document structure...</p>
+                            <div style="width: 100%; background: #dfe6e9; height: 6px; border-radius: 3px; margin-top: 15px; overflow: hidden;">
+                                <div id="scan-progress" style="width: 0%; height: 100%; background: #00b894; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
                 `;
+
+                // Add CSS for pulse if not exists
+                if (!document.getElementById('pulse-anim-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'pulse-anim-style';
+                    style.innerHTML = `@keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.6; transform: scale(1); } }`;
+                    document.head.appendChild(style);
+                }
 
                 // Event Listeners
                 const reasonSelect = document.getElementById('today-absence-reason-select');
                 const reasonOther = document.getElementById('today-absence-reason-other');
+                const medicalContainer = document.getElementById('medical-upload-container');
+                const medicalInput = document.getElementById('medical-file-input');
                 const form = document.getElementById('today-absence-form');
+                const scanModal = document.getElementById('ai-scan-modal');
+                const scanTitle = document.getElementById('scan-title');
+                const scanStatus = document.getElementById('scan-status');
+                const scanProgress = document.getElementById('scan-progress');
+                const scanAnim = document.getElementById('scan-animation');
 
-                if (reasonSelect && reasonOther) {
+                if (reasonSelect) {
                     reasonSelect.addEventListener('change', () => {
-                        reasonOther.style.display = reasonSelect.value === 'Other' ? 'block' : 'none';
-                        if (reasonSelect.value === 'Other') reasonOther.required = true;
-                        else reasonOther.required = false;
+                        // Toggle Other Input
+                        if (reasonSelect.value === 'Other') {
+                            reasonOther.style.display = 'block';
+                            reasonOther.required = true;
+                        } else {
+                            reasonOther.style.display = 'none';
+                            reasonOther.required = false;
+                        }
+
+                        // Toggle Medical Input for "Sick"
+                        if (reasonSelect.value === 'Sick') {
+                            medicalContainer.style.display = 'block';
+                            // Note: We don't verify file existence here, we do it on submit
+                        } else {
+                            medicalContainer.style.display = 'none';
+                            medicalInput.value = ''; // Clear selection
+                        }
                     });
                 }
 
                 // --- SMART SCHOOL DAY CHECK ---
-                // This function will check the daily status and enable/disable the form
                 async function checkStatus() {
                     const today = new Date();
                     const y = today.getFullYear();
@@ -5036,22 +5089,19 @@
                     const warningMsg = document.getElementById('today-absence-warning');
 
                     try {
-                        // Check Active Status
                         const statusSnap = await getDoc(doc(db, "daily_status", todayStr));
                         const isDayActive = statusSnap.exists() && statusSnap.data().active;
 
                         if (!isDayActive) {
-                            // KEEP DISABLED
                             if (warningMsg) {
                                 warningMsg.innerHTML = "⚠ Today has not been activated via the Mobile App scanner. <br>Absence marking is disabled for non-school days.";
-                                warningMsg.style.color = "#d63031"; // Red
+                                warningMsg.style.color = "#d63031";
                             }
                         } else {
-                            // ENABLE
                             if (reasonSelectElement) reasonSelectElement.disabled = false;
                             if (submitBtn) {
                                 submitBtn.disabled = false;
-                                submitBtn.style.background = '#d63031'; // Restore Red Color
+                                submitBtn.style.background = '#d63031';
                             }
                             if (formElement) {
                                 formElement.style.opacity = '1';
@@ -5065,93 +5115,152 @@
                     }
                 }
 
-                // Initialize
                 checkStatus();
 
-                if (form) {
-                    form.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        // Double check disabled status
-                        if (document.getElementById('today-absence-submit-btn').disabled) return;
+                async function submitAbsence(reason, deductPoints, isVerified = false) {
+                    const btn = document.getElementById('today-absence-submit-btn');
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-                        // Use Premium Modal for Confirmation
+                    try {
+                        if (status === 'none') {
+                            const userDoc = await getDoc(doc(db, "prefects", prefectId));
+                            const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
+
+                            const attData = {
+                                prefect_id: prefectId,
+                                uid: auth.currentUser.uid,
+                                name: prefectName,
+                                date: todayString,
+                                time_in: null,
+                                time_out: null,
+                                status: "Absent",
+                                reason: reason,
+                                created_at: serverTimestamp()
+                            };
+
+                            // Mark as verified if Sick (Fake Scan passed)
+                            if (reason === 'Sick' && isVerified) {
+                                attData.medical_verification_status = 'verified_by_ai';
+                            } else if (reason === 'Sick') {
+                                attData.medical_verification_status = 'pending';
+                            }
+
+                            // NOTE: We do NOT save the Base64 image anymore for Sick leave as per new "Fake AI" requirement to save space.
+
+                            await addDoc(collection(db, "attendance"), attData);
+
+                            // Update Points
+                            await updateDoc(doc(db, "prefects", prefectId), {
+                                total_points: increment(-deductPoints)
+                            });
+
+                            // Log History
+                            await addDoc(collection(db, "points"), {
+                                prefect_id: prefectId,
+                                points: -deductPoints,
+                                reason: reason === 'Sick' ? `Sick Leave (Verified)` : `Daily Absence: ${reason}`,
+                                date: todayString,
+                                timestamp: serverTimestamp()
+                            });
+
+                        } else if (status === 'absent') {
+                            const docId = querySnapshot.docs[0].id;
+                            await updateDoc(doc(db, "attendance", docId), {
+                                reason: reason,
+                                medical_verification_status: (reason === 'Sick' && isVerified) ? 'verified_by_ai' : 'none'
+                            });
+                        }
+
+                        openModal({
+                            title: 'Success',
+                            message: `Status reported. ${deductPoints} Points deducted.`,
+                            type: 'success',
+                            onConfirm: async () => {
+                                await checkForAbsenceReason(prefectId);
+                                await fetchRecentAttendance(prefectId);
+                                fetchKeyStats(prefectId);
+                            }
+                        });
+
+
+                    } catch (err) {
+                        console.error("Submission Error:", err);
+                        openModal({ title: 'Error', message: err.message, type: 'error' });
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                }
+
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const btn = document.getElementById('today-absence-submit-btn');
+                        if (btn.disabled) return;
+
+                        let reason = reasonSelect.value;
+                        if (reason === 'Other') reason = reasonOther.value.trim();
+
+                        // --- SICK LEAVE FLOW (FAKE AI) ---
+                        if (reason === 'Sick') {
+                            // 1. Limit Check
+                            try {
+                                const qSick = query(collection(db, "attendance"), where("prefect_id", "==", prefectId), where("reason", "==", "Sick"));
+                                const snapSick = await getDocs(qSick);
+                                let monthSickCount = 0;
+                                snapSick.forEach(d => {
+                                    if (d.data().date && d.data().date.startsWith(currentMonthPrefix)) {
+                                        monthSickCount++;
+                                    }
+                                });
+                                if (monthSickCount >= 3) return alert(`Limit reached! You have already taken ${monthSickCount} sick leaves this month.`);
+                            } catch (e) { return alert("Error checking limits."); }
+
+                            // 2. Verify Upload
+                            if (medicalInput.files.length === 0) return alert("⚠️ Please upload a medical slip to proceed.");
+
+                            // 3. Fake Scan Animation
+                            scanModal.style.display = "flex";
+
+                            // Step 1: Analyzing
+                            scanTitle.innerText = "Smart Scan Initiated";
+                            scanStatus.innerText = "Analyzing document text hierarchy...";
+                            scanProgress.style.width = "20%";
+
+                            setTimeout(() => {
+                                // Step 2: Date Verification
+                                scanStatus.innerText = "Verifying dates and signatures...";
+                                scanProgress.style.width = "60%";
+                                scanAnim.innerHTML = '<i class="fas fa-search fa-3x" style="color: #6c5ce7; animation: pulse 1s infinite;"></i>';
+
+                                setTimeout(() => {
+                                    // Step 3: Success
+                                    scanStatus.innerText = "Medical slip verified successfully.";
+                                    scanProgress.style.width = "100%";
+                                    scanAnim.innerHTML = '<i class="fas fa-check-circle fa-4x" style="color: #00b894;"></i>';
+                                    scanTitle.innerText = "Verification Complete";
+                                    scanTitle.style.color = "#00b894";
+
+                                    setTimeout(() => {
+                                        // Close and Submit
+                                        scanModal.style.display = "none";
+                                        submitAbsence('Sick', 3, true); // Deduct 3
+                                    }, 2000);
+
+                                }, 5000);
+                            }, 4000);
+                            return; // Stop default flow
+                        }
+
+                        // --- OTHER FLOW (Standard) ---
                         openModal({
                             title: 'Confirm Submission',
                             message: 'Are you sure you want to report this absence? 5 Points will be deducted.',
                             type: 'confirm',
                             confirmText: 'Yes, Report',
                             onConfirm: async () => {
-                                // --- SUBMISSION LOGIC START ---
-                                const btn = document.getElementById('today-absence-submit-btn');
-                                const originalText = btn.innerHTML;
-                                btn.disabled = true;
-                                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-                                let reason = reasonSelect.value;
-                                if (reason === 'Other') reason = reasonOther.value.trim();
-
-                                try {
-                                    if (status === 'none') {
-                                        // Create new record
-                                        const userDoc = await getDoc(doc(db, "prefects", prefectId));
-                                        const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
-
-                                        await addDoc(collection(db, "attendance"), {
-                                            prefect_id: prefectId,
-                                            uid: auth.currentUser.uid,
-                                            name: prefectName,
-                                            date: todayString,
-                                            time_in: null,
-                                            time_out: null,
-                                            status: "Absent",
-                                            reason: reason,
-                                            created_at: serverTimestamp()
-                                        });
-
-                                        // --- NEW: DEDUCT 5 POINTS FOR ABSENCE WITH REASON ---
-                                        // Update Prefect Points
-                                        await updateDoc(doc(db, "prefects", prefectId), {
-                                            total_points: increment(-5)
-                                        });
-
-                                        // Log Points History
-                                        await addDoc(collection(db, "points"), {
-                                            prefect_id: prefectId,
-                                            points: -5,
-                                            reason: `Daily Absence: ${reason}`,
-                                            date: todayString,
-                                            timestamp: serverTimestamp()
-                                        });
-
-                                    } else if (status === 'absent') {
-                                        // Update existing record
-                                        const docId = querySnapshot.docs[0].id;
-                                        await updateDoc(doc(db, "attendance", docId), {
-                                            reason: reason
-                                        });
-                                    }
-
-                                    // Success Modal
-                                    openModal({
-                                        title: 'Success',
-                                        message: 'Your absence has been reported. 5 Points deducted.',
-                                        type: 'success',
-                                        onConfirm: async () => {
-                                            // Refresh UI
-                                            await checkForAbsenceReason(prefectId);
-                                            await fetchRecentAttendance(prefectId);
-                                            fetchKeyStats(prefectId);
-                                        }
-                                    });
-
-
-                                } catch (err) {
-                                    console.error("Error saving absence:", err);
-                                    openModal({ title: 'Error', message: 'Failed to save: ' + err.message, type: 'error' });
-                                    btn.disabled = false;
-                                    btn.innerHTML = originalText;
-                                }
-                                // --- SUBMISSION LOGIC END ---
+                                submitAbsence(reason, 5, false); // Deduct 5
                             }
                         });
                     });
