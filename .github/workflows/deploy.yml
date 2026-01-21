@@ -15,16 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist   # change if needed
+          path: .   # root folder (index.html තියෙන තැන)
 
   deploy:
     needs: build
