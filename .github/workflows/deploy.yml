@@ -18,7 +18,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .   # index.html තියෙන folder එක
+          path: .   # index.html තියෙන root folder එක
 
   deploy:
     needs: build
