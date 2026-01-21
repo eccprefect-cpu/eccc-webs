@@ -5124,10 +5124,15 @@
                     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
                     try {
+                        // Use Batch for Atomic Writes
+                        const batch = writeBatch(db);
+
                         if (status === 'none') {
                             const userDoc = await getDoc(doc(db, "prefects", prefectId));
                             const prefectName = userDoc.exists() ? userDoc.data().name || "Unknown" : "Unknown";
 
+                            // 1. Attendance Record
+                            const attRef = doc(collection(db, "attendance"));
                             const attData = {
                                 prefect_id: prefectId,
                                 uid: auth.currentUser.uid,
@@ -5137,27 +5142,20 @@
                                 time_out: null,
                                 status: "Absent",
                                 reason: reason,
-                                created_at: serverTimestamp()
+                                created_at: serverTimestamp(),
+                                medical_verification_status: reason === 'Sick' ? (isVerified ? 'verified_by_ai' : 'pending') : 'none'
                             };
+                            batch.set(attRef, attData);
 
-                            // Mark as verified if Sick (Fake Scan passed)
-                            if (reason === 'Sick' && isVerified) {
-                                attData.medical_verification_status = 'verified_by_ai';
-                            } else if (reason === 'Sick') {
-                                attData.medical_verification_status = 'pending';
-                            }
-
-                            // NOTE: We do NOT save the Base64 image anymore for Sick leave as per new "Fake AI" requirement to save space.
-
-                            await addDoc(collection(db, "attendance"), attData);
-
-                            // Update Points
-                            await updateDoc(doc(db, "prefects", prefectId), {
+                            // 2. Deduct Points
+                            const prefectRef = doc(db, "prefects", prefectId);
+                            batch.update(prefectRef, {
                                 total_points: increment(-deductPoints)
                             });
 
-                            // Log History
-                            await addDoc(collection(db, "points"), {
+                            // 3. Log History
+                            const pointsRef = doc(collection(db, "points"));
+                            batch.set(pointsRef, {
                                 prefect_id: prefectId,
                                 points: -deductPoints,
                                 reason: reason === 'Sick' ? `Sick Leave (Verified)` : `Daily Absence: ${reason}`,
@@ -5165,7 +5163,10 @@
                                 timestamp: serverTimestamp()
                             });
 
+                            await batch.commit();
+
                         } else if (status === 'absent') {
+                            // Update existing reason (No point deduction change logic for now)
                             const docId = querySnapshot.docs[0].id;
                             await updateDoc(doc(db, "attendance", docId), {
                                 reason: reason,
@@ -5175,7 +5176,7 @@
 
                         openModal({
                             title: 'Success',
-                            message: `Status reported. ${deductPoints} Points deducted.`,
+                            message: `Status reported. ${deductPoints} Points deducted (Synced).`,
                             type: 'success',
                             onConfirm: async () => {
                                 await checkForAbsenceReason(prefectId);
