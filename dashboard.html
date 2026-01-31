@@ -3524,7 +3524,9 @@
             // Edge case: boundaries.
             // If today is 28th or 29th, the window vars above are correct for "this month's window".
 
-            const isInsideWindow = (now >= windowStart && now < windowEnd);
+            // TEMPORARY UNLOCK: Allow download today (User Request)
+            // Original: const isInsideWindow = (now >= windowStart && now < windowEnd);
+            const isInsideWindow = true; // Forced Unlock
 
             if (isInsideWindow) {
                 // UNLOCKED
@@ -3604,14 +3606,25 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // --- 1. DATE RANGE LOGIC (28th to 28th) ---
+            // --- 1. DATE RANGE LOGIC (Strictly up to 28th) ---
             const now = new Date();
             const currentDay = now.getDate();
 
-            // Assume report generated "today" is the end of the Current Cycle
-            // Cycle End: Today (should be 28th), Cycle Start: Previous Month 28th
+            // Cycle End: ALWAYS the 28th of the current month (or previous month if today < 28)
             let cycleEnd = new Date(now);
-            if (currentDay < 28) cycleEnd.setDate(28); // Force to logical 28th if testing early
+
+            if (currentDay >= 28) {
+                // If we are past the 28th (e.g. 30th), report should stop at 28th
+                cycleEnd.setDate(28);
+            } else {
+                // If today is before 28th (e.g. 5th), report is for LAST month's cycle
+                cycleEnd.setMonth(cycleEnd.getMonth() - 1);
+                cycleEnd.setDate(28);
+            }
+
+            // Set time to end of day? No, usually cycle ends at start of day or specific time. 
+            // Let's keep existing time logic or just date.
+
 
             let cycleStart = new Date(cycleEnd);
             cycleStart.setMonth(cycleStart.getMonth() - 1); // Previous Month
@@ -3636,7 +3649,11 @@
                 );
                 const snapshot = await getDocs(q);
                 return snapshot.docs.map(d => d.data()).filter(d => {
-                    return d.date >= sStr && d.date <= eStr;
+                    let dStr = d.date;
+                    if (d.date && typeof d.date === 'object' && d.date.seconds) {
+                        dStr = new Date(d.date.seconds * 1000).toISOString().split('T')[0];
+                    }
+                    return dStr >= sStr && dStr <= eStr;
                 });
             };
 
@@ -3862,64 +3879,165 @@
             doc.line(10, 75, 200, 75); // Moved UP from 90
 
             // ================= BODY =================
-            let startY = 85; // Moved UP from 105
+            let startY = 85;
+            const MAX_ITEMS = 12;
+            const ROW_HEIGHT = 8;
+            // Moved UP from 105
 
-            // SECTION A: ATTENDANCE
+            // --- 2.2 AUTO-DETECT MISSING DAYS (Fix "Samahara dawas adui") ---
+            // Create a Set of existing dates for quick lookup
+            const existingDates = new Set();
+            currentAttendance.forEach(a => {
+                const dStr = a.date && a.date.seconds ? new Date(a.date.seconds * 1000).toISOString().split('T')[0] : a.date;
+                existingDates.add(dStr);
+            });
+
+            // Iterate through the cycle
+            let dLoop = new Date(cycleStart);
+            while (dLoop <= cycleEnd) {
+                // Stop if we reach "tomorrow" (don't mark future as absent)
+                if (dLoop > now) break;
+
+                const checkStr = dLoop.toISOString().split('T')[0];
+                const dayNum = dLoop.getDay();
+
+                // Skip if already exists
+                if (!existingDates.has(checkStr)) {
+                    // Check Logic: Skip Weekends (Sat=6, Sun=0) & Holidays
+                    // Access cachedHolidays global set if available, else standard weekends
+                    const isHoliday = (typeof cachedHolidays !== 'undefined' && cachedHolidays.has(checkStr));
+                    const isWeekend = (dayNum === 0 || dayNum === 6);
+
+                    if (!isWeekend && !isHoliday) {
+                        // It's a missing school day -> Mark as Auto Absent
+                        currentAttendance.push({
+                            date: checkStr,
+                            status: 'Absent',
+                            reason: 'No Record (Auto-Detect)',
+                            auto: true
+                        });
+                        // Add to prev count if we were comparing (complex, let's leave cmp chart as is for now)
+                    }
+                }
+                dLoop.setDate(dLoop.getDate() + 1);
+            }
+
+            // Re-Sort (Newest First)
+            currentAttendance.sort((a, b) => {
+                const dateA = a.date && a.date.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
+                const dateB = b.date && b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date);
+                return dateB - dateA;
+            });
+
+
+            // --- 2.3 RE-CALCULATE COUNTS ---
+            // calc counts for summary
+            let nPresent = 0, nLate = 0, nAbsent = 0;
+            const exceptionList = []; // For the printed list
+            currentAttendance.forEach(r => {
+                let s = (r.status || '').toString().toLowerCase().trim();
+
+                // Robust Fallback using Points if Status is unclear
+                if (!s && r.points_awarded != undefined) {
+                    // Use loose equality (==) to handle string "2" vs number 2
+                    if (r.points_awarded == 2) s = 'late';
+                    else if (r.points_awarded == 4) s = 'present';
+                }
+
+                if (!s && r.time_in) s = 'present';
+
+                if (s.includes('present') || s === 'duty') {
+                    nPresent++;
+                }
+                else if (s.includes('late')) {
+                    nLate++;
+                    exceptionList.push(r);
+                }
+                else if (s.includes('absent') || s.includes('missing')) {
+                    nAbsent++;
+                    exceptionList.push(r);
+                }
+                // If we have a record that is neither present/late/absent, maybe log it?
+            });
+            const totalRecordedExclHolidays = nPresent + nLate + nAbsent;
+
+
+            // ================= BODY =================
+
+
+            // SECTION A: ATTENDANCE SUMMARY (Refined Design)
             doc.setFontSize(12);
             doc.setTextColor(...darkText);
             doc.setFont("helvetica", "bold");
             doc.setFillColor(...primaryColor);
             doc.circle(18, startY - 1, 2, 'F');
-            doc.text(`ATTENDANCE (${currCount})`, 25, startY);
+            doc.text(`ATTENDANCE OVERVIEW`, 25, startY);
 
-            doc.setFontSize(9);
-            doc.setTextColor(...growthColor);
-            doc.text(growthText, 25, startY + 5);
+            // Draw Summary Box
+            // X: 25, Y: startY+5
+            const statsY = startY + 8;
+
+            // Present Count
+            doc.setFontSize(10); doc.setTextColor(22, 101, 52); // Green
+            doc.text(`Present: ${nPresent}`, 25, statsY);
+
+            // Late Count
+            doc.setTextColor(202, 138, 4); // Yellow/Gold
+            doc.text(`Late: ${nLate}`, 60, statsY);
+
+            // Absent Count
+            doc.setTextColor(185, 28, 28); // Red
+            doc.text(`Absent: ${nAbsent}`, 90, statsY);
 
             // Timeline Line
             doc.setDrawColor(...lineColor);
             doc.setLineWidth(0.5);
-            doc.line(20, startY + 10, 20, 205); // Extended timeline slightly
+            doc.line(20, startY + 10, 20, 205);
 
-            let currentY = startY + 15;
-            const ROW_HEIGHT = 8; // Reduced from 12mm to 8mm for density
-            const MAX_ITEMS = 12; // Increased from 8 to 12
+            let currentY = startY + 20; // Adjusted for Stats Box
 
-            // Show recent records
-            let renderAtt = currentAttendance.slice(0, MAX_ITEMS);
-            if (renderAtt.length === 0) {
-                doc.setFontSize(9); doc.setTextColor(...lightText);
-                doc.text("No records this period.", 28, currentY);
-            }
-            renderAtt.forEach(record => {
-                doc.setFillColor(255, 255, 255);
-                doc.setDrawColor(...primaryColor);
-                doc.setLineWidth(1);
-                doc.circle(20, currentY, 1.5, 'FD');
-
-                doc.setFontSize(9);
-                doc.setTextColor(...darkText);
+            // LIST: ONLY EXCEPTIONS (Lassanata Summarize Method)
+            if (exceptionList.length === 0 && nPresent > 0) {
+                doc.setFontSize(10);
+                doc.setTextColor(22, 163, 74); // Green
                 doc.setFont("helvetica", "bold");
-                doc.text((record.status || 'N/A').toUpperCase(), 28, currentY + 1);
+                doc.text("✨ Perfect Attendance! Excellent!", 28, currentY);
+            } else if (totalRecordedExclHolidays === 0) {
+                doc.setFontSize(9); doc.setTextColor(...lightText);
+                doc.text("No school days recorded in this period.", 28, currentY);
+            } else {
+                // Render Exceptions
+                const renderList = exceptionList.slice(0, 10); // Top 10 bad records
+                renderList.forEach(record => {
+                    const s = (record.status || '').toLowerCase();
+                    let color = darkText;
+                    if (s === 'absent') color = [185, 28, 28];
+                    if (s === 'late') color = [202, 138, 4];
 
-                doc.setFontSize(8);
-                doc.setTextColor(...lightText);
-                doc.setFont("helvetica", "normal");
-                const dateStr = record.date && record.date.seconds
-                    ? new Date(record.date.seconds * 1000).toLocaleDateString()
-                    : record.date;
-                doc.text(`${dateStr} | ${record.reason || '-'}`, 28, currentY + 4); // Adjusted Y for tighter 8mm
-                currentY += ROW_HEIGHT;
-            });
+                    doc.setFillColor(255, 255, 255);
+                    doc.setDrawColor(...primaryColor);
+                    doc.circle(20, currentY, 1.5, 'FD');
 
-            // Overflow Indicator (Attendance)
-            if (currentAttendance.length > MAX_ITEMS) {
-                doc.setFillColor(255, 255, 255);
-                doc.circle(20, currentY, 1, 'F'); // Small dot
-                doc.setFontSize(8);
-                doc.setTextColor(...lightText);
-                doc.setFont("helvetica", "italic");
-                doc.text(`... and ${currentAttendance.length - MAX_ITEMS} more records`, 28, currentY + 2);
+                    doc.setFontSize(9);
+                    doc.setTextColor(...color);
+                    doc.setFont("helvetica", "bold");
+                    doc.text((record.status || 'N/A').toUpperCase(), 28, currentY + 1);
+
+                    doc.setFontSize(8);
+                    doc.setTextColor(...lightText);
+                    doc.setFont("helvetica", "normal");
+
+                    const dateObj = record.date && record.date.seconds ? new Date(record.date.seconds * 1000) : new Date(record.date);
+                    const dStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
+
+                    doc.text(`${dStr} | ${record.reason || '-'}`, 28, currentY + 4);
+                    currentY += 10; // More spacing for detail
+                });
+
+                if (exceptionList.length > 10) {
+                    doc.setFontSize(8); doc.setTextColor(...lightText); doc.setFont("helvetica", "italic");
+                    doc.text(`... and ${exceptionList.length - 10} more exceptions.`, 28, currentY);
+                }
             }
 
             // SECTION B: POINTS
@@ -4812,58 +4930,115 @@
                     return;
                 }
 
-                // 4. UI එක Render කිරීම
-                let html = '<div class="attendance-list-container">';
+                // 4. UI එක Render කිරීම (SUPIRI DESIGN UPDATE)
+                let html = '<div class="attendance-list-container" style="display: flex; flex-direction: column; gap: 12px;">';
 
                 allRecords.forEach(record => {
-                    let statusClass = 'neutral';
-                    let iconClass = 'fa-circle';
-                    let statusText = record.status || 'N/A';
                     const statusLower = (record.status || '').toLowerCase();
+                    let statusColor = '#64748b'; // Default Gray
+                    let statusIcon = 'fa-circle-question';
+                    let statusLabel = 'UNKNOWN';
+                    let pointsBadge = '';
+                    let detailsHtml = '';
 
-                    // Reason එකක් නැති Absent එකක් නම් විශේෂ පාටකින් පෙන්වීම
+                    // 1. Determine Status & Base Styles
                     if (record.is_missing) {
-                        statusClass = 'absent'; // රතු පාට
-                        iconClass = 'fa-question-circle'; // Question mark icon
-                        statusText = 'ABSENT (NO REASON)';
+                        statusColor = '#ef4444'; // Red
+                        statusIcon = 'fa-circle-xmark';
+                        statusLabel = 'ABSENT (MISSING)';
+                        pointsBadge = '<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-8 Pts</span>';
+                        detailsHtml = `<div style="color: #ef4444; font-size: 0.9rem;"><i class="fa-solid fa-triangle-exclamation"></i> Not Recorded</div>`;
                     }
                     else if (statusLower === 'present') {
-                        statusClass = 'present';
-                        iconClass = 'fa-check-circle';
-                    } else if (statusLower === 'late') {
-                        statusClass = 'late';
-                        iconClass = 'fa-clock';
-                    } else if (statusLower === 'absent') {
-                        statusClass = 'absent';
-                        iconClass = 'fa-times-circle';
+                        statusColor = '#22c55e'; // Green
+                        statusIcon = 'fa-circle-check';
+                        statusLabel = 'PRESENT';
+                        pointsBadge = '<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">+4 Pts</span>';
+                        detailsHtml = `<div style="color: #334155; font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> In: <strong>${record.time_in || 'N/A'}</strong></div>`;
+                    }
+                    else if (statusLower === 'late') {
+                        statusColor = '#eab308'; // Yellow/Orange
+                        statusIcon = 'fa-clock';
+                        statusLabel = 'LATE';
+                        pointsBadge = '<span class="badge" style="background:#fef9c3; color:#a16207; border:1px solid #fde047; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">+2 Pts</span>';
+                        detailsHtml = `<div style="color: #334155; font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> In: <strong>${record.time_in || 'N/A'}</strong></div>`;
+                    }
+                    else if (statusLower === 'absent') {
+                        // Check if excused (points_awarded logic or reason)
+                        const isExcused = (record.points_awarded === -5) || (record.reason && record.reason.toLowerCase().includes('excused'));
+
+                        if (isExcused) {
+                            statusColor = '#f59e0b'; // Amber
+                            statusIcon = 'fa-file-circle-check'; // Excused icon
+                            statusLabel = 'EXCUSED';
+                            pointsBadge = '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-5 Pts</span>';
+                        } else {
+                            statusColor = '#ef4444'; // Red
+                            statusIcon = 'fa-circle-xmark';
+                            statusLabel = 'ABSENT';
+                            pointsBadge = '<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-8 Pts</span>';
+                        }
+                        detailsHtml = `<div style="color: #64748b; font-size: 0.9rem; font-style: italic;">${record.reason || 'No reason provided'}</div>`;
                     }
 
-                    // වේලාව හෝ හේතුව පෙන්වීම
-                    let timeDisplay = record.time_in || '';
-                    if (!timeDisplay) {
-                        if (record.is_missing) timeDisplay = "Record not found";
-                        else if (statusLower === 'absent') timeDisplay = record.reason || 'No reason';
+                    // Check for Issues (Additional deductions)
+                    if (record.issues && Array.isArray(record.issues) && record.issues.length > 0) {
+                        const issueCount = record.issues.length;
+                        const deduction = issueCount * 1.5;
+                        pointsBadge += ` <span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; margin-left: 4px; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">-${deduction} Issues</span>`;
+                        detailsHtml += `<div style="color: #dc2626; font-size: 0.85rem; margin-top: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> ${record.issues.join(', ')}</div>`;
                     }
 
-                    // දිනය Format කිරීම (Display සඳහා)
+                    // Date Formatting
                     const dateObj = record.date && record.date.seconds ? new Date(record.date.seconds * 1000) : new Date(record.date);
-                    const dateDisplay = dateObj.toLocaleDateString();
+                    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                    const dayNum = dateObj.getDate();
+                    const monthName = dateObj.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
 
+                    // HTML Card Component
                     html += `
-                    <div class="attendance-card-item ${statusClass}">
-                        <div class="attendance-info-group">
-                            <div class="attendance-icon-wrapper">
-                                <i class="fas ${iconClass}"></i>
-                            </div>
-                            <div>
-                                <span class="attendance-date-text">${dateDisplay}</span>
-                                <span class="attendance-time-text">${timeDisplay}</span>
-                            </div>
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        background: white; 
+                        border-radius: 12px; 
+                        padding: 12px 16px; 
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+                        border-left: 5px solid ${statusColor};
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        
+                        <!-- DATE BOX -->
+                        <div style="
+                            display: flex; 
+                            flex-direction: column; 
+                            align-items: center; 
+                            justify-content: center; 
+                            min-width: 50px; 
+                            margin-right: 16px; 
+                            color: #64748b;
+                        ">
+                            <span style="font-size: 0.75rem; font-weight: 700;">${monthName}</span>
+                            <span style="font-size: 1.5rem; font-weight: 800; line-height: 1; color: #334155;">${dayNum}</span>
+                            <span style="font-size: 0.7rem; font-weight: 600;">${dayName}</span>
                         </div>
-                        <div class="attendance-status-badge">${statusText}</div>
-                    </div>
-                    `;
+
+                        <!-- CONTENT -->
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid ${statusIcon}" style="color: ${statusColor}; font-size: 1.1rem;"></i>
+                                    <span style="font-weight: 700; color: ${statusColor}; font-size: 1rem;">${statusLabel}</span>
+                                </div>
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
+                                    ${pointsBadge}
+                                </div>
+                            </div>
+                            ${detailsHtml}
+                        </div>
+                    </div>`;
                 });
+
                 html += '</div>';
                 attendanceList.innerHTML = html;
 
