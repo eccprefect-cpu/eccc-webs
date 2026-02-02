@@ -3355,9 +3355,15 @@
                             timestamp: serverTimestamp()
                         });
 
-                        // Optional: Create Absent Record
-                        // const attRef = doc(collection(db, "attendance"));
-                        // batch.set(attRef, { ... });
+                        // Create Absent Record so it shows in Stats!
+                        const attRef = doc(collection(db, "attendance"));
+                        batch.set(attRef, {
+                            prefect_id: pid,
+                            date: yesterdayStr,
+                            status: 'Absent',
+                            reason: 'Unexcused (Auto-Detected)',
+                            timestamp: serverTimestamp()
+                        });
 
                         opsCount++;
                     }
@@ -3510,54 +3516,10 @@
 
         function updateDownloadButtonState() {
             if (!btnDownloadReport) return;
-
-            const now = new Date();
-            const currentDay = now.getDate();
-            const currentMonth = now.getMonth(); // 0-11
-            const currentYear = now.getFullYear();
-
-            // Target Window: 28th 00:01 to 29th 00:01
-            // Check if WE ARE CURRENTLY inside the window
-            let windowStart = new Date(currentYear, currentMonth, 28, 0, 1, 0);
-            let windowEnd = new Date(currentYear, currentMonth, 29, 0, 1, 0);
-
-            // Edge case: boundaries.
-            // If today is 28th or 29th, the window vars above are correct for "this month's window".
-
-            // TEMPORARY UNLOCK: Allow download today (User Request)
-            // Original: const isInsideWindow = (now >= windowStart && now < windowEnd);
-            const isInsideWindow = true; // Forced Unlock
-
-            if (isInsideWindow) {
-                // UNLOCKED
-                btnDownloadReport.disabled = false;
-                btnDownloadReport.classList.remove('disabled-countdown');
-                btnDownloadReport.innerHTML = '<i class="fas fa-file-download"></i> Download Monthly Report';
-            } else {
-                // LOCKED - Calculate Next Unlock
-                btnDownloadReport.disabled = true;
-                btnDownloadReport.classList.add('disabled-countdown');
-
-                // Determine NEXT start date
-                let nextUnlock = new Date(windowStart);
-                if (now >= windowEnd) {
-                    // Missed this month's window, next is next month
-                    nextUnlock.setMonth(nextUnlock.getMonth() + 1);
-                } else if (now < windowStart) {
-                    // Not yet reached this month's window
-                    nextUnlock = windowStart;
-                }
-
-                const diff = nextUnlock - now;
-
-                // Format diff
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                btnDownloadReport.innerHTML = `<i class="fas fa-lock"></i> Next Unlock: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-            }
+            // ALWAYS UNLOCKED
+            btnDownloadReport.disabled = false;
+            btnDownloadReport.classList.remove('disabled-countdown');
+            btnDownloadReport.innerHTML = '<i class="fas fa-file-download"></i> Download Monthly Report';
         }
 
         // Initialize
@@ -3606,28 +3568,21 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // --- 1. DATE RANGE LOGIC (Strictly up to 28th) ---
+            // --- 1. DATE RANGE LOGIC (28th to 28th) ---
             const now = new Date();
             const currentDay = now.getDate();
 
-            // Cycle End: ALWAYS the 28th of the current month (or previous month if today < 28)
-            let cycleEnd = new Date(now);
+            // Default: End of this month's cycle (This Month 28th)
+            let cycleEnd = new Date(now.getFullYear(), now.getMonth(), 28);
 
-            if (currentDay >= 28) {
-                // If we are past the 28th (e.g. 30th), report should stop at 28th
-                cycleEnd.setDate(28);
-            } else {
-                // If today is before 28th (e.g. 5th), report is for LAST month's cycle
+            // If we are before the 28th, we want the PREVIOUS month's cycle
+            // e.g. If today is Feb 2nd, the "Current Cycle" is Dec 28 - Jan 28
+            if (currentDay < 28) {
                 cycleEnd.setMonth(cycleEnd.getMonth() - 1);
-                cycleEnd.setDate(28);
             }
 
-            // Set time to end of day? No, usually cycle ends at start of day or specific time. 
-            // Let's keep existing time logic or just date.
-
-
             let cycleStart = new Date(cycleEnd);
-            cycleStart.setMonth(cycleStart.getMonth() - 1); // Previous Month
+            cycleStart.setMonth(cycleStart.getMonth() - 1); // Previous Month 28th
 
             // Previous Cycle (for comparison)
             let prevCycleEnd = new Date(cycleStart);
@@ -3639,27 +3594,37 @@
 
             // --- 2. DATA FETCHING ---
 
+            // Helper: Format Date to YYYY-MM-DD (Local)
+            const formatDateLocal = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const sStr = formatDateLocal(cycleStart);
+            const eStr = formatDateLocal(cycleEnd);
+            const psStr = formatDateLocal(prevCycleStart);
+            const peStr = formatDateLocal(prevCycleEnd);
+
             // Helper: Fetch Attendance in Range
-            const getAttendanceInPeriod = async (start, end) => {
-                const sStr = start.toISOString().split('T')[0];
-                const eStr = end.toISOString().split('T')[0];
-                // Optimization: Fetch all for user and filter in JS to avoid Composite Index errors
+            const getAttendanceInPeriod = async (startStr, endStr) => {
                 const q = query(collection(db, "attendance"),
                     where("prefect_id", "==", prefect.id)
                 );
                 const snapshot = await getDocs(q);
                 return snapshot.docs.map(d => d.data()).filter(d => {
+                    // Handle Timestamp or String
                     let dStr = d.date;
-                    if (d.date && typeof d.date === 'object' && d.date.seconds) {
-                        dStr = new Date(d.date.seconds * 1000).toISOString().split('T')[0];
+                    if (d.date && d.date.seconds) {
+                        dStr = formatDateLocal(new Date(d.date.seconds * 1000));
                     }
-                    return dStr >= sStr && dStr <= eStr;
+                    return dStr >= startStr && dStr <= endStr;
                 });
             };
 
-
-            const currentAttendance = await getAttendanceInPeriod(cycleStart, cycleEnd);
-            const prevAttendance = await getAttendanceInPeriod(prevCycleStart, prevCycleEnd);
+            const currentAttendance = await getAttendanceInPeriod(sStr, eStr);
+            const prevAttendance = await getAttendanceInPeriod(psStr, peStr);
 
             // Sort (Newest First)
             currentAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -3680,11 +3645,13 @@
             let pointsRecords = [];
             pointsSnap.forEach(d => {
                 const data = d.data();
-                const dDate = new Date(data.date);
-                // Flexible parsing if date is string or timestamp
-                const pDate = data.date && data.date.seconds ? new Date(data.date.seconds * 1000) : new Date(data.date);
+                let pStr = data.date;
+                if (data.date && data.date.seconds) {
+                    pStr = formatDateLocal(new Date(data.date.seconds * 1000));
+                }
 
-                if (pDate >= cycleStart && pDate <= cycleEnd) {
+                // Compare Strings YYYY-MM-DD
+                if (pStr >= sStr && pStr <= eStr) {
                     pointsRecords.push(data);
                 }
             });
@@ -3879,93 +3846,9 @@
             doc.line(10, 75, 200, 75); // Moved UP from 90
 
             // ================= BODY =================
-            let startY = 85;
-            const MAX_ITEMS = 12;
-            const ROW_HEIGHT = 8;
-            // Moved UP from 105
+            let startY = 85; // Moved UP from 105
 
-            // --- 2.2 AUTO-DETECT MISSING DAYS (Fix "Samahara dawas adui") ---
-            // Create a Set of existing dates for quick lookup
-            const existingDates = new Set();
-            currentAttendance.forEach(a => {
-                const dStr = a.date && a.date.seconds ? new Date(a.date.seconds * 1000).toISOString().split('T')[0] : a.date;
-                existingDates.add(dStr);
-            });
-
-            // Iterate through the cycle
-            let dLoop = new Date(cycleStart);
-            while (dLoop <= cycleEnd) {
-                // Stop if we reach "tomorrow" (don't mark future as absent)
-                if (dLoop > now) break;
-
-                const checkStr = dLoop.toISOString().split('T')[0];
-                const dayNum = dLoop.getDay();
-
-                // Skip if already exists
-                if (!existingDates.has(checkStr)) {
-                    // Check Logic: Skip Weekends (Sat=6, Sun=0) & Holidays
-                    // Access cachedHolidays global set if available, else standard weekends
-                    const isHoliday = (typeof cachedHolidays !== 'undefined' && cachedHolidays.has(checkStr));
-                    const isWeekend = (dayNum === 0 || dayNum === 6);
-
-                    if (!isWeekend && !isHoliday) {
-                        // It's a missing school day -> Mark as Auto Absent
-                        currentAttendance.push({
-                            date: checkStr,
-                            status: 'Absent',
-                            reason: 'No Record (Auto-Detect)',
-                            auto: true
-                        });
-                        // Add to prev count if we were comparing (complex, let's leave cmp chart as is for now)
-                    }
-                }
-                dLoop.setDate(dLoop.getDate() + 1);
-            }
-
-            // Re-Sort (Newest First)
-            currentAttendance.sort((a, b) => {
-                const dateA = a.date && a.date.seconds ? new Date(a.date.seconds * 1000) : new Date(a.date);
-                const dateB = b.date && b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date);
-                return dateB - dateA;
-            });
-
-
-            // --- 2.3 RE-CALCULATE COUNTS ---
-            // calc counts for summary
-            let nPresent = 0, nLate = 0, nAbsent = 0;
-            const exceptionList = []; // For the printed list
-            currentAttendance.forEach(r => {
-                let s = (r.status || '').toString().toLowerCase().trim();
-
-                // Robust Fallback using Points if Status is unclear
-                if (!s && r.points_awarded != undefined) {
-                    // Use loose equality (==) to handle string "2" vs number 2
-                    if (r.points_awarded == 2) s = 'late';
-                    else if (r.points_awarded == 4) s = 'present';
-                }
-
-                if (!s && r.time_in) s = 'present';
-
-                if (s.includes('present') || s === 'duty') {
-                    nPresent++;
-                }
-                else if (s.includes('late')) {
-                    nLate++;
-                    exceptionList.push(r);
-                }
-                else if (s.includes('absent') || s.includes('missing')) {
-                    nAbsent++;
-                    exceptionList.push(r);
-                }
-                // If we have a record that is neither present/late/absent, maybe log it?
-            });
-            const totalRecordedExclHolidays = nPresent + nLate + nAbsent;
-
-
-            // ================= BODY =================
-
-
-            // SECTION A: ATTENDANCE SUMMARY (Refined Design)
+            // SECTION A: ATTENDANCE
             doc.setFontSize(12);
             doc.setTextColor(...darkText);
             doc.setFont("helvetica", "bold");
@@ -3973,71 +3856,69 @@
             doc.circle(18, startY - 1, 2, 'F');
             doc.text(`ATTENDANCE OVERVIEW`, 25, startY);
 
-            // Draw Summary Box
-            // X: 25, Y: startY+5
-            const statsY = startY + 8;
+            // Calculate granular stats
+            const countP = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'present').length;
+            const countL = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'late').length;
+            const countA = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'absent').length;
 
-            // Present Count
-            doc.setFontSize(10); doc.setTextColor(22, 101, 52); // Green
-            doc.text(`Present: ${nPresent}`, 25, statsY);
+            doc.setFontSize(10);
 
-            // Late Count
-            doc.setTextColor(202, 138, 4); // Yellow/Gold
-            doc.text(`Late: ${nLate}`, 60, statsY);
+            // Present (Green)
+            doc.setTextColor(0, 128, 0); // Green
+            doc.text(`Present: ${countP}`, 25, startY + 6);
 
-            // Absent Count
+            // Late (Gold)
+            doc.setTextColor(180, 83, 9); // Dark Gold
+            doc.text(`Late: ${countL}`, 55, startY + 6);
+
+            // Absent (Red)
             doc.setTextColor(185, 28, 28); // Red
-            doc.text(`Absent: ${nAbsent}`, 90, statsY);
+            doc.text(`Absent: ${countA}`, 80, startY + 6);
 
             // Timeline Line
             doc.setDrawColor(...lineColor);
             doc.setLineWidth(0.5);
-            doc.line(20, startY + 10, 20, 205);
+            doc.line(20, startY + 10, 20, 205); // Extended timeline slightly
 
-            let currentY = startY + 20; // Adjusted for Stats Box
+            let currentY = startY + 15;
+            const ROW_HEIGHT = 8; // Reduced from 12mm to 8mm for density
+            const MAX_ITEMS = 12; // Increased from 8 to 12
 
-            // LIST: ONLY EXCEPTIONS (Lassanata Summarize Method)
-            if (exceptionList.length === 0 && nPresent > 0) {
-                doc.setFontSize(10);
-                doc.setTextColor(22, 163, 74); // Green
-                doc.setFont("helvetica", "bold");
-                doc.text("✨ Perfect Attendance! Excellent!", 28, currentY);
-            } else if (totalRecordedExclHolidays === 0) {
+            // Show recent records
+            let renderAtt = currentAttendance.slice(0, MAX_ITEMS);
+            if (renderAtt.length === 0) {
                 doc.setFontSize(9); doc.setTextColor(...lightText);
-                doc.text("No school days recorded in this period.", 28, currentY);
-            } else {
-                // Render Exceptions
-                const renderList = exceptionList.slice(0, 10); // Top 10 bad records
-                renderList.forEach(record => {
-                    const s = (record.status || '').toLowerCase();
-                    let color = darkText;
-                    if (s === 'absent') color = [185, 28, 28];
-                    if (s === 'late') color = [202, 138, 4];
+                doc.text("No records this period.", 28, currentY);
+            }
+            renderAtt.forEach(record => {
+                doc.setFillColor(255, 255, 255);
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(1);
+                doc.circle(20, currentY, 1.5, 'FD');
 
-                    doc.setFillColor(255, 255, 255);
-                    doc.setDrawColor(...primaryColor);
-                    doc.circle(20, currentY, 1.5, 'FD');
+                doc.setFontSize(9);
+                doc.setTextColor(...darkText);
+                doc.setFont("helvetica", "bold");
+                doc.text((record.status || 'N/A').toUpperCase(), 28, currentY + 1);
 
-                    doc.setFontSize(9);
-                    doc.setTextColor(...color);
-                    doc.setFont("helvetica", "bold");
-                    doc.text((record.status || 'N/A').toUpperCase(), 28, currentY + 1);
+                doc.setFontSize(8);
+                doc.setTextColor(...lightText);
+                doc.setFont("helvetica", "normal");
+                const dateStr = record.date && record.date.seconds
+                    ? new Date(record.date.seconds * 1000).toLocaleDateString()
+                    : record.date;
+                doc.text(`${dateStr} | ${record.reason || '-'}`, 28, currentY + 4); // Adjusted Y for tighter 8mm
+                currentY += ROW_HEIGHT;
+            });
 
-                    doc.setFontSize(8);
-                    doc.setTextColor(...lightText);
-                    doc.setFont("helvetica", "normal");
-
-                    const dateObj = record.date && record.date.seconds ? new Date(record.date.seconds * 1000) : new Date(record.date);
-                    const dStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' });
-
-                    doc.text(`${dStr} | ${record.reason || '-'}`, 28, currentY + 4);
-                    currentY += 10; // More spacing for detail
-                });
-
-                if (exceptionList.length > 10) {
-                    doc.setFontSize(8); doc.setTextColor(...lightText); doc.setFont("helvetica", "italic");
-                    doc.text(`... and ${exceptionList.length - 10} more exceptions.`, 28, currentY);
-                }
+            // Overflow Indicator (Attendance)
+            if (currentAttendance.length > MAX_ITEMS) {
+                doc.setFillColor(255, 255, 255);
+                doc.circle(20, currentY, 1, 'F'); // Small dot
+                doc.setFontSize(8);
+                doc.setTextColor(...lightText);
+                doc.setFont("helvetica", "italic");
+                doc.text(`... and ${currentAttendance.length - MAX_ITEMS} more records`, 28, currentY + 2);
             }
 
             // SECTION B: POINTS
@@ -4166,14 +4047,19 @@
                 console.error("Graph Error:", e);
             }
 
-            // C1. COMPARISON CHART (Replaces Duty Log)
+
+            // C2. MONTHLY PERFORMANCE GROWTH (Bottom Left - Restored)
             try {
                 // 1. Calculate Previous Period Points
                 let prevPointsTotal = 0;
                 pointsSnap.forEach(d => {
                     const data = d.data();
-                    const pDate = data.date && data.date.seconds ? new Date(data.date.seconds * 1000) : new Date(data.date);
-                    if (pDate >= prevCycleStart && pDate <= prevCycleEnd) {
+                    let pStr = data.date;
+                    if (data.date && data.date.seconds) {
+                        pStr = formatDateLocal(new Date(data.date.seconds * 1000));
+                    }
+                    // Compare Strings YYYY-MM-DD
+                    if (pStr >= psStr && pStr <= peStr) {
                         prevPointsTotal += (parseInt(data.points) || 0);
                     }
                 });
@@ -4181,11 +4067,6 @@
                 // Calculate Current Period Points
                 let currPointsTotal = 0;
                 pointsRecords.forEach(r => currPointsTotal += (parseInt(r.points) || 0));
-
-                // 2. Prepare Data for Chart
-                // Labels: Attendance, Points
-                // Dataset 1 (Prev): [prevCount, prevPointsTotal]
-                // Dataset 2 (Curr): [currCount, currPointsTotal]
 
                 const compCanvas = document.createElement('canvas');
                 compCanvas.width = 400;
@@ -4245,34 +4126,95 @@
                 });
 
                 const compImg = compCanvas.toDataURL('image/png');
-
-                // Add to PDF (Left Side of Footer)
-                // Footer Rect starts at Y=215. Height=82.
-                // Place at X=10, Y=220, W=80, H=45
-                doc.addImage(compImg, 'PNG', 10, 220, 80, 45);
+                // Place: Top Left of Footer Area (Page 1)
+                doc.addImage(compImg, 'PNG', 15, 220, 80, 40);
 
             } catch (cmpErr) {
                 console.error("Comparison Chart Error:", cmpErr);
-                // Fallback Text if chart fails
-                doc.setFontSize(9);
-                doc.setTextColor(...darkText);
-                doc.text("Performance Comparison Data Unavailable", 15, 240);
             }
 
-            // C2. SIGNATURE (Bottom Right)
+            // --- PAGE 2: DUTY LOG & SIGNATURE ---
+            doc.addPage();
+
+            // SECTION C: DUTY EXECUTION LOG (MANUAL ENTRY)
+            try {
+                const dutyTableY = 40; // Top of Page 2
+
+                doc.setFontSize(11);
+                doc.setTextColor(...darkText);
+                doc.setFont("helvetica", "bold");
+                doc.text("DUTY EXECUTION LOG", 20, dutyTableY);
+
+                // Table Header
+                doc.setFillColor(240, 240, 240);
+                doc.rect(20, dutyTableY + 3, 170, 7, 'F'); // Header Bg
+
+                doc.setFontSize(9);
+                doc.setTextColor(...darkText);
+                doc.text("Date", 25, dutyTableY + 7.5);
+                doc.text("Duty Description", 60, dutyTableY + 7.5);
+                doc.text("Verified By", 150, dutyTableY + 7.5);
+
+                // Empty Rows (5 Rows)
+                let tableCurrentY = dutyTableY + 10;
+                const tableRowHeight = 10; // Slightly larger for handwriting
+
+                for (let i = 0; i < 8; i++) { // Increased to 8 rows since we have a full page
+                    doc.setDrawColor(220, 220, 220);
+                    doc.setLineWidth(0.5);
+                    doc.line(20, tableCurrentY, 20, tableCurrentY + tableRowHeight); // Left
+                    doc.line(50, tableCurrentY, 50, tableCurrentY + tableRowHeight); // Date/Duty Sep
+                    doc.line(140, tableCurrentY, 140, tableCurrentY + tableRowHeight); // Duty/Sig Sep
+                    doc.line(190, tableCurrentY, 190, tableCurrentY + tableRowHeight); // Right
+                    doc.line(20, tableCurrentY + tableRowHeight, 190, tableCurrentY + tableRowHeight); // Bottom
+                    tableCurrentY += tableRowHeight;
+                }
+            } catch (e) {
+                console.error("Duty Table Error:", e);
+            }
+
+            /* REMOVED COMPARISON CHART LOGIC */
+            /*
+                 // 1. Calculate Previous Period Points
+            */
+            // C2. SIGNATURE SECTION (Bottom of Page 2)
+            const sigY = 270;
+            const declY = 250;
+
+            // 1. Declaration Statement
+            doc.setFontSize(10);
+            doc.setTextColor(...darkText);
+            doc.setFont("helvetica", "italic");
+            const declaration = "I hereby certify that the information in this report is true and I accept the performance evaluation.";
+            doc.text(declaration, 105, declY, { align: "center" });
+
+            // 2. Prefect Signature (Left)
             doc.setDrawColor(...darkText);
             doc.setLineWidth(0.5);
-            doc.line(130, 270, 190, 270); // Signature Line
+            doc.line(20, sigY, 80, sigY); // Line
 
             doc.setFontSize(9);
-            doc.setTextColor(...darkText);
             doc.setFont("helvetica", "bold");
-            doc.text("H.P. Or D.H.P. SIGNATURE", 160, 276, { align: "center" });
+            doc.text("PREFECT SIGNATURE", 50, sigY + 6, { align: "center" });
 
             doc.setFontSize(7);
             doc.setTextColor(...lightText);
             doc.setFont("helvetica", "normal");
-            doc.text(`Authorized by ${prefect.destiny || 'Prefect Guild'}`, 160, 281, { align: "center" });
+            doc.text(`${prefect.name || 'Student Prefect'}`, 50, sigY + 11, { align: "center" });
+
+            // 3. H.P. / D.H.P. Signature (Right)
+            doc.setDrawColor(...darkText); // Reset color
+            doc.setTextColor(...darkText); // Reset text color
+            doc.line(130, sigY, 190, sigY); // Line
+
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.text("H.P. Or D.H.P. SIGNATURE", 160, sigY + 6, { align: "center" });
+
+            doc.setFontSize(7);
+            doc.setTextColor(...lightText);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Authorized by ${prefect.destiny || 'Prefect Guild'}`, 160, sigY + 11, { align: "center" });
 
 
 
@@ -4338,8 +4280,7 @@
 
                         // --- TRIGGER DAILY PROCESSOR ---
                         checkAndRunDailyAbsence(user);
-
-
+                        repairGhostAbsences(prefectId); // Fix historical data
 
                     } else {
                         console.log("No prefect profile found for this user.");
@@ -4353,6 +4294,59 @@
                 // window.location.href = 'login.html'; // Uncomment for production
             }
         });
+
+        // --- NEW: SELF-HEALING FOR GHOST ABSENCES ---
+        async function repairGhostAbsences(uid) {
+            try {
+                // Find points deductions that look like auto-absences
+                // Filter client-side to avoid complex index requirements
+                const q = query(collection(db, "points"), where("prefect_id", "==", uid));
+                const snap = await getDocs(q);
+
+                const batch = writeBatch(db);
+                let count = 0;
+
+                // Gather date checks to run in parallel
+                const restoreList = [];
+
+                for (const d of snap.docs) {
+                    const pData = d.data();
+                    // Look for patterns: "Absent (No Record)" or similar
+                    if (pData.reason && (pData.reason.includes("Absent (No Record)") || pData.reason.includes("Auto-Process"))) {
+                        restoreList.push({ date: pData.date, pointsId: d.id });
+                    }
+                }
+
+                for (const item of restoreList) {
+                    if (!item.date) continue;
+                    // Check if attendance exists for this date
+                    const attQ = query(collection(db, "attendance"),
+                        where("prefect_id", "==", uid),
+                        where("date", "==", item.date));
+                    const attSnap = await getDocs(attQ);
+
+                    if (attSnap.empty) {
+                        // Create Missing Record!
+                        const newRef = doc(collection(db, "attendance"));
+                        batch.set(newRef, {
+                            prefect_id: uid,
+                            date: item.date,
+                            status: 'Absent',
+                            reason: 'Unexcused (Auto-Restored)',
+                            timestamp: serverTimestamp()
+                        });
+                        count++;
+                    }
+                }
+
+                if (count > 0) {
+                    await batch.commit();
+                    console.log(`System Auto-Healed: Restored ${count} missing absence records.`);
+                }
+            } catch (e) {
+                console.error("Ghost Repair Error:", e);
+            }
+        }
 
         function updateProfileUI(data) {
             const defaultImg = "meroon Transparent logo prefect.png";
@@ -4498,41 +4492,106 @@
 
         async function fetchKeyStats(prefectId) {
             // Points - Using real-time listener
-            const pointsQuery = query(collection(db, "points"), where("prefect_id", "==", prefectId));
-            onSnapshot(pointsQuery, (pointsSnapshot) => {
-                let totalPoints = 0;
-                pointsSnapshot.forEach(doc => { totalPoints += doc.data().points || 0; });
+            // Points - Using real-time listener on PREFECT DOCUMENT (Single Source of Truth)
+            // PREVIOUSLY: Summed up 'points' collection. CHANGED to trust 'total_points' in prefect doc.
+            const prefectDocRef = doc(db, "prefects", prefectId);
+            onSnapshot(prefectDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const totalPoints = data.total_points || 0;
 
-                const pointsEl = document.getElementById('total-points');
-                if (pointsEl) pointsEl.textContent = totalPoints;
+                    // Update Main Dashboard Counter
+                    const pointsEl = document.getElementById('total-points');
+                    if (pointsEl) pointsEl.textContent = totalPoints;
+
+                    // Update Profile Page Input
+                    const profileInput = document.getElementById('profile-total-points');
+                    if (profileInput) profileInput.value = totalPoints;
+
+                    // Update Header Badge (SYNCED)
+                    const heroRankEl = document.getElementById('hero-rank-display');
+                    if (heroRankEl) {
+                        let rankText = "⭐ Rookie Prefect";
+                        if (totalPoints >= 120) rankText = "💎 Platinum Prefect";
+                        else if (totalPoints >= 90) rankText = "👑 Gold Prefect";
+                        else if (totalPoints >= 80) rankText = "🥈 Silver Prefect";
+                        else if (totalPoints >= 50) rankText = "🛡️ Bronze Prefect";
+
+                        heroRankEl.innerHTML = `<strong style="color:var(--primary-600)">${rankText}</strong> • ${totalPoints} Points`;
+                    }
+                }
             }, (error) => {
-                console.error("Error listening to points:", error);
+                console.error("Error listening to prefect profile:", error);
             });
 
             // Attendance (Absences & Late & Health) - Using real-time listener
             const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
             onSnapshot(attendanceQuery, (attendanceSnapshot) => {
-                let totalAbsences = 0;
+                // --- UPDATED COUNTER LOGIC (Matches Recent Attendance List) ---
+                const existingDates = new Set();
+                let dbAbsences = 0;
                 let totalLate = 0;
                 let totalPresent = 0;
 
                 attendanceSnapshot.forEach(doc => {
                     const record = doc.data();
-                    const status = (record.status || '').toLowerCase(); // Case-insensitive comparison
+                    const status = (record.status || '').toLowerCase();
 
-                    if (status === 'absent') totalAbsences++;
+                    // Track dates to find gaps
+                    let dateStr = "";
+                    if (record.date && record.date.seconds) {
+                        dateStr = new Date(record.date.seconds * 1000).toISOString().split('T')[0];
+                    } else if (typeof record.date === 'string') {
+                        dateStr = record.date;
+                    }
+                    if (dateStr) existingDates.add(dateStr);
+
+                    // Count DB Records
+                    if (status === 'present') {
+                        totalPresent++;
+                    }
                     else if (status === 'late') {
                         totalLate++;
-                        totalPresent++; // Late counts as present for health
+                        totalPresent++;
                     }
-                    else if (status === 'present') totalPresent++;
+                    else {
+                        dbAbsences++;
+                    }
                 });
+
+                // Calculate Inferred Absences (Gaps in last 14 days)
+                let inferredAbsences = 0;
+                const today = new Date();
+
+                // Ensure holidays are loaded (optimistic check, might need refresh if not ready)
+                // We assume loadHolidays() is called elsewhere or we strictly check 
+                // but this runs real-time so it will update.
+
+                for (let i = 0; i < 14; i++) {
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+                    const dayNum = d.getDay();
+                    if (dayNum === 0 || dayNum === 6) continue; // Skip Weekend
+
+                    const checkDateStr = d.toISOString().split('T')[0];
+                    if (cachedHolidays.has(checkDateStr)) continue; // Skip Holiday
+
+                    if (!existingDates.has(checkDateStr)) {
+                        // If today is empty, don't count it yet (unless it's late night?)
+                        // "Recent Attendance" logic skips i=0 usually.
+                        if (i === 0) continue;
+                        inferredAbsences++;
+                    }
+                }
+
+                const totalAbsences = dbAbsences + inferredAbsences;
 
                 const absencesEl = document.getElementById('total-absences');
                 const lateEl = document.getElementById('total-late');
 
                 if (absencesEl) absencesEl.textContent = totalAbsences;
                 if (lateEl) lateEl.textContent = totalLate;
+
 
                 // --- Calculate Attendance Health ---
                 // Formula: (Total Present / Total Recorded Days) * 100
@@ -4592,17 +4651,17 @@
                     const labels = recentData.map(d => formatDate(d.date).split('/')[0] + '/' + formatDate(d.date).split('/')[1]); // DD/MM
                     const statusValues = recentData.map(d => {
                         const s = (d.status || '').toLowerCase();
-                        if (s === 'present') return 10; // Visualization height
-                        if (s === 'late') return 6;
-                        if (s === 'absent') return 10;
+                        if (s === 'present') return 10;
+                        if (s === 'late') return 7;
+                        if (s === 'absent') return 4;
                         return 0;
                     });
                     const statusColors = recentData.map(d => {
                         const s = (d.status || '').toLowerCase();
-                        if (s === 'present') return '#4caf50';
-                        if (s === 'late') return '#fbc02d';
-                        if (s === 'absent') return '#d63031';
-                        return '#ccc';
+                        if (s === 'present') return '#4caf50'; // Green
+                        if (s === 'late') return '#fbc02d';    // Yellow
+                        if (s === 'absent') return '#d63031';  // Red
+                        return '#ccc'; // Gray for unknown
                     });
 
                     // Render Chart.js
@@ -4630,9 +4689,9 @@
                                         label: function (context) {
                                             const val = context.raw;
                                             if (val === 10) return 'Present';
-                                            if (val === 6) return 'Late';
-                                            if (val === 2) return 'Absent';
-                                            return 'Unknown';
+                                            if (val === 7) return 'Late';
+                                            if (val === 4) return 'Absent';
+                                            return 'No Record';
                                         }
                                     }
                                 }
@@ -4930,115 +4989,58 @@
                     return;
                 }
 
-                // 4. UI එක Render කිරීම (SUPIRI DESIGN UPDATE)
-                let html = '<div class="attendance-list-container" style="display: flex; flex-direction: column; gap: 12px;">';
+                // 4. UI එක Render කිරීම
+                let html = '<div class="attendance-list-container">';
 
                 allRecords.forEach(record => {
+                    let statusClass = 'neutral';
+                    let iconClass = 'fa-circle';
+                    let statusText = record.status || 'N/A';
                     const statusLower = (record.status || '').toLowerCase();
-                    let statusColor = '#64748b'; // Default Gray
-                    let statusIcon = 'fa-circle-question';
-                    let statusLabel = 'UNKNOWN';
-                    let pointsBadge = '';
-                    let detailsHtml = '';
 
-                    // 1. Determine Status & Base Styles
+                    // Reason එකක් නැති Absent එකක් නම් විශේෂ පාටකින් පෙන්වීම
                     if (record.is_missing) {
-                        statusColor = '#ef4444'; // Red
-                        statusIcon = 'fa-circle-xmark';
-                        statusLabel = 'ABSENT (MISSING)';
-                        pointsBadge = '<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-8 Pts</span>';
-                        detailsHtml = `<div style="color: #ef4444; font-size: 0.9rem;"><i class="fa-solid fa-triangle-exclamation"></i> Not Recorded</div>`;
+                        statusClass = 'absent'; // රතු පාට
+                        iconClass = 'fa-question-circle'; // Question mark icon
+                        statusText = 'ABSENT (NO REASON)';
                     }
                     else if (statusLower === 'present') {
-                        statusColor = '#22c55e'; // Green
-                        statusIcon = 'fa-circle-check';
-                        statusLabel = 'PRESENT';
-                        pointsBadge = '<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">+4 Pts</span>';
-                        detailsHtml = `<div style="color: #334155; font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> In: <strong>${record.time_in || 'N/A'}</strong></div>`;
-                    }
-                    else if (statusLower === 'late') {
-                        statusColor = '#eab308'; // Yellow/Orange
-                        statusIcon = 'fa-clock';
-                        statusLabel = 'LATE';
-                        pointsBadge = '<span class="badge" style="background:#fef9c3; color:#a16207; border:1px solid #fde047; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">+2 Pts</span>';
-                        detailsHtml = `<div style="color: #334155; font-size: 0.9rem;"><i class="fa-regular fa-clock"></i> In: <strong>${record.time_in || 'N/A'}</strong></div>`;
-                    }
-                    else if (statusLower === 'absent') {
-                        // Check if excused (points_awarded logic or reason)
-                        const isExcused = (record.points_awarded === -5) || (record.reason && record.reason.toLowerCase().includes('excused'));
-
-                        if (isExcused) {
-                            statusColor = '#f59e0b'; // Amber
-                            statusIcon = 'fa-file-circle-check'; // Excused icon
-                            statusLabel = 'EXCUSED';
-                            pointsBadge = '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-5 Pts</span>';
-                        } else {
-                            statusColor = '#ef4444'; // Red
-                            statusIcon = 'fa-circle-xmark';
-                            statusLabel = 'ABSENT';
-                            pointsBadge = '<span class="badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">-8 Pts</span>';
-                        }
-                        detailsHtml = `<div style="color: #64748b; font-size: 0.9rem; font-style: italic;">${record.reason || 'No reason provided'}</div>`;
+                        statusClass = 'present';
+                        iconClass = 'fa-check-circle';
+                    } else if (statusLower === 'late') {
+                        statusClass = 'late';
+                        iconClass = 'fa-clock';
+                    } else if (statusLower === 'absent') {
+                        statusClass = 'absent';
+                        iconClass = 'fa-times-circle';
                     }
 
-                    // Check for Issues (Additional deductions)
-                    if (record.issues && Array.isArray(record.issues) && record.issues.length > 0) {
-                        const issueCount = record.issues.length;
-                        const deduction = issueCount * 1.5;
-                        pointsBadge += ` <span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; margin-left: 4px; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">-${deduction} Issues</span>`;
-                        detailsHtml += `<div style="color: #dc2626; font-size: 0.85rem; margin-top: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> ${record.issues.join(', ')}</div>`;
+                    // වේලාව හෝ හේතුව පෙන්වීම
+                    let timeDisplay = record.time_in || '';
+                    if (!timeDisplay) {
+                        if (record.is_missing) timeDisplay = "Record not found";
+                        else if (statusLower === 'absent') timeDisplay = record.reason || 'No reason';
                     }
 
-                    // Date Formatting
+                    // දිනය Format කිරීම (Display සඳහා)
                     const dateObj = record.date && record.date.seconds ? new Date(record.date.seconds * 1000) : new Date(record.date);
-                    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-                    const dayNum = dateObj.getDate();
-                    const monthName = dateObj.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+                    const dateDisplay = dateObj.toLocaleDateString();
 
-                    // HTML Card Component
                     html += `
-                    <div style="
-                        display: flex; 
-                        align-items: center; 
-                        background: white; 
-                        border-radius: 12px; 
-                        padding: 12px 16px; 
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-                        border-left: 5px solid ${statusColor};
-                        transition: transform 0.2s;
-                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                        
-                        <!-- DATE BOX -->
-                        <div style="
-                            display: flex; 
-                            flex-direction: column; 
-                            align-items: center; 
-                            justify-content: center; 
-                            min-width: 50px; 
-                            margin-right: 16px; 
-                            color: #64748b;
-                        ">
-                            <span style="font-size: 0.75rem; font-weight: 700;">${monthName}</span>
-                            <span style="font-size: 1.5rem; font-weight: 800; line-height: 1; color: #334155;">${dayNum}</span>
-                            <span style="font-size: 0.7rem; font-weight: 600;">${dayName}</span>
-                        </div>
-
-                        <!-- CONTENT -->
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid ${statusIcon}" style="color: ${statusColor}; font-size: 1.1rem;"></i>
-                                    <span style="font-weight: 700; color: ${statusColor}; font-size: 1rem;">${statusLabel}</span>
-                                </div>
-                                <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
-                                    ${pointsBadge}
-                                </div>
+                    <div class="attendance-card-item ${statusClass}">
+                        <div class="attendance-info-group">
+                            <div class="attendance-icon-wrapper">
+                                <i class="fas ${iconClass}"></i>
                             </div>
-                            ${detailsHtml}
+                            <div>
+                                <span class="attendance-date-text">${dateDisplay}</span>
+                                <span class="attendance-time-text">${timeDisplay}</span>
+                            </div>
                         </div>
-                    </div>`;
+                        <div class="attendance-status-badge">${statusText}</div>
+                    </div>
+                    `;
                 });
-
                 html += '</div>';
                 attendanceList.innerHTML = html;
 
