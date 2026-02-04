@@ -3355,15 +3355,9 @@
                             timestamp: serverTimestamp()
                         });
 
-                        // Create Absent Record so it shows in Stats!
-                        const attRef = doc(collection(db, "attendance"));
-                        batch.set(attRef, {
-                            prefect_id: pid,
-                            date: yesterdayStr,
-                            status: 'Absent',
-                            reason: 'Unexcused (Auto-Detected)',
-                            timestamp: serverTimestamp()
-                        });
+                        // Optional: Create Absent Record
+                        // const attRef = doc(collection(db, "attendance"));
+                        // batch.set(attRef, { ... });
 
                         opsCount++;
                     }
@@ -3516,7 +3510,8 @@
 
         function updateDownloadButtonState() {
             if (!btnDownloadReport) return;
-            // ALWAYS UNLOCKED
+
+            // UNLOCKED ALWAYS (User Request)
             btnDownloadReport.disabled = false;
             btnDownloadReport.classList.remove('disabled-countdown');
             btnDownloadReport.innerHTML = '<i class="fas fa-file-download"></i> Download Monthly Report';
@@ -3525,7 +3520,7 @@
         // Initialize
         if (btnDownloadReport) {
             updateDownloadButtonState();
-            setInterval(updateDownloadButtonState, 1000); // Live Countdown
+            // No interval needed if always unlocked, but keeping structure safe
 
             btnDownloadReport.addEventListener('click', async () => {
                 // Self-Healing: If global is null, try to fetch it
@@ -3568,63 +3563,41 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // --- 1. DATE RANGE LOGIC (28th to 28th) ---
+            // --- 1. DATE RANGE LOGIC (Previous Calendar Month: 1st to End) ---
             const now = new Date();
-            const currentDay = now.getDate();
 
-            // Default: End of this month's cycle (This Month 28th)
-            let cycleEnd = new Date(now.getFullYear(), now.getMonth(), 28);
+            // Current Cycle = Last Full Month
+            // Start: 1st of Previous Month
+            let cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
-            // If we are before the 28th, we want the PREVIOUS month's cycle
-            // e.g. If today is Feb 2nd, the "Current Cycle" is Dec 28 - Jan 28
-            if (currentDay < 28) {
-                cycleEnd.setMonth(cycleEnd.getMonth() - 1);
-            }
+            // End: Last Day of Previous Month
+            let cycleEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+            // (Setting day to 0 of current month gives last day of prev month)
 
-            let cycleStart = new Date(cycleEnd);
-            cycleStart.setMonth(cycleStart.getMonth() - 1); // Previous Month 28th
-
-            // Previous Cycle (for comparison)
-            let prevCycleEnd = new Date(cycleStart);
-            let prevCycleStart = new Date(prevCycleEnd);
-            prevCycleStart.setMonth(prevCycleStart.getMonth() - 1);
+            // Previous Cycle (Month before last, for comparison)
+            let prevCycleStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+            let prevCycleEnd = new Date(now.getFullYear(), now.getMonth() - 1, 0);
 
             const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
             const cycleString = `${cycleStart.toLocaleDateString('en-US', dateOptions)} - ${cycleEnd.toLocaleDateString('en-US', dateOptions)}`;
 
             // --- 2. DATA FETCHING ---
 
-            // Helper: Format Date to YYYY-MM-DD (Local)
-            const formatDateLocal = (date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-
-            const sStr = formatDateLocal(cycleStart);
-            const eStr = formatDateLocal(cycleEnd);
-            const psStr = formatDateLocal(prevCycleStart);
-            const peStr = formatDateLocal(prevCycleEnd);
-
             // Helper: Fetch Attendance in Range
-            const getAttendanceInPeriod = async (startStr, endStr) => {
+            const getAttendanceInPeriod = async (start, end) => {
+                const sStr = start.toISOString().split('T')[0];
+                const eStr = end.toISOString().split('T')[0];
                 const q = query(collection(db, "attendance"),
                     where("prefect_id", "==", prefect.id)
                 );
                 const snapshot = await getDocs(q);
                 return snapshot.docs.map(d => d.data()).filter(d => {
-                    // Handle Timestamp or String
-                    let dStr = d.date;
-                    if (d.date && d.date.seconds) {
-                        dStr = formatDateLocal(new Date(d.date.seconds * 1000));
-                    }
-                    return dStr >= startStr && dStr <= endStr;
+                    return d.date >= sStr && d.date <= eStr;
                 });
             };
 
-            const currentAttendance = await getAttendanceInPeriod(sStr, eStr);
-            const prevAttendance = await getAttendanceInPeriod(psStr, peStr);
+            const currentAttendance = await getAttendanceInPeriod(cycleStart, cycleEnd);
+            const prevAttendance = await getAttendanceInPeriod(prevCycleStart, prevCycleEnd);
 
             // Sort (Newest First)
             currentAttendance.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -3637,21 +3610,17 @@
             let growthText = "Stable";
             let growthColor = [100, 100, 100];
             const diff = currCount - prevCount;
-            if (diff > 0) { growthText = `Increase (+${diff})`; growthColor = [22, 101, 52]; } // Green
-            if (diff < 0) { growthText = `Decrease (${diff})`; growthColor = [185, 28, 28]; } // Red
+            if (diff > 0) { growthText = `Increase (+${diff})`; growthColor = [22, 101, 52]; }
+            if (diff < 0) { growthText = `Decrease (${diff})`; growthColor = [185, 28, 28]; }
 
             // Helper: Points in Range
             const pointsSnap = await getDocs(query(collection(db, "points"), where("prefect_id", "==", prefect.id)));
             let pointsRecords = [];
             pointsSnap.forEach(d => {
                 const data = d.data();
-                let pStr = data.date;
-                if (data.date && data.date.seconds) {
-                    pStr = formatDateLocal(new Date(data.date.seconds * 1000));
-                }
+                const pDate = data.date && data.date.seconds ? new Date(data.date.seconds * 1000) : new Date(data.date);
 
-                // Compare Strings YYYY-MM-DD
-                if (pStr >= sStr && pStr <= eStr) {
+                if (pDate >= cycleStart && pDate <= cycleEnd) {
                     pointsRecords.push(data);
                 }
             });
@@ -3659,7 +3628,6 @@
 
             // Helper: Duties in Range
             let dutyRecords = [];
-            // Optimize: Fetch events in date range, then check usage
             const eventsQ = query(collection(db, "events"),
                 where("date", ">=", cycleStart.toISOString().split('T')[0]),
                 where("date", "<=", cycleEnd.toISOString().split('T')[0]));
@@ -3667,7 +3635,6 @@
             const eventsSnap = await getDocs(eventsQ);
             for (const evDoc of eventsSnap.docs) {
                 const evParams = evDoc.data();
-                // Check duties
                 const dutiesQ = query(collection(db, "event_duties"),
                     where("eventId", "==", evDoc.id),
                     where("assignedPrefectId", "==", prefect.id));
@@ -3680,7 +3647,6 @@
                     });
                 });
             }
-
 
             // --- DESIGN & RENDER ---
             const primaryColor = [114, 14, 14]; // Maroon
@@ -3696,20 +3662,20 @@
             // CENTERED NAME & DETAILS
             doc.setFontSize(32);
             doc.setTextColor(...darkText);
-            doc.text(prefect.name.split(" ")[0], 105, 26, { align: "center" }); // Was 38
+            doc.text(prefect.name.split(" ")[0], 105, 26, { align: "center" });
 
             doc.setFont("helvetica", "normal");
-            doc.text((prefect.name.split(" ").slice(1).join(" ") || ""), 105, 38, { align: "center" }); // Was 50
+            doc.text((prefect.name.split(" ").slice(1).join(" ") || ""), 105, 38, { align: "center" });
 
             doc.setFontSize(10);
             doc.setTextColor(...primaryColor);
             doc.setFont("helvetica", "bold");
-            doc.text((prefect.destiny || "PREFECT").toUpperCase(), 105, 48, { align: "center" }); // Was 60
+            doc.text((prefect.destiny || "PREFECT").toUpperCase(), 105, 48, { align: "center" });
 
             doc.setFontSize(9);
             doc.setTextColor(...lightText);
             doc.setFont("helvetica", "normal");
-            doc.text(`ID: ${prefect.school_index_number || '-'}`, 105, 58, { align: "center" }); // Was 70
+            doc.text(`ID: ${prefect.school_index_number || '-'}`, 105, 58, { align: "center" });
 
             // Rank Display
             const currentPoints = prefect.total_points || 0;
@@ -3729,27 +3695,23 @@
 
             doc.setTextColor(...lightText);
             doc.setFont("helvetica", "normal");
-            doc.text(`Period: ${cycleString}`, 105, 68, { align: "center" }); // Was 63 -> 68 due to extra line
+            doc.text(`Period: ${cycleString}`, 105, 68, { align: "center" });
 
             // 2. Profile Picture (Moved to Left)
             const profileImg = document.getElementById('header-profile-img');
             if (profileImg) {
                 try {
-                    // Create off-screen canvas for circular clipping
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const size = 520; // 52 * 10 for better quality
+                    const size = 520;
                     canvas.width = size;
                     canvas.height = size;
 
-                    // Draw circular clip path
                     ctx.beginPath();
                     ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
                     ctx.closePath();
                     ctx.clip();
 
-                    // Draw image centered and scaled to fill circle
-                    // First ensure image is loaded properly
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
                     img.src = profileImg.src;
@@ -3763,23 +3725,14 @@
                     });
 
                     ctx.drawImage(img, 0, 0, size, size);
-
-                    // Convert canvas to image data
                     const circularImg = canvas.toDataURL('image/png');
-
-                    // Add circular image to PDF (Left Aligned: X=15)
-                    // New Size: 35mm
-                    // Center X = 15 + 17.5 = 32.5
-                    // Center Y = 15 + 17.5 = 32.5
                     doc.addImage(circularImg, 'PNG', 15, 15, 35, 35);
 
-                    // Add white border ring
                     doc.setDrawColor(255, 255, 255);
                     doc.setLineWidth(2);
                     doc.circle(32.5, 32.5, 17.5, 'S');
                 } catch (e) {
                     console.error("PDF Image Error:", e);
-                    // Fallback: draw maroon circle with initials
                     doc.setFillColor(...primaryColor);
                     doc.circle(32.5, 32.5, 17.5, 'F');
                     doc.setTextColor(255, 255, 255);
@@ -3804,7 +3757,7 @@
             const sumTxt = `Report Period: ${cycleString}. Attendance: ${growthText}. Total Points: ${prefect.total_points}. Duties: ${dutyRecords.length}.`;
             doc.text(doc.splitTextToSize(sumTxt, 50), 195, 29, { align: "right" });
 
-            // --- 4. NEW FEATURE: RANK PROGRESS BAR ---
+            // --- 4. RANK PROGRESS BAR ---
             const points = prefect.total_points || 0;
             const tiers = [
                 { name: "Rookie", min: 0 },
@@ -3814,39 +3767,31 @@
                 { name: "Platinum", min: 120 }
             ];
             let nextTier = tiers.find(t => t.min > points);
-            if (!nextTier) nextTier = { name: "Max Rank", min: points }; // Reached top
+            if (!nextTier) nextTier = { name: "Max Rank", min: points };
             let prevTier = tiers[[...tiers].reverse().findIndex(t => t.min <= points)];
             if (!prevTier) prevTier = tiers[0];
-            // Fix logic to find correct previous tier strictly
-            // Simpler: Just get next tier. % is (points / nextTier.min) * 100
 
-            // Calculate Percentage
-            // Simple: 0 to Next Goal
             let progressPercent = 100;
             if (nextTier.min > 0) {
                 progressPercent = Math.min((points / nextTier.min) * 100, 100);
             }
 
-            // Draw Bar (Below Summary) Y=40
             doc.setFontSize(7);
             doc.setTextColor(...lightText);
             doc.text(`Next Rank: ${nextTier.name} (${Math.round(progressPercent)}%)`, 195, 38, { align: "right" });
 
-            // Background Bar
             doc.setFillColor(230, 230, 230);
             doc.roundedRect(145, 40, 50, 3, 1, 1, 'F');
 
-            // Progress Fill
-            doc.setFillColor(...primaryColor); // Maroon fill
+            doc.setFillColor(...primaryColor);
             doc.roundedRect(145, 40, (50 * progressPercent) / 100, 3, 1, 1, 'F');
 
-
-            // --- SEPARATOR & BODY START (REDUCED HEIGHT) ---
+            // --- SEPARATOR & BODY START ---
             doc.setDrawColor(230, 230, 230);
-            doc.line(10, 75, 200, 75); // Moved UP from 90
+            doc.line(10, 75, 200, 75);
 
             // ================= BODY =================
-            let startY = 85; // Moved UP from 105
+            let startY = 85;
 
             // SECTION A: ATTENDANCE
             doc.setFontSize(12);
@@ -3854,37 +3799,20 @@
             doc.setFont("helvetica", "bold");
             doc.setFillColor(...primaryColor);
             doc.circle(18, startY - 1, 2, 'F');
-            doc.text(`ATTENDANCE OVERVIEW`, 25, startY);
+            doc.text(`ATTENDANCE (${currCount})`, 25, startY);
 
-            // Calculate granular stats
-            const countP = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'present').length;
-            const countL = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'late').length;
-            const countA = currentAttendance.filter(r => (r.status || '').toLowerCase() === 'absent').length;
+            doc.setFontSize(9);
+            doc.setTextColor(...growthColor);
+            doc.text(growthText, 25, startY + 5);
 
-            doc.setFontSize(10);
-
-            // Present (Green)
-            doc.setTextColor(0, 128, 0); // Green
-            doc.text(`Present: ${countP}`, 25, startY + 6);
-
-            // Late (Gold)
-            doc.setTextColor(180, 83, 9); // Dark Gold
-            doc.text(`Late: ${countL}`, 55, startY + 6);
-
-            // Absent (Red)
-            doc.setTextColor(185, 28, 28); // Red
-            doc.text(`Absent: ${countA}`, 80, startY + 6);
-
-            // Timeline Line
             doc.setDrawColor(...lineColor);
             doc.setLineWidth(0.5);
-            doc.line(20, startY + 10, 20, 205); // Extended timeline slightly
+            doc.line(20, startY + 10, 20, 205);
 
             let currentY = startY + 15;
-            const ROW_HEIGHT = 8; // Reduced from 12mm to 8mm for density
-            const MAX_ITEMS = 12; // Increased from 8 to 12
+            const ROW_HEIGHT = 8;
+            const MAX_ITEMS = 12;
 
-            // Show recent records
             let renderAtt = currentAttendance.slice(0, MAX_ITEMS);
             if (renderAtt.length === 0) {
                 doc.setFontSize(9); doc.setTextColor(...lightText);
@@ -3907,14 +3835,13 @@
                 const dateStr = record.date && record.date.seconds
                     ? new Date(record.date.seconds * 1000).toLocaleDateString()
                     : record.date;
-                doc.text(`${dateStr} | ${record.reason || '-'}`, 28, currentY + 4); // Adjusted Y for tighter 8mm
+                doc.text(`${dateStr} | ${record.reason || '-'}`, 28, currentY + 4);
                 currentY += ROW_HEIGHT;
             });
 
-            // Overflow Indicator (Attendance)
             if (currentAttendance.length > MAX_ITEMS) {
                 doc.setFillColor(255, 255, 255);
-                doc.circle(20, currentY, 1, 'F'); // Small dot
+                doc.circle(20, currentY, 1, 'F');
                 doc.setFontSize(8);
                 doc.setTextColor(...lightText);
                 doc.setFont("helvetica", "italic");
@@ -3958,7 +3885,6 @@
                 currentY += ROW_HEIGHT;
             });
 
-            // Overflow Indicator (Points)
             if (pointsRecords.length > MAX_ITEMS) {
                 doc.setFillColor(255, 255, 255);
                 doc.circle(120, currentY, 1, 'F');
@@ -3972,20 +3898,15 @@
             doc.setFillColor(245, 245, 245);
             doc.rect(0, 215, 210, 82, 'F');
 
-            // --- 5. NEW FEATURE: POINTS GROWTH GRAPH (Moved here to be ON TOP of Footer Background) ---
+            // --- 5. POINTS GROWTH GRAPH ---
             try {
-                // 1. Prepare Data
-                // Calculate starting points for this period
                 let cyclePointsChange = 0;
                 pointsRecords.forEach(r => cyclePointsChange += (parseInt(r.points) || 0));
                 let startPoints = (prefect.total_points || 0) - cyclePointsChange;
 
-                // Create daily data points
-                // Map dates to cumulative score
                 let graphData = [{ date: cycleStart, score: startPoints }];
                 let runningScore = startPoints;
 
-                // Sort records oldest to newest for calculation
                 let sortedRecords = [...pointsRecords].sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 sortedRecords.forEach(r => {
@@ -3993,20 +3914,16 @@
                     const d = r.date && r.date.seconds ? new Date(r.date.seconds * 1000) : new Date(r.date);
                     graphData.push({ date: d, score: runningScore });
                 });
-                // Add today/end
                 graphData.push({ date: cycleEnd, score: (prefect.total_points || 0) });
 
-                // 2. Create Canvas
                 const chartCanvas = document.createElement('canvas');
                 chartCanvas.width = 600;
                 chartCanvas.height = 300;
-                // document.body.appendChild(chartCanvas); // Debug only
 
-                // 3. Render Chart
                 new Chart(chartCanvas, {
                     type: 'line',
                     data: {
-                        labels: graphData.map(d => d.date.getDate()), // Just Day numbers
+                        labels: graphData.map(d => d.date.getDate()),
                         datasets: [{
                             label: 'Points',
                             data: graphData.map(d => d.score),
@@ -4015,7 +3932,7 @@
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointRadius: 0 // Clean line
+                            pointRadius: 0
                         }]
                     },
                     options: {
@@ -4024,47 +3941,33 @@
                         plugins: { legend: { display: false } },
                         scales: {
                             x: { display: false },
-                            y: { display: false } // Minimalist sparkline style
+                            y: { display: false }
                         }
                     }
                 });
 
-                // 4. Add to PDF (Bottom Right - Above Signature)
-                // Wait for render (sync in Chart.js generally if animation: false?)
-                // Actually Chart.js is async-ish. Let's do a small wait or use toBase64Image()
-
                 const graphImg = chartCanvas.toDataURL('image/png');
-
-                // Position: Top-Right of Footer, X=130, Y=225, Width=50, Height=25
-                // Signature is at Y=270, so this leaves space
                 doc.addImage(graphImg, 'PNG', 130, 225, 50, 25);
 
                 doc.setFontSize(7);
                 doc.setTextColor(...lightText);
-                doc.text("Points Trend", 155, 255, { align: "center" }); // Centered at 130 + 25
+                doc.text("Points Trend", 155, 255, { align: "center" });
 
             } catch (e) {
                 console.error("Graph Error:", e);
             }
 
-
-            // C2. MONTHLY PERFORMANCE GROWTH (Bottom Left - Restored)
+            // C1. COMPARISON CHART
             try {
-                // 1. Calculate Previous Period Points
                 let prevPointsTotal = 0;
                 pointsSnap.forEach(d => {
                     const data = d.data();
-                    let pStr = data.date;
-                    if (data.date && data.date.seconds) {
-                        pStr = formatDateLocal(new Date(data.date.seconds * 1000));
-                    }
-                    // Compare Strings YYYY-MM-DD
-                    if (pStr >= psStr && pStr <= peStr) {
+                    const pDate = data.date && data.date.seconds ? new Date(data.date.seconds * 1000) : new Date(data.date);
+                    if (pDate >= prevCycleStart && pDate <= prevCycleEnd) {
                         prevPointsTotal += (parseInt(data.points) || 0);
                     }
                 });
 
-                // Calculate Current Period Points
                 let currPointsTotal = 0;
                 pointsRecords.forEach(r => currPointsTotal += (parseInt(r.points) || 0));
 
@@ -4080,7 +3983,7 @@
                             {
                                 label: 'Last Month',
                                 data: [prevCount, prevPointsTotal],
-                                backgroundColor: '#9ca3af', // Gray
+                                backgroundColor: '#9ca3af',
                                 borderRadius: 4,
                                 barPercentage: 0.6,
                                 categoryPercentage: 0.8
@@ -4088,7 +3991,7 @@
                             {
                                 label: 'This Month',
                                 data: [currCount, currPointsTotal],
-                                backgroundColor: '#720e0e', // Maroon
+                                backgroundColor: '#720e0e',
                                 borderRadius: 4,
                                 barPercentage: 0.6,
                                 categoryPercentage: 0.8
@@ -4126,101 +4029,30 @@
                 });
 
                 const compImg = compCanvas.toDataURL('image/png');
-                // Place: Top Left of Footer Area (Page 1)
-                doc.addImage(compImg, 'PNG', 15, 220, 80, 40);
+                doc.addImage(compImg, 'PNG', 10, 220, 80, 45);
 
             } catch (cmpErr) {
                 console.error("Comparison Chart Error:", cmpErr);
-            }
-
-            // --- PAGE 2: DUTY LOG & SIGNATURE ---
-            doc.addPage();
-
-            // SECTION C: DUTY EXECUTION LOG (MANUAL ENTRY)
-            try {
-                const dutyTableY = 40; // Top of Page 2
-
-                doc.setFontSize(11);
-                doc.setTextColor(...darkText);
-                doc.setFont("helvetica", "bold");
-                doc.text("DUTY EXECUTION LOG", 20, dutyTableY);
-
-                // Table Header
-                doc.setFillColor(240, 240, 240);
-                doc.rect(20, dutyTableY + 3, 170, 7, 'F'); // Header Bg
-
                 doc.setFontSize(9);
                 doc.setTextColor(...darkText);
-                doc.text("Date", 25, dutyTableY + 7.5);
-                doc.text("Duty Description", 60, dutyTableY + 7.5);
-                doc.text("Verified By", 150, dutyTableY + 7.5);
-
-                // Empty Rows (5 Rows)
-                let tableCurrentY = dutyTableY + 10;
-                const tableRowHeight = 10; // Slightly larger for handwriting
-
-                for (let i = 0; i < 8; i++) { // Increased to 8 rows since we have a full page
-                    doc.setDrawColor(220, 220, 220);
-                    doc.setLineWidth(0.5);
-                    doc.line(20, tableCurrentY, 20, tableCurrentY + tableRowHeight); // Left
-                    doc.line(50, tableCurrentY, 50, tableCurrentY + tableRowHeight); // Date/Duty Sep
-                    doc.line(140, tableCurrentY, 140, tableCurrentY + tableRowHeight); // Duty/Sig Sep
-                    doc.line(190, tableCurrentY, 190, tableCurrentY + tableRowHeight); // Right
-                    doc.line(20, tableCurrentY + tableRowHeight, 190, tableCurrentY + tableRowHeight); // Bottom
-                    tableCurrentY += tableRowHeight;
-                }
-            } catch (e) {
-                console.error("Duty Table Error:", e);
+                doc.text("Performance Comparison Data Unavailable", 15, 240);
             }
 
-            /* REMOVED COMPARISON CHART LOGIC */
-            /*
-                 // 1. Calculate Previous Period Points
-            */
-            // C2. SIGNATURE SECTION (Bottom of Page 2)
-            const sigY = 270;
-            const declY = 250;
-
-            // 1. Declaration Statement
-            doc.setFontSize(10);
-            doc.setTextColor(...darkText);
-            doc.setFont("helvetica", "italic");
-            const declaration = "I hereby certify that the information in this report is true and I accept the performance evaluation.";
-            doc.text(declaration, 105, declY, { align: "center" });
-
-            // 2. Prefect Signature (Left)
+            // C2. SIGNATURE
             doc.setDrawColor(...darkText);
             doc.setLineWidth(0.5);
-            doc.line(20, sigY, 80, sigY); // Line
+            doc.line(130, 270, 190, 270);
 
             doc.setFontSize(9);
+            doc.setTextColor(...darkText);
             doc.setFont("helvetica", "bold");
-            doc.text("PREFECT SIGNATURE", 50, sigY + 6, { align: "center" });
+            doc.text("H.P. Or D.H.P. SIGNATURE", 160, 276, { align: "center" });
 
             doc.setFontSize(7);
             doc.setTextColor(...lightText);
             doc.setFont("helvetica", "normal");
-            doc.text(`${prefect.name || 'Student Prefect'}`, 50, sigY + 11, { align: "center" });
+            doc.text(`Authorized by ${prefect.destiny || 'Prefect Guild'}`, 160, 281, { align: "center" });
 
-            // 3. H.P. / D.H.P. Signature (Right)
-            doc.setDrawColor(...darkText); // Reset color
-            doc.setTextColor(...darkText); // Reset text color
-            doc.line(130, sigY, 190, sigY); // Line
-
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "bold");
-            doc.text("H.P. Or D.H.P. SIGNATURE", 160, sigY + 6, { align: "center" });
-
-            doc.setFontSize(7);
-            doc.setTextColor(...lightText);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Authorized by ${prefect.destiny || 'Prefect Guild'}`, 160, sigY + 11, { align: "center" });
-
-
-
-
-
-            // Old Performance Analytics Section Removed to prevent overlap with new Duty Log & Points Graph
             // Save
             const reportMonth = cycleEnd.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
             doc.save(`Monthly_Report_${reportMonth}_${prefect.name}.pdf`);
@@ -4280,7 +4112,8 @@
 
                         // --- TRIGGER DAILY PROCESSOR ---
                         checkAndRunDailyAbsence(user);
-                        repairGhostAbsences(prefectId); // Fix historical data
+
+
 
                     } else {
                         console.log("No prefect profile found for this user.");
@@ -4294,59 +4127,6 @@
                 // window.location.href = 'login.html'; // Uncomment for production
             }
         });
-
-        // --- NEW: SELF-HEALING FOR GHOST ABSENCES ---
-        async function repairGhostAbsences(uid) {
-            try {
-                // Find points deductions that look like auto-absences
-                // Filter client-side to avoid complex index requirements
-                const q = query(collection(db, "points"), where("prefect_id", "==", uid));
-                const snap = await getDocs(q);
-
-                const batch = writeBatch(db);
-                let count = 0;
-
-                // Gather date checks to run in parallel
-                const restoreList = [];
-
-                for (const d of snap.docs) {
-                    const pData = d.data();
-                    // Look for patterns: "Absent (No Record)" or similar
-                    if (pData.reason && (pData.reason.includes("Absent (No Record)") || pData.reason.includes("Auto-Process"))) {
-                        restoreList.push({ date: pData.date, pointsId: d.id });
-                    }
-                }
-
-                for (const item of restoreList) {
-                    if (!item.date) continue;
-                    // Check if attendance exists for this date
-                    const attQ = query(collection(db, "attendance"),
-                        where("prefect_id", "==", uid),
-                        where("date", "==", item.date));
-                    const attSnap = await getDocs(attQ);
-
-                    if (attSnap.empty) {
-                        // Create Missing Record!
-                        const newRef = doc(collection(db, "attendance"));
-                        batch.set(newRef, {
-                            prefect_id: uid,
-                            date: item.date,
-                            status: 'Absent',
-                            reason: 'Unexcused (Auto-Restored)',
-                            timestamp: serverTimestamp()
-                        });
-                        count++;
-                    }
-                }
-
-                if (count > 0) {
-                    await batch.commit();
-                    console.log(`System Auto-Healed: Restored ${count} missing absence records.`);
-                }
-            } catch (e) {
-                console.error("Ghost Repair Error:", e);
-            }
-        }
 
         function updateProfileUI(data) {
             const defaultImg = "meroon Transparent logo prefect.png";
@@ -4492,106 +4272,41 @@
 
         async function fetchKeyStats(prefectId) {
             // Points - Using real-time listener
-            // Points - Using real-time listener on PREFECT DOCUMENT (Single Source of Truth)
-            // PREVIOUSLY: Summed up 'points' collection. CHANGED to trust 'total_points' in prefect doc.
-            const prefectDocRef = doc(db, "prefects", prefectId);
-            onSnapshot(prefectDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const totalPoints = data.total_points || 0;
+            const pointsQuery = query(collection(db, "points"), where("prefect_id", "==", prefectId));
+            onSnapshot(pointsQuery, (pointsSnapshot) => {
+                let totalPoints = 0;
+                pointsSnapshot.forEach(doc => { totalPoints += doc.data().points || 0; });
 
-                    // Update Main Dashboard Counter
-                    const pointsEl = document.getElementById('total-points');
-                    if (pointsEl) pointsEl.textContent = totalPoints;
-
-                    // Update Profile Page Input
-                    const profileInput = document.getElementById('profile-total-points');
-                    if (profileInput) profileInput.value = totalPoints;
-
-                    // Update Header Badge (SYNCED)
-                    const heroRankEl = document.getElementById('hero-rank-display');
-                    if (heroRankEl) {
-                        let rankText = "⭐ Rookie Prefect";
-                        if (totalPoints >= 120) rankText = "💎 Platinum Prefect";
-                        else if (totalPoints >= 90) rankText = "👑 Gold Prefect";
-                        else if (totalPoints >= 80) rankText = "🥈 Silver Prefect";
-                        else if (totalPoints >= 50) rankText = "🛡️ Bronze Prefect";
-
-                        heroRankEl.innerHTML = `<strong style="color:var(--primary-600)">${rankText}</strong> • ${totalPoints} Points`;
-                    }
-                }
+                const pointsEl = document.getElementById('total-points');
+                if (pointsEl) pointsEl.textContent = totalPoints;
             }, (error) => {
-                console.error("Error listening to prefect profile:", error);
+                console.error("Error listening to points:", error);
             });
 
             // Attendance (Absences & Late & Health) - Using real-time listener
             const attendanceQuery = query(collection(db, "attendance"), where("prefect_id", "==", prefectId));
             onSnapshot(attendanceQuery, (attendanceSnapshot) => {
-                // --- UPDATED COUNTER LOGIC (Matches Recent Attendance List) ---
-                const existingDates = new Set();
-                let dbAbsences = 0;
+                let totalAbsences = 0;
                 let totalLate = 0;
                 let totalPresent = 0;
 
                 attendanceSnapshot.forEach(doc => {
                     const record = doc.data();
-                    const status = (record.status || '').toLowerCase();
+                    const status = (record.status || '').toLowerCase(); // Case-insensitive comparison
 
-                    // Track dates to find gaps
-                    let dateStr = "";
-                    if (record.date && record.date.seconds) {
-                        dateStr = new Date(record.date.seconds * 1000).toISOString().split('T')[0];
-                    } else if (typeof record.date === 'string') {
-                        dateStr = record.date;
-                    }
-                    if (dateStr) existingDates.add(dateStr);
-
-                    // Count DB Records
-                    if (status === 'present') {
-                        totalPresent++;
-                    }
+                    if (status === 'absent') totalAbsences++;
                     else if (status === 'late') {
                         totalLate++;
-                        totalPresent++;
+                        totalPresent++; // Late counts as present for health
                     }
-                    else {
-                        dbAbsences++;
-                    }
+                    else if (status === 'present') totalPresent++;
                 });
-
-                // Calculate Inferred Absences (Gaps in last 14 days)
-                let inferredAbsences = 0;
-                const today = new Date();
-
-                // Ensure holidays are loaded (optimistic check, might need refresh if not ready)
-                // We assume loadHolidays() is called elsewhere or we strictly check 
-                // but this runs real-time so it will update.
-
-                for (let i = 0; i < 14; i++) {
-                    const d = new Date();
-                    d.setDate(today.getDate() - i);
-                    const dayNum = d.getDay();
-                    if (dayNum === 0 || dayNum === 6) continue; // Skip Weekend
-
-                    const checkDateStr = d.toISOString().split('T')[0];
-                    if (cachedHolidays.has(checkDateStr)) continue; // Skip Holiday
-
-                    if (!existingDates.has(checkDateStr)) {
-                        // If today is empty, don't count it yet (unless it's late night?)
-                        // "Recent Attendance" logic skips i=0 usually.
-                        if (i === 0) continue;
-                        inferredAbsences++;
-                    }
-                }
-
-                const totalAbsences = dbAbsences + inferredAbsences;
 
                 const absencesEl = document.getElementById('total-absences');
                 const lateEl = document.getElementById('total-late');
 
                 if (absencesEl) absencesEl.textContent = totalAbsences;
                 if (lateEl) lateEl.textContent = totalLate;
-
 
                 // --- Calculate Attendance Health ---
                 // Formula: (Total Present / Total Recorded Days) * 100
@@ -4651,17 +4366,17 @@
                     const labels = recentData.map(d => formatDate(d.date).split('/')[0] + '/' + formatDate(d.date).split('/')[1]); // DD/MM
                     const statusValues = recentData.map(d => {
                         const s = (d.status || '').toLowerCase();
-                        if (s === 'present') return 10;
-                        if (s === 'late') return 7;
-                        if (s === 'absent') return 4;
+                        if (s === 'present') return 10; // Visualization height
+                        if (s === 'late') return 6;
+                        if (s === 'absent') return 10;
                         return 0;
                     });
                     const statusColors = recentData.map(d => {
                         const s = (d.status || '').toLowerCase();
-                        if (s === 'present') return '#4caf50'; // Green
-                        if (s === 'late') return '#fbc02d';    // Yellow
-                        if (s === 'absent') return '#d63031';  // Red
-                        return '#ccc'; // Gray for unknown
+                        if (s === 'present') return '#4caf50';
+                        if (s === 'late') return '#fbc02d';
+                        if (s === 'absent') return '#d63031';
+                        return '#ccc';
                     });
 
                     // Render Chart.js
@@ -4689,9 +4404,9 @@
                                         label: function (context) {
                                             const val = context.raw;
                                             if (val === 10) return 'Present';
-                                            if (val === 7) return 'Late';
-                                            if (val === 4) return 'Absent';
-                                            return 'No Record';
+                                            if (val === 6) return 'Late';
+                                            if (val === 2) return 'Absent';
+                                            return 'Unknown';
                                         }
                                     }
                                 }
