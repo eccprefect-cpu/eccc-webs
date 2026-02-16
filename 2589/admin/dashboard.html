@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS Console | Command Center</title>
+    <link rel="shortcut icon" href="../meroon Transparent logo prefect.png" type="image/png">
+
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Barcode Generator Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("_c_vqu57vhozvGwh5");
+        })();
+    </script>
+
+    <!-- html2canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: '#00f3ff',
+                        void: '#050505',
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                        'glass-hover': 'rgba(255, 255, 255, 0.1)',
+                        'glass-border': 'rgba(255, 255, 255, 0.1)',
+                        card: '#0f0f0f',
+                        primary: '#800000',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e5e5;
+            overflow: hidden;
+            /* Prevent body scroll, let containers scroll */
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 243, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 243, 255, 0.1);
+        }
+
+        /* Sidebar Links */
+        .sidebar-link {
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: linear-gradient(90deg, rgba(0, 243, 255, 0.1) 0%, transparent 100%);
+            border-left-color: #00f3ff;
+            color: #00f3ff;
+        }
+
+        .sidebar-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-link:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f3ff;
+        }
+
+        /* Neon Glow Text */
+        .neon-text {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body class="flex h-screen bg-[#050505] relative">
+
+    <!-- Background Gradients -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyber/5 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/5 rounded-full blur-[120px]">
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" onclick="toggleSidebar()"
+        class="fixed inset-0 bg-black/80 z-20 hidden md:hidden glass-panel"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed md:static inset-y-0 left-0 z-30 w-64 glass-panel transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center px-6 border-b border-white/10 relative overflow-hidden">
+            <div class="absolute inset-0 bg-cyber/5"></div>
+            <div class="flex items-center gap-3 relative z-10">
+                <div
+                    class="w-8 h-8 rounded bg-gradient-to-br from-cyber to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,243,255,0.3)]">
+                    <img src="../meroon Transparent logo prefect.png" alt="Logo"
+                        class="w-full h-full object-contain p-1">
+                </div>
+                <span class="font-display font-bold text-xl tracking-wider text-white">PMS <span
+                        class="text-cyber">DEV</span></span>
+            </div>
+        </div>
+
+        <!-- Role Badge -->
+        <div class="px-6 py-4">
+            <div class="bg-white/5 rounded-lg p-3 border border-white/5 flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center font-bold text-xs shadow-lg">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p id="userNameSidebar" class="text-xs font-bold text-white truncate">Loading...</p>
+                    <p id="userRoleSidebar" class="text-[10px] text-cyber uppercase tracking-wider">VERIFYING...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+            <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Main Menu</p>
+
+            <a href="#" onclick="switchTab('dashboard'); return false;" id="nav-dashboard"
+                class="sidebar-link active flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-300 group">
+                <i class="fas fa-th-large w-5 text-center mr-3 group-hover:text-cyber"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" onclick="switchTab('registration'); return false;" id="nav-registration"
+                class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-300 group">
+                <i class="fas fa-user-plus w-5 text-center mr-3 group-hover:text-cyber"></i>
+                <span class="font-medium">Registration</span>
+            </a>
+            <a href="#"
+                class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-300 group opacity-50 cursor-not-allowed"
+                title="Coming Soon">
+                <i class="fas fa-chart-line w-5 text-center mr-3 group-hover:text-cyber"></i>
+                <span class="font-medium">Analytics</span>
+            </a>
+        </nav>
+
+        <!-- Footer Actions -->
+        <div class="p-4 border-t border-white/10">
+            <button onclick="logout()"
+                class="flex items-center justify-center w-full py-2.5 px-4 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/50 transition-all text-sm font-bold gap-2 group">
+                <i class="fas fa-sign-out-alt group-hover:-translate-x-1 transition-transform"></i> Disconnect
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 bg-[#050505] relative overflow-hidden">
+
+        <!-- Background Glows -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyber/5 rounded-full blur-[120px]"></div>
+            <div
+                class="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-600/5 rounded-full blur-[120px]">
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-6 z-10 glass-card bg-black/20">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h2 class="text-xl md:text-2xl font-display font-bold text-white tracking-tight">System <span
+                        class="text-cyber">Overview</span></h2>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div
+                    class="hidden md:flex items-center text-xs text-gray-500 bg-white/5 px-3 py-1 rounded-full border border-white/5">
+                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                    SYSTEM ONLINE
+                </div>
+                <div
+                    class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-cyber border border-white/5 hover:border-cyber/30 transition cursor-pointer">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8 z-10 relative custom-scrollbar">
+
+            <!-- Stats Row -->
+            <div id="dashboard-view" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+                    <!-- Stat Card 1 -->
+                    <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div
+                            class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition">
+                        </div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Total Students
+                                </p>
+                                <h3 id="totalStudentsCore" class="text-3xl font-display font-bold text-white">Loading...
+                                </h3>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20 group-hover:scale-110 transition">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 font-mono">
+                            <span class="text-green-400 mr-2 flex items-center"><i class="fas fa-arrow-up mr-1"></i>
+                                12%</span> vs last month
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 2 -->
+                    <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div
+                            class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition">
+                        </div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Registered
+                                    Today
+                                </p>
+                                <h3 id="todayCountCore" class="text-3xl font-display font-bold text-white">Loading...
+                                </h3>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 group-hover:scale-110 transition">
+                                <i class="fas fa-calendar-day text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 font-mono">
+                            <span class="text-cyber mr-2">Live Updates</span> Auto-sync active
+                        </div>
+                    </div>
+
+                    <!-- Stat Card 3 -->
+                    <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div
+                            class="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition">
+                        </div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Server Status
+                                </p>
+                                <h3 class="text-3xl font-display font-bold text-green-400">Stable</h3>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400 border border-green-500/20 group-hover:scale-110 transition">
+                                <i class="fas fa-server text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-xs text-gray-500 font-mono">
+                            <span class="text-green-400 mr-2">99.9% Uptime</span> No issues detected
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Grid 2: Chart & Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Chart Section -->
+                    <div class="glass-card p-6 rounded-2xl lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <h4 class="font-bold text-white tracking-wide">Registration Analytics</h4>
+                            <select
+                                class="bg-black/20 border border-white/10 rounded-lg text-xs text-gray-400 px-3 py-1 outline-none focus:border-cyber">
+                                <option>Last 7 Days</option>
+                                <option>Last 30 Days</option>
+                            </select>
+                        </div>
+                        <div class="relative w-full h-[250px]">
+                            <canvas id="registrationChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-col gap-4">
+                        <a href="#" onclick="switchTab('registration'); return false;"
+                            class="glass-card p-6 rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-white/5 border border-cyber/20 hover:border-cyber">
+                            <div
+                                class="w-14 h-14 rounded-full bg-cyber/10 flex items-center justify-center text-cyber text-2xl group-hover:bg-cyber group-hover:text-black transition duration-300">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-white group-hover:text-cyber transition">New Registration</h5>
+                                <p class="text-xs text-gray-400">Launch student entry form</p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-600 group-hover:text-cyber"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Registrations (Table) -->
+                <div class="glass-card rounded-2xl overflow-hidden animate__animated animate__fadeInUp">
+                    <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black/20">
+                        <h4 class="font-bold text-white tracking-wide">Recent Registrations</h4>
+                        <button onclick="downloadExcel()"
+                            class="text-xs flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition">
+                            <i class="fas fa-file-excel"></i> Export CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-xs text-gray-500 uppercase bg-white/5">
+                                    <th class="px-6 py-4 font-bold tracking-wider">Name</th>
+                                    <th class="px-6 py-4 font-bold tracking-wider">Class</th>
+                                    <th class="px-6 py-4 font-bold tracking-wider">Date</th>
+                                    <th class="px-6 py-4 font-bold tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-white/5" id="recentStudentsTable">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500 italic">
+                                        <i class="fas fa-circle-notch animate-spin mr-2"></i> Loading data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div> <!-- End Dashboard View -->
+
+            <!-- Registration View (New Integrated Tab) -->
+            <div id="registration-view" class="hidden animate__animated animate__fadeIn">
+                <div class="glass-card p-6 md:p-8 rounded-2xl border border-white/10 relative overflow-hidden">
+                    <!-- Background Decoration -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-cyber/5 rounded-full blur-3xl pointer-events-none">
+                    </div>
+
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-8 relative z-10">
+                        <div>
+                            <h2 class="text-2xl font-display font-bold text-white mb-2">New Student Registration</h2>
+                            <p class="text-gray-400 text-sm">Enter student details to generate unique barcode ID</p>
+                        </div>
+                        <button onclick="switchTab('dashboard')"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition text-sm border border-white/5">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+
+                    <!-- Success Message (Hidden by default) -->
+                    <div id="registrationSuccess"
+                        class="hidden mb-8 p-6 rounded-xl bg-green-500/10 border border-green-500/20 text-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-green-500/5 blur-xl"></div>
+                        <div class="relative z-10">
+                            <div
+                                class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 text-green-400 text-2xl border border-green-500/30 shadow-[0_0_30px_rgba(74,222,128,0.2)]">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2">Registration Successful!</h3>
+                            <p class="text-green-300 mb-6">Student has been added to the system.</p>
+
+                            <div class="bg-black/40 rounded-lg p-4 max-w-sm mx-auto border border-white/10 mb-6 group cursor-pointer"
+                                onclick="copyBarcode()">
+                                <p class="text-xs text-gray-500 uppercase tracking-widest mb-2">Generated Barcode ID</p>
+                                <h4 id="newBarcodeDisplay"
+                                    class="text-2xl font-mono font-bold text-cyber mb-2 tracking-wider">
+                                    Loading...</h4>
+                                <div
+                                    class="text-xs text-gray-400 group-hover:text-white transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-copy"></i> Click to Copy
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center gap-4">
+                                <button onclick="resetForm()"
+                                    class="px-6 py-2 rounded-full bg-cyber/10 text-cyber border border-cyber/20 hover:bg-cyber hover:text-black transition font-bold text-sm">
+                                    <i class="fas fa-plus mr-2"></i> Register Another
+                                </button>
+                                <button onclick="switchTab('dashboard')"
+                                    class="px-6 py-2 rounded-full bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 transition font-bold text-sm">
+                                    Dashboard
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="integratedStudentForm" class="relative z-10">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- Personal Info -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-cyber font-bold text-sm uppercase tracking-widest border-b border-white/10 pb-2 mb-4">
+                                    Personal Details</h4>
+
+                                <div class="group">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">FULL
+                                        NAME *</label>
+                                    <input type="text" name="name" required
+                                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                        placeholder="e.g. A.B. Perera">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">CLASS
+                                            *</label>
+                                        <input type="text" name="class" required
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                            placeholder="e.g. 12-A">
+                                    </div>
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">GENDER
+                                            *</label>
+                                        <select name="gender" required
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition appearance-none">
+                                            <option value="" class="bg-black text-gray-500">Select...</option>
+                                            <option value="Male" class="bg-card">Male</option>
+                                            <option value="Female" class="bg-card">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="group">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">EMAIL
+                                        ADDRESS</label>
+                                    <input type="email" name="email"
+                                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                        placeholder="student@example.com">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">PHONE</label>
+                                        <input type="tel" name="phone"
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                            placeholder="07x xxx xxxx">
+                                    </div>
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">PARENT
+                                            PHONE</label>
+                                        <input type="tel" name="parents_phone"
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                            placeholder="07x xxx xxxx">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- School Info -->
+                            <div class="space-y-4">
+                                <h4
+                                    class="text-cyber font-bold text-sm uppercase tracking-widest border-b border-white/10 pb-2 mb-4">
+                                    Prefect Details</h4>
+
+                                <div class="group">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">PREFECT
+                                        UNIQUE ID *</label>
+                                    <input type="text" name="prefect_unique_id" required
+                                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                        placeholder="Unique System ID">
+                                </div>
+
+                                <div class="group">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">POST
+                                        / DESTINY *</label>
+                                    <select name="destiny"
+                                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition appearance-none">
+                                        <option value="" class="bg-black">Select Post...</option>
+                                        <option value="Head Prefect" class="bg-card">Head Prefect</option>
+                                        <option value="Deputy Head Prefect" class="bg-card">Deputy Head Prefect</option>
+                                        <option value="Section Head Prefect" class="bg-card">Section Head Prefect
+                                        </option>
+                                        <option value="Senior Prefect" class="bg-card">Senior Prefect</option>
+                                        <option value="Junior Prefect" class="bg-card">Junior Prefect</option>
+                                        <option value="Probation Prefect" class="bg-card">Probation Prefect</option>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">SCHOOL
+                                            INDEX</label>
+                                        <input type="text" name="school_index_number"
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition placeholder-gray-700"
+                                            placeholder="Admission No">
+                                    </div>
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">SECTION</label>
+                                        <select name="section"
+                                            class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition appearance-none">
+                                            <option value="" class="bg-black">Select...</option>
+                                            <option value="Science" class="bg-card">Science</option>
+                                            <option value="Commerce" class="bg-card">Commerce</option>
+                                            <option value="Arts" class="bg-card">Arts</option>
+                                            <option value="Technology" class="bg-card">Technology</option>
+                                            <option value="10" class="bg-card">Grade 10</option>
+                                            <option value="11" class="bg-card">Grade 11</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="group">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">CURRENT
+                                        DUTY</label>
+                                    <select name="current_duty"
+                                        class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition appearance-none">
+                                        <option value="" class="bg-black">Select Duty...</option>
+                                        <option value="Near the Log books" class="bg-card">Near the Log books</option>
+                                        <option value="Main Gate" class="bg-card">Main Gate</option>
+                                        <option value="Section" class="bg-card">Section</option>
+                                        <option value="Class" class="bg-card">Class</option>
+                                        <option value="Near Primary gate" class="bg-card">Near Primary gate</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Action -->
+                        <div class="border-t border-white/10 pt-6 flex justify-end">
+                            <button type="submit" id="submitBtn"
+                                class="bg-gradient-to-r from-cyber/80 to-blue-600/80 hover:from-cyber hover:to-blue-600 text-black font-bold py-3 px-8 rounded-xl shadow-[0_0_20px_rgba(0,243,255,0.2)] hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] transition transform hover:-translate-y-1 flex items-center gap-2">
+                                <span>Register Student</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+
+        </main>
+    </div>
+
+    <!-- Firebase Logic & Core Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqO--dglz2f7xH6stf_yqzjhpJtivjYh8",
+            authDomain: "pms-registration-38fd9.firebaseapp.com",
+            projectId: "pms-registration-38fd9",
+            storageBucket: "pms-registration-38fd9.firebasestorage.app",
+            messagingSenderId: "751314316733",
+            appId: "1:751314316733:web:beb5b0377934e2339df6d4",
+            measurementId: "G-DBRLXJ0Y14",
+            databaseURL: "https://pms-registration-38fd9-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Apps Script URL (Deployed by User)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby998cTPX6-9Jdt67FLZOlYGLy5hW-iLNsa2CBVb_HTWOyvs_lBVlCSRdDdGuJV3sWNEQ/exec";
+
+        // Sidebar Toggle for Mobile
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        };
+
+        // Auth Check
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "../index.html";
+            } else {
+                const docRef = doc(db, "app_admins", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.status !== 'approved') {
+                        alert("Account Pending Approval");
+                        await signOut(auth);
+                        window.location.href = "../index.html";
+                    } else {
+                        // User Approved
+                        const name = data.fullName || user.email;
+                        const role = data.role || "Admin";
+
+                        document.getElementById('userNameSidebar').textContent = name;
+                        document.getElementById('userRoleSidebar').textContent = role;
+                    }
+                } else {
+                    alert("Profile Not Found");
+                    await signOut(auth);
+                    window.location.href = "../index.html";
+                }
+            }
+        });
+
+        // Logout
+        window.logout = () => {
+            if (confirm("Are you sure you want to disconnect?")) {
+                signOut(auth).then(() => {
+                    window.location.href = "../index.html";
+                });
+            }
+        }
+
+        // ==========================================
+        // Live Stats & Chart Data (Migrated to Firestore)
+        // ==========================================
+        const studentsCollectionRef = collection(db, "students");
+
+        let chartInstance = null;
+        let allStudentsData = []; // Store for Excel export
+
+        onSnapshot(studentsCollectionRef, (snapshot) => {
+            const students = [];
+            snapshot.forEach((doc) => {
+                students.push({ id: doc.id, ...doc.data() });
+            });
+
+            allStudentsData = students; // Update global variable
+
+            // 1. Basic Stats
+            document.getElementById('totalStudentsCore').textContent = students.length;
+
+            const todayStr = new Date().toDateString();
+            const todayCount = students.filter(s => s.registrationDate === todayStr).length;
+            document.getElementById('todayCountCore').textContent = todayCount;
+
+            // 2. Recent Table (Top 5)
+            updateRecentTable(students);
+
+            // 3. Chart Data (Last 7 Days)
+            updateChart(students);
+        }, (error) => {
+            console.error("Error getting realtime stats:", error);
+        });
+
+        function updateRecentTable(students) {
+            const tableBody = document.getElementById('recentStudentsTable');
+            tableBody.innerHTML = '';
+
+            const recent = [...students].reverse().slice(0, 5);
+
+            if (recent.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">No records found.</td></tr>';
+                return;
+            }
+
+            recent.forEach(std => {
+                const row = `
+                    <tr class="hover:bg-white/5 transition duration-200">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-cyber/10 text-cyber flex items-center justify-center text-xs font-bold mr-3">
+                                    ${std.name ? std.name.charAt(0).toUpperCase() : '?'}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-white text-sm">${std.name || 'Unknown'}</div>
+                                    <div class="text-[10px] text-gray-500">${std.email || 'No Email'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-300 text-sm">${std.class || '-'}</td>
+                        <td class="px-6 py-4 text-gray-400 text-xs font-mono">${std.registrationDate || 'N/A'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded bg-green-500/10 text-green-500 text-[10px] font-bold uppercase tracking-wider border border-green-500/20">Active</span>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        function updateChart(students) {
+            const days = [];
+            const counts = [];
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toDateString();
+                days.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+
+                const count = students.filter(s => s.registrationDate === dateStr).length;
+                counts.push(count);
+            }
+
+            const ctx = document.getElementById('registrationChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Registrations',
+                        data: counts,
+                        borderColor: '#00f3ff',
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                            gradient.addColorStop(0, 'rgba(0, 243, 255, 0.4)');
+                            gradient.addColorStop(1, 'rgba(0, 243, 255, 0)');
+                            return gradient;
+                        },
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#000',
+                        pointBorderColor: '#00f3ff',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#666', stepSize: 1 }
+                        },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // UI Logic - Tab Switching
+        // ==========================================
+        window.switchTab = (tabName) => {
+            const dashboardView = document.getElementById('dashboard-view');
+            const registrationView = document.getElementById('registration-view');
+
+            const navDashboard = document.getElementById('nav-dashboard');
+            const navRegistration = document.getElementById('nav-registration');
+
+            if (tabName === 'dashboard') {
+                dashboardView.classList.remove('hidden');
+                registrationView.classList.add('hidden');
+
+                navDashboard.classList.add('active', 'text-cyber');
+                navDashboard.classList.remove('text-gray-300');
+
+                navRegistration.classList.remove('active', 'text-cyber');
+                navRegistration.classList.add('text-gray-300');
+            }
+            else if (tabName === 'registration') {
+                dashboardView.classList.add('hidden');
+                registrationView.classList.remove('hidden');
+
+                navRegistration.classList.add('active', 'text-cyber');
+                navRegistration.classList.remove('text-gray-300');
+
+                navDashboard.classList.remove('active', 'text-cyber');
+                navDashboard.classList.add('text-gray-300');
+            }
+        };
+
+        window.resetForm = () => {
+            document.getElementById('integratedStudentForm').reset();
+            document.getElementById('registrationSuccess').classList.add('hidden');
+            document.getElementById('integratedStudentForm').classList.remove('hidden');
+        };
+
+        // ==========================================
+        // Logic - Student Registration (with Image Upload)
+        // ==========================================
+
+        function generateBarcodeId(prefectId) {
+            let randomDigits = '';
+            for (let i = 0; i < 6; i++) randomDigits += Math.floor(Math.random() * 10);
+            return `${prefectId}-${randomDigits}`;
+        }
+
+        function getTodayDate() {
+            return new Date().toDateString();
+        }
+
+        function formatDateTime() {
+            return new Date().toLocaleString('en-US', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+        }
+
+        document.getElementById('integratedStudentForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnContent = submitBtn.innerHTML;
+
+            try {
+                // Loading State
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Generating ID...';
+
+                const formData = new FormData(this);
+                const prefectId = formData.get('prefect_unique_id');
+                const barcodeId = generateBarcodeId(prefectId);
+                const name = formData.get('name');
+                const studentClass = formData.get('class');
+                const destiny = formData.get('destiny') || 'Prefect';
+
+                // ==========================
+                // 1. POPULATE & GENERATE ID CARD IMAGE
+                // ==========================
+                document.getElementById('cardName').textContent = name;
+                document.getElementById('cardRole').textContent = destiny.toUpperCase();
+                document.getElementById('cardID').textContent = barcodeId;
+                document.getElementById('cardClass').textContent = studentClass;
+
+                // GENERATE REAL BARCODE
+                try {
+                    JsBarcode("#realBarcode", barcodeId, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 40,
+                        displayValue: true,
+                        background: "#ffffff",
+                        fontSize: 14,
+                        fontOptions: "bold"
+                    });
+                } catch (e) {
+                    console.error("Barcode Error:", e);
+                }
+
+                // Show the hidden template off-screen properly is tricky, html2canvas needs it rendered.
+                // Our template is naturally hidden by position:fixed and left:-9999px which works for html2canvas.
+
+                const template = document.getElementById('idCardTemplate');
+                // Use html2canvas to snapshot the element
+                const canvas = await html2canvas(template, {
+                    scale: 2, // 2x resolution for better quality
+                    backgroundColor: null,
+                    logging: false,
+                    useCORS: true
+                });
+
+                const base64Image = canvas.toDataURL("image/png");
+
+                // ==========================
+                // 2. UPLOAD TO GOOGLE DRIVE
+                // ==========================
+                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt animate-bounce mr-2"></i> Saving to Cloud...';
+
+                let driveLink = "Pending";
+
+                try {
+                    // Send to Google Apps Script
+                    // Using text/plain content type to avoid CORS preflight issues with simple requests
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            image: base64Image,
+                            name: name,
+                            id: barcodeId
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        driveLink = result.url;
+                        console.log("Drive Upload Success:", driveLink);
+                    } else {
+                        console.warn("Drive Upload Error:", result.message);
+                        driveLink = "Upload Failed: " + result.message;
+                    }
+                } catch (err) {
+                    // Start of CORS workaround note
+                    console.warn("Drive Upload Network/CORS Issue:", err);
+                    driveLink = "Image Generated (Check Drive Folder)";
+                    // End of CORS workaround note
+                }
+
+                // ==========================
+                // 3. SAVE TO FIRESTORE
+                // ==========================
+                submitBtn.innerHTML = '<i class="fas fa-database animate-pulse mr-2"></i> Registering...';
+
+                const studentData = {
+                    name: name,
+                    gender: formData.get('gender'),
+                    class: studentClass,
+                    barcode_id: barcodeId,
+                    destiny: destiny,
+                    email: formData.get('email') || 'N/A',
+                    phone: formData.get('phone') || 'N/A',
+                    parents_phone: formData.get('parents_phone') || 'N/A',
+                    current_duty: formData.get('current_duty') || 'N/A',
+                    school_index_number: formData.get('school_index_number') || 'N/A',
+                    prefect_unique_id: prefectId,
+                    section: formData.get('section') || 'N/A',
+                    id_card_url: driveLink, // Store the Drive Link
+                    dateTime: formatDateTime(),
+                    registrationDate: getTodayDate(),
+                    timestamp: new Date().toISOString()
+                };
+
+                // Check for undefined values
+                Object.keys(studentData).forEach(key => {
+                    if (studentData[key] === undefined) {
+                        studentData[key] = null;
+                    }
+                });
+
+                if (!db) {
+                    throw new Error("Firestore DB connection not initialized.");
+                }
+
+                await addDoc(collection(db, "students"), studentData);
+
+                // ==========================
+                // 4. SEND EMAIL
+                // ==========================
+                if (studentData.email && studentData.email !== 'N/A') {
+                    const templateParams = {
+                        email: studentData.email,
+                        name: studentData.name,
+                        barcode: studentData.barcode_id,
+                        class: studentData.class,
+                        prefect_id: studentData.prefect_unique_id,
+                        id_link: driveLink // Pass the Drive Link to Email Template
+                    };
+
+                    emailjs.send('service_mghsyrc', 'template_g0s6s4x', templateParams)
+                        .then(function (response) {
+                            console.log('EMAIL SUCCESS!', response.status, response.text);
+                        }, function (error) {
+                            console.error('EMAIL FAILED...', error);
+                        });
+                }
+
+                // Success UI
+                document.getElementById('integratedStudentForm').classList.add('hidden');
+                document.getElementById('registrationSuccess').classList.remove('hidden');
+                document.getElementById('newBarcodeDisplay').textContent = barcodeId;
+
+            } catch (err) {
+                console.error('Registration Error:', err);
+                alert('An error occurred: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = btnContent;
+            }
+        });
+
+        window.downloadExcel = () => {
+            if (!allStudentsData || allStudentsData.length === 0) {
+                alert('No data available to export!');
+                return;
+            }
+            const exportData = allStudentsData.map((student) => ({
+                'name': student.name || '',
+                'class': student.class || '',
+                'barcode_id': student.barcode_id || '',
+                'role': student.destiny || '',
+                'email': student.email || '',
+                'phone': student.phone || '',
+                'parents_phone': student.parents_phone || '',
+                'current_duty': student.current_duty || '',
+                'school_index_number': student.school_index_number || '',
+                'prefect_unique_id': student.prefect_unique_id || '',
+                'section': student.section || '',
+                'id_card_link': student.id_card_url || ''
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Students");
+            XLSX.writeFile(wb, "ECCPMS_Student_Data.xlsx");
+        };
+
+        window.copyBarcode = () => {
+            const text = document.getElementById('newBarcodeDisplay').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        };
+    </script>
+
+    <!-- Hidden ID Card Template -->
+    <!-- This is rendered off-screen but visible to the browser engine for capturing -->
+    <div id="idCardTemplate"
+        style="position: fixed; left: -9999px; top: 0; width: 600px; height: 350px; background: #000; overflow: hidden; font-family: 'Space Grotesk', sans-serif; border-radius: 20px; border: 2px solid #00f3ff; box-sizing: border-box;">
+
+        <!-- Background Graphics -->
+        <div
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 100% 0%, #00f3ff22 0%, #000 50%); z-index: 1;">
+        </div>
+        <div
+            style="position: absolute; bottom: 0; right: 0; width: 300px; height: 300px; background: #80000044; filter: blur(60px); border-radius: 50%; z-index: 1;">
+        </div>
+
+        <!-- "TEMPORARY" Watermark/Stamp -->
+        <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; font-weight: 900; color: rgba(255, 255, 255, 0.03); z-index: 0; white-space: nowrap; letter-spacing: 10px; pointer-events: none;">
+            TEMPORARY
+        </div>
+
+        <!-- Content -->
+        <div
+            style="position: relative; z-index: 10; padding: 30px; display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <!-- Logo (Assuming file exists in parent dir) -->
+                    <img src="../meroon Transparent logo prefect.png"
+                        style="width: 50px; height: 50px; object-fit: contain;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: white; letter-spacing: 1px;">
+                            ECC <span style="color: #00f3ff;">PMS</span></h2>
+                        <span
+                            style="font-size: 10px; color: #ffeb3b; letter-spacing: 2px; background: rgba(255, 235, 59, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 235, 59, 0.3); font-weight: bold;">TEMPORARY
+                            IDENTITY</span>
+                    </div>
+                </div>
+                <div
+                    style="border: 1px solid #00f3ff; color: #00f3ff; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold;">
+                    VALID: 30 DAYS
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div style="display: flex; gap: 30px; margin-top: 20px;">
+                <!-- Avatar Placeholder -->
+                <div
+                    style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a1a1a, #0d0d0d); border-radius: 15px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                    <i class="fas fa-user-clock" style="font-size: 40px; color: #555;"></i>
+                    <!-- Corner ribbon -->
+                    <div style="position: absolute; bottom: 0; width: 100%; background: #00f3ff; height: 5px;"></div>
+                </div>
+
+                <div style="flex: 1;">
+                    <h1 id="cardName"
+                        style="margin: 0 0 5px 0; font-size: 28px; color: white; text-transform: uppercase; line-height: 1.1;">
+                        Student Name</h1>
+                    <p id="cardRole"
+                        style="margin: 0; color: #00f3ff; font-size: 16px; font-weight: bold; text-transform: uppercase;">
+                        Prefect</p>
+
+                    <div style="display: flex; gap: 20px; margin-top: 25px;">
+                        <div>
+                            <span
+                                style="display: block; font-size: 10px; color: #666; font-weight: bold; letter-spacing: 1px;">CLASS</span>
+                            <span id="cardClass" style="color: #ddd; font-size: 16px; font-weight: 500;">12-A</span>
+                        </div>
+                        <div>
+                            <span
+                                style="display: block; font-size: 10px; color: #666; font-weight: bold; letter-spacing: 1px;">ID
+                                NUMBER</span>
+                            <span id="cardID" style="color: #ddd; font-size: 16px; font-weight: 500;">123456</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div
+                style="margin-top: auto; border-top: 1px solid #333; padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 9px; color: #555; line-height: 1.4;">
+                    ISSUED FOR TEMPORARY USE ONLY<br>
+                    PROPERTY OF ECC PMS ADMIN
+                </div>
+                <div
+                    style="background: white; padding: 5px 10px; border-radius: 6px; display: flex; align-items: center; justify-content: center; min-width: 150px;">
+                    <!-- Real Barcode SVG -->
+                    <svg id="realBarcode" style="width: 100%; height: 35px; display: block;"></svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
