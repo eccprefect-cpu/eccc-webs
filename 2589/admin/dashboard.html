@@ -575,19 +575,30 @@
                                         <option value="Near Primary gate" class="bg-card">Near Primary gate</option>
                                     </select>
                                 </div>
+                                </select>
+                            </div>
+
+                            <div class="group">
+                                <label
+                                    class="block text-xs font-bold text-gray-500 mb-1 ml-1 group-focus-within:text-cyber transition">STUDENT
+                                    PHOTO *</label>
+                                <input type="file" name="student_photo" id="studentPhotoInput" accept="image/*" required
+                                    class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-cyber focus:outline-none focus:ring-1 focus:ring-cyber/30 transition text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-cyber/10 file:text-cyber hover:file:bg-cyber/20">
+                                <p class="text-[10px] text-gray-600 mt-1 ml-1">Upload a clear face photo (JPG/PNG)</p>
                             </div>
                         </div>
-
-                        <!-- Submit Action -->
-                        <div class="border-t border-white/10 pt-6 flex justify-end">
-                            <button type="submit" id="submitBtn"
-                                class="bg-gradient-to-r from-cyber/80 to-blue-600/80 hover:from-cyber hover:to-blue-600 text-black font-bold py-3 px-8 rounded-xl shadow-[0_0_20px_rgba(0,243,255,0.2)] hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] transition transform hover:-translate-y-1 flex items-center gap-2">
-                                <span>Register Student</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </form>
                 </div>
+
+                <!-- Submit Action -->
+                <div class="border-t border-white/10 pt-6 flex justify-end">
+                    <button type="submit" id="submitBtn"
+                        class="bg-gradient-to-r from-cyber/80 to-blue-600/80 hover:from-cyber hover:to-blue-600 text-black font-bold py-3 px-8 rounded-xl shadow-[0_0_20px_rgba(0,243,255,0.2)] hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] transition transform hover:-translate-y-1 flex items-center gap-2">
+                        <span>Register Student</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                </form>
+            </div>
 
 
         </main>
@@ -597,7 +608,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Config
         const firebaseConfig = {
@@ -615,8 +626,37 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Apps Script URL (Deployed by User)
+        // ==========================================
+        // ORIGINAL DATABASE CONFIG (To be added)
+        // ==========================================
+        const firebaseConfigOriginal = {
+            apiKey: "AIzaSyCEvF1sD56pmtYlbno4QAY_Kr5xeFrTAvU",
+            authDomain: "prefect-management-syste-e1575.firebaseapp.com",
+            projectId: "prefect-management-syste-e1575",
+            storageBucket: "prefect-management-syste-e1575.firebasestorage.app",
+            messagingSenderId: "973932803095",
+            appId: "1:973932803095:web:a7f2db386cafb53330d852",
+            measurementId: "G-FLF7R3B8J3"
+        };
+
+        // Initialize Secondary App (Original DB)
+        let dbOriginal = null;
+        try {
+            const appOriginal = initializeApp(firebaseConfigOriginal, "originalDB");
+            dbOriginal = getFirestore(appOriginal);
+        } catch (e) {
+            console.warn("Original DB Config missing or invalid. Dual write will be skipped.", e);
+        }
+
+        // ==========================================
+        // API CONFIGURATION
+        // ==========================================
+
+        // Google Apps Script URL (Existing)
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby998cTPX6-9Jdt67FLZOlYGLy5hW-iLNsa2CBVb_HTWOyvs_lBVlCSRdDdGuJV3sWNEQ/exec";
+
+        // ImgBB API Key
+        const IMGBB_API_KEY = "15bafc3c0e843f52e278843362b9a56c";
 
         // Sidebar Toggle for Mobile
         window.toggleSidebar = () => {
@@ -856,6 +896,37 @@
             });
         }
 
+        // Helper: Upload to ImgBB
+        async function uploadToImgBB(base64Image) {
+            if (!IMGBB_API_KEY) {
+                console.warn("ImgBB API Key is missing. Skipping ImgBB upload.");
+                return "";
+            }
+
+            try {
+                // Remove header if present (e.g. data:image/png;base64,)
+                const base64Data = base64Image.split(',')[1];
+                const formData = new FormData();
+                formData.append("image", base64Data);
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    return data.data.url;
+                } else {
+                    console.error("ImgBB Upload Failed:", data);
+                    return "";
+                }
+            } catch (error) {
+                console.error("ImgBB Error:", error);
+                return "";
+            }
+        }
+
         document.getElementById('integratedStudentForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -865,7 +936,7 @@
             try {
                 // Loading State
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Generating ID...';
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin mr-2"></i> Processing...';
 
                 const formData = new FormData(this);
                 const prefectId = formData.get('prefect_unique_id');
@@ -881,6 +952,32 @@
                 document.getElementById('cardRole').textContent = destiny.toUpperCase();
                 document.getElementById('cardID').textContent = barcodeId;
                 document.getElementById('cardClass').textContent = studentClass;
+
+                // Handle Photo (Preview and Upload Logic)
+                const photoInput = document.getElementById('studentPhotoInput');
+                let studentPhotoBase64 = null;
+
+                if (photoInput.files && photoInput.files[0]) {
+                    const file = photoInput.files[0];
+                    const reader = new FileReader();
+
+                    await new Promise((resolve, reject) => {
+                        reader.onload = function (e) {
+                            studentPhotoBase64 = e.target.result;
+                            // Update Card Template
+                            document.getElementById('cardPhoto').src = studentPhotoBase64;
+                            document.getElementById('cardPhoto').style.display = 'block';
+                            document.getElementById('cardIcon').style.display = 'none';
+                            resolve();
+                        };
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    // Reset to default if no photo
+                    document.getElementById('cardPhoto').style.display = 'none';
+                    document.getElementById('cardIcon').style.display = 'block';
+                }
 
                 // GENERATE REAL BARCODE
                 try {
@@ -898,13 +995,10 @@
                     console.error("Barcode Error:", e);
                 }
 
-                // Show the hidden template off-screen properly is tricky, html2canvas needs it rendered.
-                // Our template is naturally hidden by position:fixed and left:-9999px which works for html2canvas.
-
                 const template = document.getElementById('idCardTemplate');
                 // Use html2canvas to snapshot the element
                 const canvas = await html2canvas(template, {
-                    scale: 2, // 2x resolution for better quality
+                    scale: 2, // 2x resolution
                     backgroundColor: null,
                     logging: false,
                     useCORS: true
@@ -913,50 +1007,55 @@
                 const base64Image = canvas.toDataURL("image/png");
 
                 // ==========================
-                // 2. UPLOAD TO GOOGLE DRIVE
+                // 2. UPLOAD TO CLOUD (Concurrent)
                 // ==========================
-                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt animate-bounce mr-2"></i> Saving to Cloud...';
+                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt animate-bounce mr-2"></i> Uploading...';
 
+                // We have two images to deal with:
+                // 1. base64Image -> The Generated ID Card (Goes to Drive)
+                // 2. studentPhotoBase64 -> The Student's Face Photo (Goes to ImgBB and Original DB)
+
+                // Start uploads
+                const driveUploadPromise = fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        image: base64Image,
+                        name: name,
+                        id: barcodeId
+                    })
+                }).then(res => res.json()).catch(err => ({ status: 'error', message: err.toString() }));
+
+                // Upload student photo to ImgBB (if exists)
+                const imgbbUploadPromise = studentPhotoBase64 ? uploadToImgBB(studentPhotoBase64) : Promise.resolve("");
+
+                // Wait for results
+                const [driveResult, imgbbLink] = await Promise.all([driveUploadPromise, imgbbUploadPromise]);
+
+                // Process Drive Result
                 let driveLink = "Pending";
-
-                try {
-                    // Send to Google Apps Script
-                    // Using text/plain content type to avoid CORS preflight issues with simple requests
-                    const response = await fetch(GOOGLE_SCRIPT_URL, {
-                        method: "POST",
-                        body: JSON.stringify({
-                            image: base64Image,
-                            name: name,
-                            id: barcodeId
-                        })
-                    });
-
-                    const result = await response.json();
-
-                    if (result.status === 'success') {
-                        driveLink = result.url;
-                        console.log("Drive Upload Success:", driveLink);
-                    } else {
-                        console.warn("Drive Upload Error:", result.message);
-                        driveLink = "Upload Failed: " + result.message;
-                    }
-                } catch (err) {
-                    // Start of CORS workaround note
-                    console.warn("Drive Upload Network/CORS Issue:", err);
-                    driveLink = "Image Generated (Check Drive Folder)";
-                    // End of CORS workaround note
+                if (driveResult.status === 'success') {
+                    driveLink = driveResult.url;
+                    console.log("Drive Upload Success:", driveLink);
+                } else {
+                    console.warn("Drive Upload Issue:", driveResult.message);
+                    driveLink = "Image Generated (Check Drive)";
                 }
 
-                // ==========================
-                // 3. SAVE TO FIRESTORE
-                // ==========================
-                submitBtn.innerHTML = '<i class="fas fa-database animate-pulse mr-2"></i> Registering...';
+                console.log("ImgBB Link Generated:", imgbbLink);
 
-                const studentData = {
+                // ==========================
+                // 3. SAVE TO DATABASES
+                // ==========================
+                submitBtn.innerHTML = '<i class="fas fa-database animate-pulse mr-2"></i> Saving...';
+
+                const timestamp = new Date().toISOString();
+
+                // A. SAVE TO CURRENT DB
+                const studentDataCurrent = {
                     name: name,
                     gender: formData.get('gender'),
                     class: studentClass,
-                    barcode_id: barcodeId,
+                    barcode_id: barcodeId, // Generated ID
                     destiny: destiny,
                     email: formData.get('email') || 'N/A',
                     phone: formData.get('phone') || 'N/A',
@@ -965,44 +1064,61 @@
                     school_index_number: formData.get('school_index_number') || 'N/A',
                     prefect_unique_id: prefectId,
                     section: formData.get('section') || 'N/A',
-                    id_card_url: driveLink, // Store the Drive Link
+                    id_card_url: driveLink, // Keep Drive Link for Current System
                     dateTime: formatDateTime(),
                     registrationDate: getTodayDate(),
-                    timestamp: new Date().toISOString()
+                    timestamp: timestamp
                 };
 
-                // Check for undefined values
-                Object.keys(studentData).forEach(key => {
-                    if (studentData[key] === undefined) {
-                        studentData[key] = null;
-                    }
+                // Handle undefined
+                Object.keys(studentDataCurrent).forEach(key => {
+                    if (studentDataCurrent[key] === undefined) studentDataCurrent[key] = null;
                 });
 
-                if (!db) {
-                    throw new Error("Firestore DB connection not initialized.");
-                }
+                await addDoc(collection(db, "students"), studentDataCurrent);
 
-                await addDoc(collection(db, "students"), studentData);
+                // B. SAVE TO ORIGINAL DB (If Configured)
+                if (dbOriginal) {
+                    const studentDataOriginal = {
+                        id: barcodeId,
+                        barcode_id: barcodeId,
+                        prefect_unique_id: prefectId,
+                        name: name,
+                        class: studentClass,
+                        destiny: destiny,
+                        email: formData.get('email') || '',
+                        phone: formData.get('phone') || '',
+                        parents_phone: formData.get('parents_phone') || '',
+                        current_duty: formData.get('current_duty') || '',
+                        school_index_number: formData.get('school_index_number') || '',
+                        section: formData.get('section') || '',
+                        picture: imgbbLink, // ImgBB URL for Original DB
+                        badges: [],
+                        fingerprint_template: "",
+                        total_points: 100, // Process Rules: Start with 100
+                        uid: ""
+                    };
+
+                    // Use setDoc to force the Document ID to be the Barcode ID (as per screenshot format)
+                    await setDoc(doc(dbOriginal, "prefects", barcodeId), studentDataOriginal);
+                    console.log("Saved to Original DB successfully");
+                }
 
                 // ==========================
                 // 4. SEND EMAIL
                 // ==========================
-                if (studentData.email && studentData.email !== 'N/A') {
+                if (studentDataCurrent.email && studentDataCurrent.email !== 'N/A') {
                     const templateParams = {
-                        email: studentData.email,
-                        name: studentData.name,
-                        barcode: studentData.barcode_id,
-                        class: studentData.class,
-                        prefect_id: studentData.prefect_unique_id,
-                        id_link: driveLink // Pass the Drive Link to Email Template
+                        email: studentDataCurrent.email,
+                        name: studentDataCurrent.name,
+                        barcode: studentDataCurrent.barcode_id,
+                        class: studentDataCurrent.class,
+                        prefect_id: studentDataCurrent.prefect_unique_id,
+                        id_link: driveLink
                     };
 
                     emailjs.send('service_mghsyrc', 'template_g0s6s4x', templateParams)
-                        .then(function (response) {
-                            console.log('EMAIL SUCCESS!', response.status, response.text);
-                        }, function (error) {
-                            console.error('EMAIL FAILED...', error);
-                        });
+                        .catch(err => console.error('Email failed:', err));
                 }
 
                 // Success UI
@@ -1097,10 +1213,13 @@
 
             <!-- Body -->
             <div style="display: flex; gap: 30px; margin-top: 20px;">
-                <!-- Avatar Placeholder -->
+                <!-- Avatar Placeholder / Photo -->
                 <div
                     style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a1a1a, #0d0d0d); border-radius: 15px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                    <i class="fas fa-user-clock" style="font-size: 40px; color: #555;"></i>
+                    <!-- Default Icon (Hidden when photo is present) -->
+                    <i id="cardIcon" class="fas fa-user-clock" style="font-size: 40px; color: #555;"></i>
+                    <!-- Real Photo -->
+                    <img id="cardPhoto" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                     <!-- Corner ribbon -->
                     <div style="position: absolute; bottom: 0; width: 100%; background: #00f3ff; height: 5px;"></div>
                 </div>
